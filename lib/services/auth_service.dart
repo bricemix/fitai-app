@@ -1,0 +1,192 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class AuthResult {
+  final bool success;
+  final String? token;
+  final Map<String, dynamic>? user;
+  final String? error;
+
+  const AuthResult({required this.success, this.token, this.user, this.error});
+}
+
+class AuthService {
+  static const String baseUrl = 'https://api.diet-vision.com/api/v1';
+  static const _tokenKey = 'dv_jwt_token';
+  static const _userKey  = 'dv_user';
+
+  // ── Session unique : notifier global ─────────────────────────────────────
+  // Lorsque le serveur répond SESSION_INVALIDATED (autre appareil connecté),
+  // on peuple ce ValueNotifier avec le message d'erreur.
+  // Le widget racine (_AppLoaderState) écoute ce notifier et déconnecte l'utilisateur.
+
+  static final ValueNotifier<String?> sessionInvalidated = ValueNotifier(null);
+
+  /// À appeler sur chaque réponse 401 reçue depuis l'API.
+  /// Retourne true si la session a été invalidée (autre appareil).
+  static Future<bool> handleUnauthorized(http.Response response) async {
+    try {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (body['code'] == 'SESSION_INVALIDATED') {
+        await clearSession();
+        sessionInvalidated.value =
+            body['error'] as String? ??
+            'Votre compte a été connecté sur un autre appareil.';
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  // ── Token ──────────────────────────────────────────────────────────────────
+
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
+  static Future<void> saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
+  }
+
+  static Future<bool> isLoggedIn() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
+  }
+
+  // ── User cache ─────────────────────────────────────────────────────────────
+
+  static Future<Map<String, dynamic>?> getCachedUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_userKey);
+    if (raw == null) return null;
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> _saveUser(Map<String, dynamic> user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userKey, jsonEncode(user));
+  }
+
+  /// Met à jour le cache utilisateur (appelé après refresh depuis le serveur).
+  static Future<void> cacheUser(Map<String, dynamic> user) => _saveUser(user);
+
+  // ── Session ────────────────────────────────────────────────────────────────
+
+  static Future<void> clearSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_userKey);
+  }
+
+  // ── Auth calls ─────────────────────────────────────────────────────────────
+
+  static Future<AuthResult> login(String email, String password) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/auth/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email.trim(), 'password': password}),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        final token = data['token'] as String;
+        final user  = data['user'] as Map<String, dynamic>;
+        await saveToken(token);
+        await _saveUser(user);
+        return AuthResult(success: true, token: token, user: user);
+      } else {
+        final error = data['error'] ?? data['message'] ?? 'Identifiants invalides';
+        return AuthResult(success: false, error: error.toString());
+      }
+    } catch (_) {
+      return const AuthResult(
+          success: false, error: 'Impossible de contacter le serveur');
+    }
+  }
+
+  static Future<AuthResult> register({
+    required String name,
+    required String email,
+    required String password,
+    String? phone,
+    String? country,
+    String? age,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/auth/register'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'name':     name.trim(),
+              'email':    email.trim(),
+              'password': password,
+              if (phone != null && phone.trim().isNotEmpty) 'phone': phone.trim(),
+              'country':  country,
+              if (age != null && age.trim().isNotEmpty) 'age': int.tryParse(age.trim()),
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final token = data['token'] as String;
+        final user  = data['user'] as Map<String, dynamic>;
+        await saveToken(token);
+        await _saveUser(user);
+        return AuthResult(success: true, token: token, user: user);
+      } else {
+        final error = data['error'] ?? data['message'] ?? 'Erreur lors de la création du compte';
+        return AuthResult(success: false, error: error.toString());
+      }
+    } catch (_) {
+      return const AuthResult(
+          success: false, error: 'Impossible de contacter le serveur');
+    }
+  }
+
+  /// Appel API de logout : invalide le session_token côté serveur.
+  static Future<void> logout() async {
+    try {
+      final token = await getToken();
+      if (token != null) {
+        await http
+            .delete(
+              Uri.parse('$baseUrl/auth/logout'),
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token',
+              },
+            )
+            .timeout(const Duration(seconds: 10));
+      }
+    } catch (_) {
+      // On déconnecte localement même si le serveur est injoignable
+    } finally {
+      await clearSession();
+    }
+  }
+
+  // ── Auth headers helper ────────────────────────────────────────────────────
+
+  static Future<Map<String, String>> authHeaders() async {
+    final token = await getToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+}

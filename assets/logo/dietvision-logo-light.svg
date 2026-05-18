@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
+  <!-- Version fond clair — utiliser sur fond blanc/gris clair -->
+
+  <g transform="translate(100,100)">
+    <path d="M-60,-60 L-42,-60 M-60,-60 L-60,-42" fill="none" stroke="#2a6e00" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M60,-60 L42,-60 M60,-60 L60,-42" fill="none" stroke="#2a6e00" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M-60,60 L-42,60 M-60,60 L-60,42" fill="none" stroke="#2a6e00" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M60,60 L42,60 M60,60 L60,42" fill="none" stroke="#2a6e00" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="0" cy="0" r="50" fill="none" stroke="#2a6e00" stroke-width="3"/>
+    <circle cx="0" cy="0" r="40" fill="#efefef" stroke="#ddd" stroke-width="1"/>
+    <line x1="-12" y1="-25" x2="-12" y2="25" stroke="#2a6e00" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-17" y1="-25" x2="-17" y2="-10" stroke="#2a6e00" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-7" y1="-25" x2="-7" y2="-10" stroke="#2a6e00" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M-17,-10 Q-12,-5 -7,-10" fill="none" stroke="#2a6e00" stroke-width="2.8"/>
+    <line x1="12" y1="-25" x2="12" y2="25" stroke="#2a6e00" stroke-width="4" stroke-linecap="round"/>
+    <path d="M12,-25 Q20,-15 12,-5" fill="#efefef" stroke="#2a6e00" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="0" cy="2" r="8" fill="#2a6e00"/>
+    <circle cx="0" cy="2" r="3" fill="#f5f5f5"/>
+  </g>
+
+  <text x="186" y="118" font-family="system-ui,-apple-system,Helvetica Neue,sans-serif" font-size="70" font-weight="700" fill="#111111" letter-spacing="-2">Diet</text>
+  <text x="352" y="118" font-family="system-ui,-apple-system,Helvetica Neue,sans-serif" font-size="70" font-weight="700" fill="#2a6e00" letter-spacing="-2">Vision</text>
+  <line x1="186" y1="132" x2="740" y2="132" stroke="#e0e0e0" stroke-width="1"/>
+  <text x="186" y="154" font-family="system-ui,sans-serif" font-size="15" fill="#999999" letter-spacing="3">NUTRITION · IA · SUIVI</text>
+  <text x="186" y="176" font-family="system-ui,sans-serif" font-size="13" fill="#2a6e00" fill-opacity="0.75">Mange. Scanne. Progresse.</text>
+</svg>
