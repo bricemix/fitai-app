@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../services/consent_service.dart';
 import '../theme.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/legal_content.dart';
 
 const _kApiBase = 'https://api.diet-vision.com';
 
@@ -57,9 +58,11 @@ class _ConsentScreenState extends State<ConsentScreen> {
 
   Future<void> _fetchRgpd() async {
     final region = _detectRegion();
+    // Pass the app locale so the server can serve the right language document
+    final locale = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
     try {
       final res = await http
-          .get(Uri.parse('$_kApiBase/api/v1/legal/rgpd?region=$region'))
+          .get(Uri.parse('$_kApiBase/api/v1/legal/rgpd?region=$region&lang=$locale'))
           .timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
@@ -261,132 +264,39 @@ class _ConsentScreenState extends State<ConsentScreen> {
                 ),
               ),
 
-            // ── Scrollable content ───────────────────────────────────────────
+            // ── Scrollable content — locale-aware ───────────────────────────
             Expanded(
-              child: ListView(
-                controller: _scrollCtrl,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                children: [
-                  _PolicySection(
-                    icon: Icons.assignment_rounded,
-                    title: 'Objet',
-                    body:
-                        'DietVision est une application de coaching nutritionnel '
-                        'alimentee par intelligence artificielle. Les presentes conditions '
-                        'regissent votre utilisation de l\'application et definissent la '
-                        'maniere dont vos donnees personnelles sont collectees, traitees '
-                        'et protegees, conformement au Reglement General sur la Protection '
-                        'des Donnees (RGPD — UE 2016/679) et a la loi francaise Informatique '
-                        'et Libertes.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.storage_rounded,
-                    title: l10n.dataCollected,
-                    body:
-                        '• Donnees d\'identite : nom, adresse e-mail, numero de telephone, pays.\n'
-                        '• Donnees de sante : poids, taille, age, objectif nutritionnel, '
-                        'niveau d\'activite physique, restrictions alimentaires.\n'
-                        '• Donnees d\'usage : photos de repas (traitees en memoire, non stockees '
-                        'sur nos serveurs), historique nutritionnel, conversations avec le '
-                        'coach IA.\n'
-                        '• Donnees techniques : identifiant de session, adresse IP, logs '
-                        'd\'acces a l\'API.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.balance_rounded,
-                    title: l10n.legalBasis,
-                    body:
-                        'Le traitement de vos donnees repose sur :\n'
-                        '• Votre consentement explicite (art. 6 §1 a) RGPD) pour les donnees '
-                        'de sante et l\'analyse nutritionnelle.\n'
-                        '• L\'execution du contrat (art. 6 §1 b) pour la fourniture du service.\n'
-                        '• L\'interet legitime (art. 6 §1 f) pour la securite et l\'amelioration '
-                        'du service.\n\n'
-                        'Les donnees de sante constituent des donnees sensibles (art. 9 RGPD) '
-                        'et ne sont traitees qu\'avec votre consentement explicite.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.track_changes_rounded,
-                    title: l10n.purposes,
-                    body:
-                        '• Fournir les fonctionnalites d\'analyse nutritionnelle par IA.\n'
-                        '• Personnaliser les recommandations du coach selon votre profil.\n'
-                        '• Gerer votre compte et votre abonnement.\n'
-                        '• Ameliorer la qualite du service (donnees agregees et anonymisees).\n'
-                        '• Respecter nos obligations legales et comptables.\n\n'
-                        'Vos donnees ne sont jamais vendues a des tiers ni utilisees '
-                        'a des fins publicitaires.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.link_rounded,
-                    title: l10n.subprocessors,
-                    body:
-                        'DietVision fait appel aux sous-traitants suivants, lies par des '
-                        'clauses contractuelles types conformes au RGPD :\n'
-                        '• Anthropic / OpenRouter (analyse IA des repas) — serveurs aux Etats-Unis, '
-                        'couvert par les Clauses Contractuelles Types CE.\n'
-                        '• CinetPay (paiements Mobile Money) — traitement des paiements en '
-                        'Afrique de l\'Ouest, certifie PCI-DSS.\n'
-                        '• Hebergeur backend — Union Europeenne.\n\n'
-                        'Aucun transfert de donnees de sante hors UE sans garanties appropriees.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.schedule_rounded,
-                    title: l10n.retention,
-                    body:
-                        '• Donnees de compte : duree de l\'abonnement actif + 3 ans.\n'
-                        '• Historique nutritionnel : 12 mois glissants, puis anonymisation.\n'
-                        '• Logs techniques : 90 jours.\n'
-                        '• Donnees de paiement : 10 ans (obligation comptable legale).\n\n'
-                        'A l\'expiration, les donnees sont supprimees definitivement '
-                        'ou anonymisees de facon irreversible.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.shield_rounded,
-                    title: l10n.yourRights,
-                    body:
-                        'Conformement aux articles 15 a 22 du RGPD, vous disposez des droits '
-                        'suivants, que vous pouvez exercer a tout moment :\n\n'
-                        '• Droit d\'acces — obtenir une copie de vos donnees.\n'
-                        '• Droit de rectification — corriger des donnees inexactes.\n'
-                        '• Droit a l\'effacement ("droit a l\'oubli") — supprimer votre compte '
-                        'et toutes vos donnees.\n'
-                        '• Droit a la portabilite — recevoir vos donnees dans un format '
-                        'lisible par machine.\n'
-                        '• Droit d\'opposition — vous opposer au traitement a des fins '
-                        'd\'interet legitime.\n'
-                        '• Droit au retrait du consentement — revocable a tout moment '
-                        'dans les parametres de l\'application, sans effet retroactif.\n\n'
-                        'Pour exercer ces droits : privacy@dietvision.app\n'
-                        'Delai de reponse : 30 jours maximum (art. 12 RGPD).\n\n'
-                        'Vous avez egalement le droit d\'introduire une reclamation aupres '
-                        'de la CNIL (www.cnil.fr) ou de l\'autorite de controle de votre '
-                        'Etat membre.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.lock_rounded,
-                    title: l10n.security,
-                    body:
-                        'DietVision met en oeuvre les mesures techniques et organisationnelles '
-                        'appropriees pour proteger vos donnees :\n'
-                        '• Chiffrement des donnees en transit (TLS 1.3) et au repos (AES-256).\n'
-                        '• Authentification par jeton JWT a duree limitee.\n'
-                        '• Acces aux donnees restreint au personnel autorise.\n'
-                        '• Audits de securite reguliers.',
-                  ),
-                  _PolicySection(
-                    icon: Icons.contact_support_rounded,
-                    title: l10n.controller,
-                    body:
-                        'Responsable du traitement : DietVision SAS\n'
-                        'Contact DPO : privacy@dietvision.app\n'
-                        'Version de la politique : 1.0 — 25 avril 2026\n\n'
-                        'Cette politique peut etre mise a jour. En cas de modification '
-                        'substantielle, votre consentement sera a nouveau sollicite.',
-                  ),
-                  SizedBox(height: 8),
-                  _ScrollEndMarker(),
-                ],
+              child: Builder(
+                builder: (context) {
+                  final locale = Localizations.localeOf(context).languageCode;
+                  final sections = LegalContent.rgpd(locale);
+                  // Map section index to icon
+                  const icons = [
+                    Icons.assignment_rounded,
+                    Icons.storage_rounded,
+                    Icons.balance_rounded,
+                    Icons.track_changes_rounded,
+                    Icons.link_rounded,
+                    Icons.schedule_rounded,
+                    Icons.shield_rounded,
+                    Icons.lock_rounded,
+                    Icons.contact_support_rounded,
+                  ];
+                  return ListView(
+                    controller: _scrollCtrl,
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                    children: [
+                      for (var i = 0; i < sections.length; i++)
+                        _PolicySection(
+                          icon: i < icons.length ? icons[i] : Icons.info_rounded,
+                          title: sections[i].title,
+                          body: sections[i].body,
+                        ),
+                      const SizedBox(height: 8),
+                      const _ScrollEndMarker(),
+                    ],
+                  );
+                },
               ),
             ),
 
