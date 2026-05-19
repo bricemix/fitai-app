@@ -8,6 +8,7 @@ import '../theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
 import 'consent_screen.dart';
+import 'forgot_password_screen.dart';
 
 // ── Comprehensive country list (code, flag, name in French) ───────────────────
 const _kAllCountries = [
@@ -542,7 +543,25 @@ class _LoginFormState extends State<_LoginForm> {
               return null;
             },
           ),
-          const SizedBox(height: 24),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                l10n.forgotPassword,
+                style: const TextStyle(color: AppTheme.muted, fontSize: 13),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
 
           SizedBox(
             width: double.infinity,
@@ -656,9 +675,10 @@ class _RegisterFormState extends State<_RegisterForm> {
     }
     setState(() { _loading = true; _error = null; });
 
+    final email = _emailCtrl.text.trim();
     final result = await AuthService.register(
       name: _nameCtrl.text,
-      email: _emailCtrl.text,
+      email: email,
       password: _passCtrl.text,
       phone: _phoneCtrl.text,
       country: _countryCode,
@@ -669,6 +689,7 @@ class _RegisterFormState extends State<_RegisterForm> {
     setState(() => _loading = false);
 
     if (result.success) {
+      // Laisser main.dart gérer la gate de vérification e-mail
       widget.onSuccess();
     } else {
       setState(() => _error = result.error);
@@ -850,11 +871,16 @@ class _RegisterFormState extends State<_RegisterForm> {
                 onPressed: () => setState(() => _obscurePass = !_obscurePass),
               ),
             ),
+            onChanged: (_) => setState(() {}),
             validator: (v) {
               if (v == null || v.length < 8) return l10n.passwordMin8;
+              if (!v.contains(RegExp(r'[A-Z]'))) return l10n.passwordNeedsUppercase;
+              if (!v.contains(RegExp(r'[\d!@#$%^&*()\-_=+\[\]{};:,.<>/?\\|~]')))
+                return l10n.passwordNeedsNumberOrSymbol;
               return null;
             },
           ),
+          _PasswordStrengthHint(password: _passCtrl.text),
           const SizedBox(height: 14),
 
           // Confirm password
@@ -950,6 +976,50 @@ class _RegisterFormState extends State<_RegisterForm> {
                   : Text(l10n.registerButton),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Password Strength Hint ────────────────────────────────────────────────────
+
+class _PasswordStrengthHint extends StatelessWidget {
+  final String password;
+  const _PasswordStrengthHint({required this.password});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final hasLength  = password.length >= 8;
+    final hasUpper   = password.contains(RegExp(r'[A-Z]'));
+    final hasNumSym  = password.contains(RegExp(r'[\d!@#$%^&*()\-_=+\[\]{};:,.<>/?\\|~]'));
+
+    if (password.isEmpty) return const SizedBox.shrink();
+
+    Widget row(bool ok, String text) => Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Row(
+        children: [
+          Icon(
+            ok ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+            size: 14,
+            color: ok ? AppTheme.accent : AppTheme.muted,
+          ),
+          const SizedBox(width: 6),
+          Text(text, style: TextStyle(fontSize: 12, color: ok ? AppTheme.accent : AppTheme.muted)),
+        ],
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, left: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          row(hasLength, l10n.passwordMin8),
+          row(hasUpper,  l10n.passwordNeedsUppercase),
+          row(hasNumSym, l10n.passwordNeedsNumberOrSymbol),
         ],
       ),
     );

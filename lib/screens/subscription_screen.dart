@@ -91,7 +91,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       isScrollControlled: true,
-      builder: (_) => _CheckoutSheet(
+      builder: (_) => CheckoutSheet(
         plan: plan,
         checkoutUrl: result.checkoutUrl,
         sessionId: result.sessionId,
@@ -138,14 +138,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 }
 
 // ── Checkout Bottom Sheet ─────────────────────────────────────────────────────
+// Public pour permettre de l'appeler directement depuis le paywall screen.
 
-class _CheckoutSheet extends StatefulWidget {
+class CheckoutSheet extends StatefulWidget {
   final Plan plan;
   final String checkoutUrl;
   final String sessionId;
   final AppCurrency currency;
   final VoidCallback? onSubscribed;
-  const _CheckoutSheet({
+  const CheckoutSheet({
+    super.key,
     required this.plan,
     required this.checkoutUrl,
     required this.sessionId,
@@ -154,10 +156,10 @@ class _CheckoutSheet extends StatefulWidget {
   });
 
   @override
-  State<_CheckoutSheet> createState() => _CheckoutSheetState();
+  State<CheckoutSheet> createState() => _CheckoutSheetState();
 }
 
-class _CheckoutSheetState extends State<_CheckoutSheet> {
+class _CheckoutSheetState extends State<CheckoutSheet> {
   bool _opened   = false;
   bool _checking = false;
 

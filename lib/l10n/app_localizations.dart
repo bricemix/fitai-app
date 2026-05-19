@@ -64,8 +64,21 @@ abstract class AppLocalizations {
   String get passwordHint;
   String get passwordRequired;
   String get passwordMin8;
+  String get passwordNeedsUppercase;
+  String get passwordNeedsNumberOrSymbol;
   String get confirmPassword;
   String get passwordMismatch;
+  // Forgot password
+  String get forgotPassword;
+  String get forgotPasswordTitle;
+  String get forgotPasswordDesc;
+  String get sendResetCode;
+  String get resetPasswordTitle;
+  String get resetPasswordDesc;
+  String get newPassword;
+  String get resetPassword;
+  String get passwordResetSuccess;
+  String get passwordResetSuccessDesc;
   String get firstName;
   String get firstNameHint;
   String get firstNameRequired;
@@ -82,6 +95,14 @@ abstract class AppLocalizations {
   String get mustAcceptPrivacy;
   String get iAcceptThe;
   String get privacyPolicyLink;
+
+  // ── Email verification ───────────────────────────────────────────────────────
+  String get verifyEmailTitle;
+  String get verifyEmailDesc;
+  String get verifyCode;
+  String get resendCode;
+  String get skipForNow;
+  String get checkSpam;
 
   // ── Dashboard ───────────────────────────────────────────────────────────────
   String helloUser(String name);
@@ -250,11 +271,18 @@ abstract class AppLocalizations {
   String get paywallSubtitle;
   String get choosePlan;
   String get unlimitedScan;
+  String get featureSubScan;
   String get personalizedCoach;
+  String get featureSubCoach;
   String get nutritionPlanning;
+  String get featureSubPlanning;
   String get customRecipes;
+  String get featureSubRecipes;
   String get progressTracking;
+  String get featureSubProgress;
   String get dailyReminders;
+  String get featureSubReminders;
+  String get perMonth;
   String get rating;
   String get freeTrial;
   String get continueFreePlanLabel;

@@ -158,6 +158,105 @@ class AuthService {
     }
   }
 
+  // ── Email verification ─────────────────────────────────────────────────────
+
+  /// Demande l'envoi d'un nouveau code de vérification à [email].
+  static Future<AuthResult> sendVerificationCode(String email) async {
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$baseUrl/auth/send_verification'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email.trim()}),
+          )
+          .timeout(const Duration(seconds: 15));
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      if (res.statusCode == 200) {
+        return AuthResult(success: true, error: null);
+      } else if (res.statusCode == 429) {
+        return AuthResult(success: false, error: data['error'] ?? 'Veuillez patienter avant de renvoyer');
+      } else {
+        return AuthResult(success: false, error: data['error'] ?? 'Erreur lors de l\'envoi');
+      }
+    } catch (_) {
+      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+    }
+  }
+
+  /// Vérifie le code [code] pour l'adresse [email].
+  /// Retourne success:true + user mis à jour si ok.
+  static Future<AuthResult> verifyEmail(String email, String code) async {
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$baseUrl/auth/verify_email'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email.trim(), 'code': code.trim()}),
+          )
+          .timeout(const Duration(seconds: 15));
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      if (res.statusCode == 200) {
+        final user = data['user'] as Map<String, dynamic>?;
+        if (user != null) await _saveUser(user);
+        return AuthResult(success: true, user: user);
+      } else {
+        return AuthResult(success: false, error: data['error'] ?? 'Code incorrect');
+      }
+    } catch (_) {
+      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+    }
+  }
+
+  // ── Password reset ─────────────────────────────────────────────────────────
+
+  /// Demande l'envoi d'un code de réinitialisation à [email].
+  static Future<AuthResult> forgotPassword(String email) async {
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$baseUrl/auth/forgot_password'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email.trim()}),
+          )
+          .timeout(const Duration(seconds: 15));
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      if (res.statusCode == 200) {
+        return AuthResult(success: true, error: null);
+      } else if (res.statusCode == 429) {
+        return AuthResult(success: false, error: data['error'] ?? 'Veuillez patienter');
+      } else {
+        return AuthResult(success: false, error: data['error'] ?? 'Erreur lors de l\'envoi');
+      }
+    } catch (_) {
+      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+    }
+  }
+
+  /// Réinitialise le mot de passe avec le code reçu par email.
+  static Future<AuthResult> resetPassword(String email, String token, String newPassword) async {
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$baseUrl/auth/reset_password'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'email':    email.trim(),
+              'token':    token.trim(),
+              'password': newPassword,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      if (res.statusCode == 200) {
+        return AuthResult(success: true, error: null);
+      } else {
+        return AuthResult(success: false, error: data['error'] ?? 'Code invalide ou expiré');
+      }
+    } catch (_) {
+      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+    }
+  }
+
   /// Appel API de logout : invalide le session_token côté serveur.
   static Future<void> logout() async {
     try {

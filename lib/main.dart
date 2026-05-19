@@ -19,6 +19,7 @@ import 'screens/paywall_screen.dart';
 import 'screens/subscription_screen.dart';
 import 'screens/consent_screen.dart';
 import 'screens/auth_screen.dart';
+import 'screens/email_verification_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/scan_screen.dart';
@@ -96,6 +97,8 @@ class _AppLoaderState extends State<_AppLoader> {
   bool _loggedIn         = false;
   UserProfile? _profile;
   SubscriptionStatus? _subscriptionStatus;
+  // Gate vérification email : non-null si l'utilisateur est connecté mais email non vérifié
+  String? _pendingVerificationEmail;
 
   @override
   void initState() {
@@ -169,12 +172,20 @@ class _AppLoaderState extends State<_AppLoader> {
     final loggedIn = await AuthService.isLoggedIn();
     UserProfile? profile;
     SubscriptionStatus? subscriptionStatus;
+    String? pendingVerificationEmail;
     if (loggedIn) {
       profile = await StorageService.loadProfile();
       subscriptionStatus = await PaymentService.fetchSubscriptionStatus();
       // Programmer les notifications trial si trial en cours
       if (subscriptionStatus?.trialEndsAt != null && !(subscriptionStatus!.trialExpired)) {
         await NotificationService.scheduleTrialExpiryNotifications(subscriptionStatus.trialEndsAt!);
+      }
+      // Vérifier si l'email est validé — si non, bloquer avant l'onboarding
+      final cachedUser = await AuthService.getCachedUser();
+      final emailVerified = cachedUser?['email_verified'] as bool? ?? true;
+      if (!emailVerified) {
+        pendingVerificationEmail = cachedUser?['email'] as String?;
+        profile = null; // forcer le gate, pas l'onboarding
       }
     }
     if (mounted) {
@@ -183,6 +194,7 @@ class _AppLoaderState extends State<_AppLoader> {
         _loggedIn = loggedIn;
         _profile = profile;
         _subscriptionStatus = subscriptionStatus;
+        _pendingVerificationEmail = pendingVerificationEmail;
         _loading = false;
       });
     }
@@ -213,12 +225,44 @@ class _AppLoaderState extends State<_AppLoader> {
     final subscriptionStatus = await PaymentService.fetchSubscriptionStatus();
     // Programmer les notifications trial si trial en cours
     if (subscriptionStatus?.trialEndsAt != null && !(subscriptionStatus!.trialExpired)) {
-      await NotificationService.scheduleTrialExpiryNotifications(subscriptionStatus.trialEndsAt!);
+      try {
+        await NotificationService.scheduleTrialExpiryNotifications(subscriptionStatus.trialEndsAt!);
+      } catch (_) {
+        // Ne pas bloquer la connexion si les notifications échouent
+      }
     }
 
     if (isNewAccount) {
-      // Nouveau compte → onboarding obligatoire
+      // Nouveau compte : vérifier si l'email est validé avant d'aller à l'onboarding
+      final cachedUser = await AuthService.getCachedUser();
+      final emailVerified = cachedUser?['email_verified'] as bool? ?? true;
+      final userEmail = cachedUser?['email'] as String?;
+      if (!emailVerified && userEmail != null) {
+        // Email non vérifié → gate de vérification (pas l'onboarding)
+        if (mounted) setState(() {
+          _loggedIn = true;
+          _profile = null;
+          _subscriptionStatus = subscriptionStatus;
+          _pendingVerificationEmail = userEmail;
+        });
+        return;
+      }
+      // Email vérifié (ou pas de donnée) → onboarding normal
       if (mounted) setState(() { _loggedIn = true; _profile = null; _subscriptionStatus = subscriptionStatus; });
+      return;
+    }
+
+    // Utilisateur existant : vérifier aussi si son email est validé
+    final cachedUser = await AuthService.getCachedUser();
+    final emailVerified = cachedUser?['email_verified'] as bool? ?? true;
+    final userEmail = cachedUser?['email'] as String?;
+    if (!emailVerified && userEmail != null) {
+      if (mounted) setState(() {
+        _loggedIn = true;
+        _profile = null;
+        _subscriptionStatus = subscriptionStatus;
+        _pendingVerificationEmail = userEmail;
+      });
       return;
     }
 
@@ -305,7 +349,32 @@ class _AppLoaderState extends State<_AppLoader> {
       return AuthScreen(onAuthenticated: _onAuthenticated);
     }
 
-    // ── 5b. Gate abonnement (trial expiré ou abo inactif) ──────────────────
+    // ── 5b. Gate vérification email ────────────────────────────────────────
+    // L'utilisateur est connecté mais n'a pas encore validé son email.
+    // Bloque l'accès à l'onboarding jusqu'à validation.
+    if (_pendingVerificationEmail != null) {
+      return EmailVerificationScreen(
+        email: _pendingVerificationEmail!,
+        onContinue: () {
+          // Email vérifié → lever le gate et laisser l'onboarding s'afficher
+          setState(() => _pendingVerificationEmail = null);
+        },
+        onBack: () async {
+          // Revenir = déconnexion (l'utilisateur ne peut pas sauter cette étape)
+          await AuthService.logout();
+          if (mounted) {
+            setState(() {
+              _loggedIn = false;
+              _profile = null;
+              _pendingVerificationEmail = null;
+              _subscriptionStatus = null;
+            });
+          }
+        },
+      );
+    }
+
+    // ── 5c. Gate abonnement (trial expiré ou abo inactif) ──────────────────
     if (_subscriptionStatus?.needsPayment == true) {
       return _SubscriptionGate(
         subscriptionStatus: _subscriptionStatus!,
@@ -317,7 +386,7 @@ class _AppLoaderState extends State<_AppLoader> {
       );
     }
 
-    // ── 6. Onboarding (nouveau compte) ─────────────────────────────────────
+    // ── 6. Onboarding (nouveau compte, email vérifié) ──────────────────────
     if (_profile == null) {
       return OnboardingScreen(onDone: _onOnboardingDone);
     }
