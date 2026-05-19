@@ -41,6 +41,7 @@ class AuthService {
   }
 
   // ── Token ──────────────────────────────────────────────────────────────────
+  // TODO(SEC-1): migrer vers flutter_secure_storage quand le SSL Gradle est résolu
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -81,9 +82,18 @@ class AuthService {
   // ── Session ────────────────────────────────────────────────────────────────
 
   static Future<void> clearSession() async {
+    // Supprimer toutes les données utilisateur de SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_userKey);
+    await prefs.remove('fitai_profile');
+    await prefs.remove('fitai_meals');
+    await prefs.remove('fitai_body_entries');
+    await prefs.remove('fitai_planning');
+    await prefs.remove('fitai_dishes');
+    await prefs.remove('dv_gate_offer_start');
+    // Note: fitai_first_open_done, dv_consent_* et fitai_currency sont conservés
+    // car ils sont liés à l'appareil, pas à l'utilisateur.
   }
 
   // ── Auth calls ─────────────────────────────────────────────────────────────
@@ -107,12 +117,12 @@ class AuthService {
         await _saveUser(user);
         return AuthResult(success: true, token: token, user: user);
       } else {
-        final error = data['error'] ?? data['message'] ?? 'Identifiants invalides';
+        final error = data['error'] ?? data['message'] ?? 'Invalid credentials';
         return AuthResult(success: false, error: error.toString());
       }
     } catch (_) {
       return const AuthResult(
-          success: false, error: 'Impossible de contacter le serveur');
+          success: false, error: 'Unable to reach the server');
     }
   }
 
@@ -149,12 +159,12 @@ class AuthService {
         await _saveUser(user);
         return AuthResult(success: true, token: token, user: user);
       } else {
-        final error = data['error'] ?? data['message'] ?? 'Erreur lors de la création du compte';
+        final error = data['error'] ?? data['message'] ?? 'Error creating account';
         return AuthResult(success: false, error: error.toString());
       }
     } catch (_) {
       return const AuthResult(
-          success: false, error: 'Impossible de contacter le serveur');
+          success: false, error: 'Unable to reach the server');
     }
   }
 
@@ -174,12 +184,12 @@ class AuthService {
       if (res.statusCode == 200) {
         return AuthResult(success: true, error: null);
       } else if (res.statusCode == 429) {
-        return AuthResult(success: false, error: data['error'] ?? 'Veuillez patienter avant de renvoyer');
+        return AuthResult(success: false, error: data['error'] ?? 'Please wait before resending');
       } else {
-        return AuthResult(success: false, error: data['error'] ?? 'Erreur lors de l\'envoi');
+        return AuthResult(success: false, error: data['error'] ?? 'Error sending code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+      return const AuthResult(success: false, error: 'Unable to reach the server');
     }
   }
 
@@ -200,10 +210,10 @@ class AuthService {
         if (user != null) await _saveUser(user);
         return AuthResult(success: true, user: user);
       } else {
-        return AuthResult(success: false, error: data['error'] ?? 'Code incorrect');
+        return AuthResult(success: false, error: data['error'] ?? 'Invalid code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+      return const AuthResult(success: false, error: 'Unable to reach the server');
     }
   }
 
@@ -223,12 +233,12 @@ class AuthService {
       if (res.statusCode == 200) {
         return AuthResult(success: true, error: null);
       } else if (res.statusCode == 429) {
-        return AuthResult(success: false, error: data['error'] ?? 'Veuillez patienter');
+        return AuthResult(success: false, error: data['error'] ?? 'Please wait');
       } else {
-        return AuthResult(success: false, error: data['error'] ?? 'Erreur lors de l\'envoi');
+        return AuthResult(success: false, error: data['error'] ?? 'Error sending code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+      return const AuthResult(success: false, error: 'Unable to reach the server');
     }
   }
 
@@ -250,10 +260,10 @@ class AuthService {
       if (res.statusCode == 200) {
         return AuthResult(success: true, error: null);
       } else {
-        return AuthResult(success: false, error: data['error'] ?? 'Code invalide ou expiré');
+        return AuthResult(success: false, error: data['error'] ?? 'Invalid or expired code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Impossible de contacter le serveur');
+      return const AuthResult(success: false, error: 'Unable to reach the server');
     }
   }
 

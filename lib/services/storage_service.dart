@@ -55,8 +55,12 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_mealsKey);
     if (raw == null) return [];
-    final list = jsonDecode(raw) as List;
-    return list.map((e) => Meal.fromJson(e as Map<String, dynamic>)).toList();
+    try {
+      final list = jsonDecode(raw) as List;
+      return list.map((e) => Meal.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   static Future<void> saveMeals(List<Meal> meals) async {

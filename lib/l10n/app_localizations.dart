@@ -283,6 +283,9 @@ abstract class AppLocalizations {
   String get dailyReminders;
   String get featureSubReminders;
   String get perMonth;
+  String get perYear;
+  String get perQuarter;
+  String get per6Months;
   String get rating;
   String get freeTrial;
   String get continueFreePlanLabel;

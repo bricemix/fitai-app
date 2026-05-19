@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, compute;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image/image.dart' as img;
@@ -12,6 +12,21 @@ import '../services/auth_service.dart';
 import '../theme.dart';
 import '../l10n/app_localizations.dart';
 import 'subscription_screen.dart';
+
+/// Fonction top-level pour compute() — doit être en dehors de toute classe.
+String _compressImage(Uint8List rawBytes) {
+  var decoded = img.decodeImage(rawBytes);
+  if (decoded == null) throw Exception('Unsupported image format');
+  if (decoded.width > 1024 || decoded.height > 1024) {
+    decoded = img.copyResize(
+      decoded,
+      width: decoded.width > decoded.height ? 1024 : -1,
+      height: decoded.height >= decoded.width ? 1024 : -1,
+    );
+  }
+  final jpeg = img.encodeJpg(decoded, quality: 85);
+  return base64Encode(jpeg);
+}
 
 class ScanScreen extends StatefulWidget {
   final void Function(Meal) onMealAdded;
@@ -48,21 +63,9 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   // Compresse en JPEG ≤ 1024px et retourne le base64.
-  // Fonctionne sur web ET mobile (reçoit des Uint8List, pas un File).
+  // Exécuté dans un isolate séparé via compute() pour éviter les janks.
   Future<String> _toBase64Jpeg(Uint8List rawBytes) async {
-    var decoded = img.decodeImage(rawBytes);
-    if (decoded == null) throw Exception('Format image non supporté');
-
-    if (decoded.width > 1024 || decoded.height > 1024) {
-      decoded = img.copyResize(
-        decoded,
-        width: decoded.width > decoded.height ? 1024 : -1,
-        height: decoded.height >= decoded.width ? 1024 : -1,
-      );
-    }
-
-    final jpeg = img.encodeJpg(decoded, quality: 85);
-    return base64Encode(jpeg);
+    return compute(_compressImage, rawBytes);
   }
 
   Future<void> _pickImage(ImageSource source) async {

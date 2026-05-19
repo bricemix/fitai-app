@@ -5,6 +5,7 @@ import '../models/meal.dart';
 import '../models/profile.dart';
 import '../models/planning.dart';
 import 'auth_service.dart';
+import 'settings_service.dart';
 
 /// Retourne le code langue sélectionné par l'utilisateur dans l'app.
 /// Priorité : préférence sauvegardée → 'fr' par défaut.
@@ -35,10 +36,12 @@ class AiService {
   static Future<FoodResult> analyzeFood(String base64Image, {String? description}) async {
     final headers = await AuthService.authHeaders();
     final locale = await _appLocale();
+    final model  = await SettingsService.getModel();
     final http.Response response;
     final body = <String, dynamic>{
       'image': base64Image,
       'locale': locale,
+      'model': model,
     };
     if (description != null && description.trim().isNotEmpty) {
       body['description'] = description.trim();
@@ -52,14 +55,14 @@ class AiService {
           )
           .timeout(const Duration(seconds: 90));
     } on Exception catch (e) {
-      throw AiException('Connexion impossible : ${e.runtimeType}');
+      throw AiException('Connection error: ${e.runtimeType}');
     }
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       return FoodResult.fromJson(data);
     } else if (response.statusCode == 429) {
-      throw AiException('Quota IA atteint. Revenez demain ou passez Premium.');
+      throw AiException('AI quota reached. Come back tomorrow or upgrade to Premium.');
     } else if (response.statusCode == 401) {
       final invalidated = await AuthService.handleUnauthorized(response);
       if (invalidated) throw AiException('SESSION_INVALIDATED');
@@ -83,6 +86,7 @@ class AiService {
     try {
       final headers = await AuthService.authHeaders();
       final locale = await _appLocale();
+      final model  = await SettingsService.getModel();
       final response = await http
           .post(
             Uri.parse('$_baseUrl/ai/coach'),
@@ -91,21 +95,22 @@ class AiService {
               'messages': messages,
               'profile': profile.toJson(),
               'locale': locale,
+              'model': model,
             }),
           )
           .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        return data['reply'] as String? ?? 'Désolé, je n\'ai pas pu répondre.';
+        return data['reply'] as String? ?? 'Sorry, I could not respond.';
       } else if (response.statusCode == 401) {
-        return 'Session expirée — veuillez vous reconnecter.';
+        return 'Session expired — please log in again.';
       } else if (response.statusCode == 429) {
-        return 'Quota IA atteint pour ce mois. Revenez le mois prochain ou passez Premium.';
+        return 'Monthly AI quota reached. Come back next month or upgrade to Premium.';
       }
-      return 'Erreur de connexion (code ${response.statusCode}).';
+      return 'Connection error (code ${response.statusCode}).';
     } catch (_) {
-      return 'Impossible de contacter le serveur.';
+      return 'Unable to reach the server.';
     }
   }
 
@@ -161,8 +166,8 @@ The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always
       if (invalidated) throw AiException('SESSION_INVALIDATED');
       throw AiException('Session expirée — veuillez vous reconnecter.');
     }
-    if (response.statusCode == 429) throw AiException('Quota IA atteint. Revenez demain ou passez Premium.');
-    if (response.statusCode != 200) throw AiException('Erreur serveur (${response.statusCode})');
+    if (response.statusCode == 429) throw AiException('AI quota reached. Come back tomorrow or upgrade to Premium.');
+    if (response.statusCode != 200) throw AiException('Server error (${response.statusCode})');
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final text = data['reply'] as String? ?? '';

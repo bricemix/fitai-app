@@ -29,7 +29,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _resetFormKey = GlobalKey<FormState>();
   final List<TextEditingController> _codeCtrl =
       List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _codeFocus = List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _codeFocus    = List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _rawCodeFocus = List.generate(6, (_) => FocusNode());
   final _newPassCtrl     = TextEditingController();
   final _confirmPassCtrl = TextEditingController();
   bool _obscureNew       = true;
@@ -46,6 +47,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     _emailCtrl.dispose();
     for (final c in _codeCtrl) c.dispose();
     for (final f in _codeFocus) f.dispose();
+    for (final f in _rawCodeFocus) f.dispose();
     _newPassCtrl.dispose();
     _confirmPassCtrl.dispose();
     _countdownTimer?.cancel();
@@ -322,7 +324,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 child: RawKeyboardListener(
-                  focusNode: FocusNode(),
+                  focusNode: _rawCodeFocus[i],
                   onKey: (e) => _onCodeKeyDown(i, e),
                   child: TextFormField(
                     controller: _codeCtrl[i],

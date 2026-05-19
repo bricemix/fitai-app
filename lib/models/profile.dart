@@ -108,16 +108,37 @@ class UserProfile {
         : 10 * w + 6.25 * h - 5 * a + 5;
   }
 
-  /// Facteur d'activité
+  /// Facteur d'activité — reconnaît toutes les langues (FR/EN/DE/ES/PT)
   double get activityMultiplier {
-    const mults = {
-      'sédentaire': 1.2,
-      'léger (1-2j/sem)': 1.375,
-      'modéré (3-4j/sem)': 1.55,
-      'actif (5-6j/sem)': 1.725,
-      'très actif': 1.9,
-    };
-    return mults[activity.toLowerCase()] ?? 1.55;
+    final a = activity.toLowerCase().trim();
+    // ── Niveau 1 : Sédentaire ───────────────────────────────────────────────
+    if (a.contains('sédentaire') || a.contains('sedentary') ||
+        a.contains('sedentario') || a.contains('sedentário') ||
+        a == 'sitzend') {
+      return 1.2;
+    }
+    // ── Niveau 2 : Léger ────────────────────────────────────────────────────
+    if (a.contains('léger') || a.contains('light') || a.contains('leicht') ||
+        a.contains('ligero') || a.contains('leve')) {
+      return 1.375;
+    }
+    // ── Niveau 3 : Modéré ───────────────────────────────────────────────────
+    if (a.contains('modéré') || a.contains('moderate') || a.contains('moderat') ||
+        a.contains('moderado')) {
+      return 1.55;
+    }
+    // ── Niveau 4 : Actif ────────────────────────────────────────────────────
+    if (a.contains('actif') || a.contains('active') || a.contains('aktiv') ||
+        a.contains('activo') || a.contains('ativo')) {
+      // "très actif" / "very active" / "sehr aktiv" / "muy activo" / "muito ativo"
+      if (a.contains('très') || a.contains('very') || a.contains('sehr') ||
+          a.contains('muy') || a.contains('muito')) {
+        return 1.9;
+      }
+      return 1.725;
+    }
+    // Fallback conservateur
+    return 1.55;
   }
 
   /// Besoins de maintenance

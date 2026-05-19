@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -178,7 +179,11 @@ class _AppLoaderState extends State<_AppLoader> {
       subscriptionStatus = await PaymentService.fetchSubscriptionStatus();
       // Programmer les notifications trial si trial en cours
       if (subscriptionStatus?.trialEndsAt != null && !(subscriptionStatus!.trialExpired)) {
-        await NotificationService.scheduleTrialExpiryNotifications(subscriptionStatus.trialEndsAt!);
+        try {
+          await NotificationService.scheduleTrialExpiryNotifications(subscriptionStatus.trialEndsAt!);
+        } catch (_) {
+          // Ne pas bloquer le démarrage si les notifications échouent
+        }
       }
       // Vérifier si l'email est validé — si non, bloquer avant l'onboarding
       final cachedUser = await AuthService.getCachedUser();
@@ -203,12 +208,17 @@ class _AppLoaderState extends State<_AppLoader> {
   void _onConsentAccepted() async {
     final loggedIn = await AuthService.isLoggedIn();
     UserProfile? profile;
-    if (loggedIn) profile = await StorageService.loadProfile();
+    SubscriptionStatus? subscriptionStatus;
+    if (loggedIn) {
+      profile = await StorageService.loadProfile();
+      subscriptionStatus = await PaymentService.fetchSubscriptionStatus();
+    }
     if (mounted) {
       setState(() {
         _consentAccepted = true;
         _loggedIn = loggedIn;
         _profile = profile;
+        _subscriptionStatus = subscriptionStatus;
       });
     }
   }
@@ -426,7 +436,9 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
   String? _errorMsg;
   int _mealsCount = 0;
   DateTime? _offerExpiresAt;
-  late final Stream<int> _countdownTimer = Stream.periodic(const Duration(minutes: 1), (i) => i);
+  // Timer annulable pour le compte à rebours de l'offre
+  Timer? _countdownTick;
+  int _tickCount = 0;
 
   static const _offerStartKey = 'dv_gate_offer_start';
 
@@ -435,6 +447,16 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
     super.initState();
     _loadStats();
     _initOfferCountdown();
+    // Rafraîchir l'affichage toutes les minutes
+    _countdownTick = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted) setState(() => _tickCount++);
+    });
+  }
+
+  @override
+  void dispose() {
+    _countdownTick?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadStats() async {
@@ -587,9 +609,7 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
               // ── Badge offre spéciale + countdown ─────────────────────────
               if (offerActive) ...[
                 const SizedBox(height: 14),
-                StreamBuilder<Object>(
-                  stream: _countdownTimer,
-                  builder: (ctx, snap) {
+                Builder(builder: (ctx) {
                     final (h, m) = _countdown();
                     return Container(
                       width: double.infinity,
@@ -628,8 +648,7 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                         ],
                       ),
                     );
-                  },
-                ),
+                  }),
               ],
 
               const SizedBox(height: 28),
@@ -784,37 +803,41 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     // Watch locale so HomeShell rebuilds when language changes
     context.watch<LocaleProvider>();
-    final screens = [
-      DashboardScreen(
-        profile: _profile,
-        meals: _meals,
-        todayBodyEntry: _todayBodyEntry,
-        todayPlan: _todayPlan,
-        onLogBody: _goToBodyLog,
-        userPlan: _userPlan,
-        trialEndsAt: _trialEndsAt,
-      ),
-      ScanScreen(onMealAdded: _addMeal),
-      CoachScreen(profile: _profile, meals: _meals, userPlan: _userPlan, onPlanChanged: _loadUserPlan),
-      ProgressScreen(
-        meals: _meals,
-        profile: _profile,
-        onBodyEntrySaved: () async {
-          final today = await StorageService.todayBodyEntry();
-          if (mounted) setState(() => _todayBodyEntry = today);
-        },
-      ),
-      ProfileScreen(
-        profile: _profile,
-        onUpdate: (p) => setState(() => _profile = p),
-        onLogout: widget.onLogout,
-        userPlan: _userPlan,
-        trialEndsAt: _trialEndsAt,
-      ),
-    ];
-
+    // IndexedStack préserve l'état de chaque onglet sans recréer les widgets
     return Scaffold(
-      body: SafeArea(child: screens[_tab]),
+      body: SafeArea(
+        child: IndexedStack(
+          index: _tab,
+          children: [
+            DashboardScreen(
+              profile: _profile,
+              meals: _meals,
+              todayBodyEntry: _todayBodyEntry,
+              todayPlan: _todayPlan,
+              onLogBody: _goToBodyLog,
+              userPlan: _userPlan,
+              trialEndsAt: _trialEndsAt,
+            ),
+            ScanScreen(onMealAdded: _addMeal),
+            CoachScreen(profile: _profile, meals: _meals, userPlan: _userPlan, onPlanChanged: _loadUserPlan),
+            ProgressScreen(
+              meals: _meals,
+              profile: _profile,
+              onBodyEntrySaved: () async {
+                final today = await StorageService.todayBodyEntry();
+                if (mounted) setState(() => _todayBodyEntry = today);
+              },
+            ),
+            ProfileScreen(
+              profile: _profile,
+              onUpdate: (p) => setState(() => _profile = p),
+              onLogout: widget.onLogout,
+              userPlan: _userPlan,
+              trialEndsAt: _trialEndsAt,
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: _BottomNav(
         current: _tab,
         onTap: (i) => setState(() => _tab = i),

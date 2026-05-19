@@ -486,7 +486,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override String get featureSubReminders => 'Motivation chaque matin';
 
-  @override String get perMonth => '/ mois';
+  @override String get perMonth   => '/ mois';
+  @override String get perYear    => '/ an';
+  @override String get perQuarter => '/ trim.';
+  @override String get per6Months => '/ 6 mois';
 
   @override String get rating => '4.8 / 5 — Plus de 2 000 utilisateurs';
 

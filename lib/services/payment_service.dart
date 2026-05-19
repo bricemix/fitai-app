@@ -309,10 +309,16 @@ class PaymentService {
   // ── Fetch plans ──────────────────────────────────────────────────────────────
 
   static Future<List<Plan>> fetchPlans() async {
-    final res = await http.get(Uri.parse('$_base/plans'));
-    if (res.statusCode != 200) throw Exception('Impossible de charger les plans');
-    final List data = jsonDecode(res.body) as List;
-    return data.map((j) => Plan.fromJson(j as Map<String, dynamic>)).toList();
+    try {
+      final res = await http
+          .get(Uri.parse('$_base/plans'))
+          .timeout(const Duration(seconds: 15));
+      if (res.statusCode != 200) throw Exception('Failed to load plans');
+      final List data = jsonDecode(res.body) as List;
+      return data.map((j) => Plan.fromJson(j as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw Exception('Unable to reach the server');
+    }
   }
 
   // ── Créer session Stripe Checkout ────────────────────────────────────────────
@@ -470,11 +476,17 @@ class PaymentService {
   static Future<List<Map<String, dynamic>>> fetchHistory() async {
     final token = await AuthService.getToken();
     if (token == null) return [];
-    final res = await http.get(
-      Uri.parse('$_base/payments'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-    if (res.statusCode != 200) return [];
-    return List<Map<String, dynamic>>.from(jsonDecode(res.body) as List);
+    try {
+      final res = await http
+          .get(
+            Uri.parse('$_base/payments'),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .timeout(const Duration(seconds: 15));
+      if (res.statusCode != 200) return [];
+      return List<Map<String, dynamic>>.from(jsonDecode(res.body) as List);
+    } catch (_) {
+      return [];
+    }
   }
 }

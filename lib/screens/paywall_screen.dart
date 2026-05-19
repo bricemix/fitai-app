@@ -548,12 +548,12 @@ class _AnimatedPlanList extends StatelessWidget {
     return saving > 0 ? saving : null;
   }
 
-  String _freqBadge(Plan p) {
+  String _freqBadge(Plan p, AppLocalizations l10n) {
     switch (p.billingFrequency) {
-      case 'yearly':      return '/ an';
-      case 'quarterly':   return '/ trim.';
-      case 'semi_annual': return '/ 6 mois';
-      default:            return '/ mois';
+      case 'yearly':      return l10n.perYear;
+      case 'quarterly':   return l10n.perQuarter;
+      case 'semi_annual': return l10n.per6Months;
+      default:            return l10n.perMonth;
     }
   }
 
@@ -640,9 +640,7 @@ class _AnimatedPlanList extends StatelessWidget {
                             const Icon(Icons.bolt_rounded, color: Colors.black, size: 13),
                             const SizedBox(width: 4),
                             Text(
-                              l10n.save40.replaceAll('%', '').contains('ÉCONOMISEZ')
-                                  ? 'MEILLEURE OFFRE'
-                                  : 'BEST OFFER',
+                              l10n.bestOffer.toUpperCase(),
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 10,
@@ -755,7 +753,7 @@ class _AnimatedPlanList extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                _freqBadge(plan),
+                                _freqBadge(plan, l10n),
                                 style: const TextStyle(fontSize: 11, color: AppTheme.muted),
                               ),
                             ],

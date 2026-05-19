@@ -31,8 +31,10 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     with SingleTickerProviderStateMixin {
   // 6 contrôleurs pour les 6 boîtes OTP
-  final List<TextEditingController> _ctrls = List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes        = List.generate(6, (_) => FocusNode());
+  final List<TextEditingController> _ctrls      = List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes              = List.generate(6, (_) => FocusNode());
+  // FocusNodes pour RawKeyboardListener (créés ici pour éviter les fuites mémoire)
+  final List<FocusNode> _rawFocusNodes           = List.generate(6, (_) => FocusNode());
 
   bool _verifying  = false;
   bool _sending    = false;
@@ -66,6 +68,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     _shakeCtrl.dispose();
     for (final c in _ctrls) c.dispose();
     for (final f in _focusNodes) f.dispose();
+    for (final f in _rawFocusNodes) f.dispose();
     super.dispose();
   }
 
@@ -310,7 +313,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                               ),
                             ),
                             child: RawKeyboardListener(
-                              focusNode: FocusNode(),
+                              focusNode: _rawFocusNodes[i],
                               onKey: (e) => _onBoxKeyDown(i, e),
                               child: TextFormField(
                                 controller: _ctrls[i],
