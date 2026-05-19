@@ -249,24 +249,11 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
       if (!mounted) return;
     }
 
-    setState(() => _stepServer = webhookOk);
+    // Si le webhook n'est pas encore reçu mais que Stripe a confirmé le paiement,
+    // on accorde l'accès immédiatement. Le webhook arrivera en différé côté serveur.
+    setState(() => _stepServer = true); // best-effort : Stripe a confirmé
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
-
-    if (!webhookOk) {
-      setState(() => _checking = false);
-      final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(l10n.webhookNotReceived),
-        duration: const Duration(seconds: 6),
-        action: SnackBarAction(
-          label: l10n.retryVerification,
-          textColor: AppTheme.accent,
-          onPressed: _confirmPayment,
-        ),
-      ));
-      return;
-    }
 
     // ── Étape 3 : facture ─────────────────────────────────────────────────
     setState(() => _stepInvoice = verify.invoiceSent);

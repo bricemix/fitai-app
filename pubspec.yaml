@@ -2,7 +2,7 @@ name: smartfit
 description: "DietVision - Coach nutrition & fitness alimenté par l'IA"
 publish_to: 'none'
 
-version: 1.0.0+6
+version: 1.0.0+7
 
 environment:
   sdk: ^3.11.5

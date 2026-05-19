@@ -1,4 +1,4 @@
-import 'app_localizations.dart';
+﻿import 'app_localizations.dart';
 
 
 
@@ -837,7 +837,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override String trialExpiredDaysAgo(int days) => 'Trial expired $days day(s) ago';
 
-  @override String trialDaysRemaining(int days) => days == 1 ? 'Trial: 1 day left â³' : 'Trial: $days days left â³';
+  @override String trialDaysRemaining(int days) => days == 1 ? 'Trial: 1 day left ' : 'Trial: $days days left ';
 
 
 
