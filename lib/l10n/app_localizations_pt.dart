@@ -1,4 +1,4 @@
-﻿import 'app_localizations.dart';
+import 'app_localizations.dart';
 
 
 
@@ -841,7 +841,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override String get billingYearly => 'Anual';
 
-  @override String get bestOffer => 'ðŸ† Melhor oferta';
+  @override String get bestOffer => 'Melhor oferta';
 
   @override String savingPerMonth(String amt) => '-$amt/mês';
 
@@ -851,7 +851,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override String get guarantee30Days => 'Garantia de 30 dias';
 
-  @override String get specialOffer => 'ðŸŽ OFERTA ESPECIAL';
+  @override String get specialOffer => 'OFERTA ESPECIAL';
 
   @override String offerExpiresIn(int h, int m) => 'Expira em ${h}h ${m}min';
 
@@ -867,7 +867,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override String get notNow => 'Agora não';
 
-  @override String annualSavingsBanner(String amt) => 'ðŸŽ Economize $amt com o anual';
+  @override String annualSavingsBanner(String amt) => 'Economize $amt com o anual';
 
   @override String get trialNotifJ7 => 'Ainda 7 dias de teste';
 

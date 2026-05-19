@@ -261,7 +261,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
     if (!mounted) return;
 
     setState(() => _checking = false);
-    Navigator.pop(context);
+    // Ne pas pop le sheet ici — le dialog gère lui-même la fermeture de la feuille.
     _showSuccessDialog(invoiceSent: verify.invoiceSent, emailSent: verify.emailSent);
   }
 
@@ -338,8 +338,11 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
             final l10n = AppLocalizations.of(ctx);
             return ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // ferme le dialog
-                Navigator.pop(context); // ferme SubscriptionScreen
+                // Utiliser le navigator du contexte du dialog (valide)
+                // 1er pop = ferme le dialog, 2e pop = ferme le bottom sheet (CheckoutSheet)
+                Navigator.of(ctx)
+                  ..pop()
+                  ..pop();
                 widget.onSubscribed?.call();
               },
               style: ElevatedButton.styleFrom(
