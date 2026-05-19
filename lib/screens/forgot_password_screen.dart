@@ -57,7 +57,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // ── Countdown ──────────────────────────────────────────────────────────────
   void _startCountdown() {
     _countdownTimer?.cancel();
-    setState(() => _resendCountdown = 60);
+    setState(() => _resendCountdown = 180); // 3 minutes = durée de validité du code
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted) { t.cancel(); return; }
       setState(() {
@@ -65,6 +65,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         else t.cancel();
       });
     });
+  }
+
+  String _formatCountdown(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '$m:${s.toString().padLeft(2, '0')}';
   }
 
   // ── Step 1 : envoyer le code ───────────────────────────────────────────────
@@ -355,6 +361,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
           // Renvoyer
           const SizedBox(height: 12),
+          // Expiry bar + resend
+          if (_resendCountdown > 0) ...[
+            const SizedBox(height: 8),
+            _CodeExpiryBar(seconds: _resendCountdown, total: 180),
+            const SizedBox(height: 8),
+          ],
           Center(
             child: GestureDetector(
               onTap: _resendCountdown == 0 ? _resendCode : null,
@@ -363,7 +375,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 opacity: _resendCountdown == 0 ? 1.0 : 0.45,
                 child: Text(
                   _resendCountdown > 0
-                      ? '${l10n.resendCode} (${_resendCountdown}s)'
+                      ? '${l10n.resendCode} (${_formatCountdown(_resendCountdown)})'
                       : l10n.resendCode,
                   style: TextStyle(
                     fontSize: 13,
@@ -578,6 +590,48 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ],
         ),
       );
+}
+
+// ── Code expiry progress bar ──────────────────────────────────────────────────
+class _CodeExpiryBar extends StatelessWidget {
+  final int seconds;
+  final int total;
+  const _CodeExpiryBar({required this.seconds, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = (seconds / total).clamp(0.0, 1.0);
+    // Couleur : vert → orange → rouge selon le temps restant
+    final color = ratio > 0.5
+        ? const Color(0xFF6BCB77)
+        : ratio > 0.25
+            ? const Color(0xFFFFD166)
+            : Colors.redAccent;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(100),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 800),
+            height: 3,
+            child: LinearProgressIndicator(
+              value: ratio,
+              backgroundColor: AppTheme.surface,
+              valueColor: AlwaysStoppedAnimation(color),
+              minHeight: 3,
+            ),
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          'Code expire dans ${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}',
+          style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+        ),
+      ],
+    );
+  }
 }
 
 // ── Password strength hint widget ─────────────────────────────────────────────

@@ -139,9 +139,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(l10n.myProfile, style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: 14),
 
-              // ── Banner Go Premium (plan free uniquement) ──────────────────
-              if (widget.userPlan == 'free') ...[
-                PremiumBannerCard(trialEndsAt: widget.trialEndsAt),
+              // ── Banner upgrade (free ou starter en trial) ─────────────────
+              if (widget.userPlan == 'free' || widget.userPlan == 'starter') ...[
+                PremiumBannerCard(
+                  trialEndsAt: widget.trialEndsAt,
+                  currentPlan: widget.userPlan,
+                ),
                 const SizedBox(height: 16),
               ],
 

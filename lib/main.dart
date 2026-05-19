@@ -176,6 +176,20 @@ class _AppLoaderState extends State<_AppLoader> {
     String? pendingVerificationEmail;
     if (loggedIn) {
       profile = await StorageService.loadProfile();
+
+      // Pas de profil local (ex : réinstallation, données effacées) → télécharger depuis le serveur
+      if (profile == null) {
+        try {
+          final gotProfile = await SyncService.downloadAll();
+          if (gotProfile) profile = await StorageService.loadProfile();
+        } catch (_) {
+          // Ne pas bloquer le démarrage si le serveur est inaccessible
+        }
+      } else {
+        // Profil local présent → sync serveur en arrière-plan pour rester à jour
+        SyncService.downloadAll().ignore();
+      }
+
       subscriptionStatus = await PaymentService.fetchSubscriptionStatus();
       // Programmer les notifications trial si trial en cours
       if (subscriptionStatus?.trialEndsAt != null && !(subscriptionStatus!.trialExpired)) {
@@ -762,11 +776,12 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _loadUserPlan() async {
-    // 1. Plan depuis le cache local (affichage immédiat)
+    // 1. Plan depuis le cache local (affichage immédiat) — normalisé
     final cached = await AuthService.getCachedUser();
-    final localPlan = cached?['plan'] as String?
+    final rawPlan = cached?['plan'] as String?
         ?? cached?['subscription_plan'] as String?
         ?? 'free';
+    final localPlan = SubscriptionStatus.normalizePlan(rawPlan);
     if (mounted) setState(() => _userPlan = localPlan);
     // 2. Rafraîchir depuis le serveur + récupérer trialEndsAt
     final status = await PaymentService.fetchSubscriptionStatus();

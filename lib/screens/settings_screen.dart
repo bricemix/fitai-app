@@ -500,10 +500,10 @@ class _PlanCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     trialDays == 0
-                        ? 'Essai expiré'
+                        ? 'Essai Starter expiré'
                         : trialDays == 1
-                            ? 'Essai : 1 jour restant'
-                            : 'Essai : $trialDays jours restants',
+                            ? 'Essai Starter : 1 jour restant'
+                            : 'Essai Starter : $trialDays jours restants',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

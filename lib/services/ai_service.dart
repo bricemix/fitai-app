@@ -157,6 +157,7 @@ The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always
             'messages': [{'role': 'user', 'content': prompt}],
             'profile': profile.toJson(),
             'locale': locale,
+            'max_tokens': 1200, // 3 dishes with ingredients require ~700-1000 tokens
           }),
         )
         .timeout(const Duration(seconds: 45));
@@ -231,6 +232,7 @@ Return ONLY this JSON (no markdown):
               'messages': [{'role': 'user', 'content': prompt}],
               'profile': profile.toJson(),
               'locale': locale,
+              'max_tokens': 1500, // 7-day plan with notes requires ~800-1200 tokens
             }),
           )
           .timeout(const Duration(seconds: 45));

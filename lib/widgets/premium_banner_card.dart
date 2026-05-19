@@ -4,11 +4,17 @@ import '../theme.dart';
 import '../screens/subscription_screen.dart';
 
 /// Bannière animée "Go Premium" — partagée entre DashboardScreen et ProfileScreen.
-/// Affiche un glow pulsé, un compteur d'essai si [trialEndsAt] est défini,
+/// Affiche un glow pulsé, un compteur d'essai Starter si [trialEndsAt] est défini,
 /// et navigue vers SubscriptionScreen au tap.
+/// [currentPlan] : 'free' | 'starter' — détermine le titre affiché.
 class PremiumBannerCard extends StatefulWidget {
   final DateTime? trialEndsAt;
-  const PremiumBannerCard({super.key, this.trialEndsAt});
+  final String currentPlan;
+  const PremiumBannerCard({
+    super.key,
+    this.trialEndsAt,
+    this.currentPlan = 'free',
+  });
 
   @override
   State<PremiumBannerCard> createState() => _PremiumBannerCardState();
@@ -37,6 +43,7 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
     super.dispose();
   }
 
+  /// Retourne le label du compteur d'essai Starter (null si pas de trial actif).
   String? _trialLabel(AppLocalizations l10n) {
     if (widget.trialEndsAt == null) return null;
     final diff = widget.trialEndsAt!.difference(DateTime.now());
@@ -46,10 +53,24 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
     return l10n.trialDaysRemaining(days);
   }
 
+  /// Titre principal selon le contexte :
+  ///  - Trial Starter actif       → "Essai Starter · X jours restants"
+  ///  - Starter sans trial        → "Passer à Pro ou Premium"
+  ///  - Free sans trial           → texte Go Premium standard
+  String _mainTitle(AppLocalizations l10n, String? trialLabel) {
+    if (widget.currentPlan == 'starter') {
+      return trialLabel != null
+          ? 'Essai Starter'
+          : l10n.goPremiumButton;
+    }
+    return l10n.goPremiumButton;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final trialLabel = _trialLabel(l10n);
+    final mainTitle  = _mainTitle(l10n, trialLabel);
 
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -122,7 +143,7 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.goPremiumButton,
+                      mainTitle,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,

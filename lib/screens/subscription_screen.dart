@@ -84,8 +84,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     }
   }
 
-  void _showCheckoutSheet(Plan plan, SubscribeResult result) {
-    showModalBottomSheet(
+  // Async : attend que CheckoutSheet retourne true (paiement confirmé)
+  // puis ferme aussi SubscriptionScreen pour revenir directement à l'écran appelant.
+  Future<void> _showCheckoutSheet(Plan plan, SubscribeResult result) async {
+    final paid = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: AppTheme.surface,
       shape: const RoundedRectangleBorder(
@@ -99,6 +101,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         onSubscribed: widget.onSubscribed,
       ),
     );
+    // Si le paiement a été confirmé → fermer aussi SubscriptionScreen
+    // pour revenir directement à CoachScreen / HomeShell.
+    if (paid == true && mounted) {
+      Navigator.pop(context);
+    }
   }
 
   void _snack(String msg, {bool error = false}) {
@@ -338,12 +345,13 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
             final l10n = AppLocalizations.of(ctx);
             return ElevatedButton(
               onPressed: () {
-                // Utiliser le navigator du contexte du dialog (valide)
-                // 1er pop = ferme le dialog, 2e pop = ferme le bottom sheet (CheckoutSheet)
-                Navigator.of(ctx)
-                  ..pop()
-                  ..pop();
+                // Déclencher le rafraîchissement du plan AVANT de fermer les écrans
+                // pour que CoachScreen ait déjà le nouveau plan quand il redevient visible.
                 widget.onSubscribed?.call();
+                final nav = Navigator.of(ctx);
+                nav.pop();        // 1er pop = ferme le dialog
+                nav.pop(true);    // 2e pop = ferme CheckoutSheet en retournant true
+                                  // → SubscriptionScreen voit le résultat et se ferme aussi
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.accent,

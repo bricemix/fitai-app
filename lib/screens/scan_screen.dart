@@ -257,6 +257,12 @@ class _ScanScreenState extends State<ScanScreen> {
 
               _PhotoDrop(imageBytes: _imageBytes, onTap: _showSourceDialog),
 
+              // ── Conseils photo (visibles uniquement sans image) ───────────
+              if (!_hasImage) ...[
+                const SizedBox(height: 18),
+                const _PhotoTipsSection(),
+              ],
+
               // ── Zone description + bouton analyser ────────────────────────
               if (_hasImage && _result == null && !_analyzing) ...[
                 const SizedBox(height: 14),
@@ -284,7 +290,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
               if (_result != null) ...[
                 const SizedBox(height: 16),
-                _ResultCard(result: _result!),
+                _AnimatedResultCard(result: _result!),
                 const SizedBox(height: 12),
 
                 // Portion picker
@@ -617,50 +623,382 @@ class _DescriptionField extends StatelessWidget {
 
 // ── Photo Drop ─────────────────────────────────────────────────────────────────
 
-class _PhotoDrop extends StatelessWidget {
+class _PhotoDrop extends StatefulWidget {
   final Uint8List? imageBytes;
   final VoidCallback onTap;
   const _PhotoDrop({required this.imageBytes, required this.onTap});
+
+  @override
+  State<_PhotoDrop> createState() => _PhotoDropState();
+}
+
+class _PhotoDropState extends State<_PhotoDrop>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseCtrl;
+  late final Animation<double>   _borderOpacity;
+  late final Animation<double>   _iconScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _borderOpacity = Tween<double>(begin: 0.35, end: 0.85)
+        .animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+    _iconScale = Tween<double>(begin: 0.92, end: 1.08)
+        .animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    if (widget.imageBytes != null) {
+      // Image chargée : affichage simple avec bouton retake
+      return GestureDetector(
+        onTap: widget.onTap,
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.memory(
+                widget.imageBytes!,
+                fit: BoxFit.cover,
+                height: 240,
+                width: double.infinity,
+              ),
+            ),
+            Positioned(
+              top: 12,
+              right: 12,
+              child: GestureDetector(
+                onTap: widget.onTap,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: AppTheme.bg.withAlpha(200),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.refresh_rounded, size: 14, color: AppTheme.accent),
+                      SizedBox(width: 5),
+                      Text('Changer',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.text)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Pas d'image : zone animée
+    return AnimatedBuilder(
+      animation: _pulseCtrl,
+      builder: (_, __) => GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppTheme.accent.withAlpha(8),
+            border: Border.all(
+              color: AppTheme.accent.withOpacity(_borderOpacity.value),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.accent.withOpacity(_borderOpacity.value * 0.18),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 32, 20, 28),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Icône pulsante
+                ScaleTransition(
+                  scale: _iconScale,
+                  child: Container(
+                    width: 76,
+                    height: 76,
+                    decoration: BoxDecoration(
+                      color: AppTheme.accent.withAlpha(20),
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: const Icon(
+                      Icons.add_photo_alternate_rounded,
+                      size: 38,
+                      color: AppTheme.accent,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(l10n.addPhoto,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: AppTheme.text)),
+                const SizedBox(height: 5),
+                Text(
+                  l10n.photoHint,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppTheme.muted, fontSize: 13),
+                ),
+                const SizedBox(height: 18),
+                // Boutons caméra / galerie inline
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _SourceBtn(
+                      icon: Icons.camera_alt_rounded,
+                      label: 'Caméra',
+                      onTap: widget.onTap,
+                    ),
+                    const SizedBox(width: 12),
+                    _SourceBtn(
+                      icon: Icons.photo_library_rounded,
+                      label: 'Galerie',
+                      onTap: widget.onTap,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SourceBtn extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _SourceBtn(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        constraints: const BoxConstraints(minHeight: 180),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          border:
-              Border.all(color: AppTheme.accent.withAlpha(128), width: 2),
-          borderRadius: BorderRadius.circular(20),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.border),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: imageBytes != null
-            ? Image.memory(imageBytes!, fit: BoxFit.cover, height: 240)
-            : Builder(
-                builder: (ctx) {
-                  final l10n = AppLocalizations.of(ctx);
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 36),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.add_photo_alternate_rounded, size: 56, color: AppTheme.accent),
-                        const SizedBox(height: 12),
-                        Text(l10n.addPhoto,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 15)),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.photoHint,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: AppTheme.muted, fontSize: 13),
-                        ),
-                      ],
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: AppTheme.accent),
+            const SizedBox(width: 7),
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.text)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Photo Tips Section ─────────────────────────────────────────────────────────
+
+class _PhotoTipsSection extends StatefulWidget {
+  const _PhotoTipsSection();
+
+  @override
+  State<_PhotoTipsSection> createState() => _PhotoTipsSectionState();
+}
+
+class _PhotoTipsSectionState extends State<_PhotoTipsSection>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fade  = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _slide = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  static const _tips = [
+    (icon: Icons.dinner_dining_rounded,     label: 'Cadrer l\'assiette',   color: Color(0xFF6BCB77)),
+    (icon: Icons.wb_sunny_rounded,          label: 'Bonne lumière',        color: Color(0xFFFFD166)),
+    (icon: Icons.straighten_rounded,        label: 'Vue du dessus',        color: Color(0xFF4DA1FF)),
+    (icon: Icons.visibility_rounded,        label: 'Aliment visible',      color: Color(0xFFFF9F1C)),
+    (icon: Icons.photo_size_select_large_rounded, label: 'Tout le plat',   color: Color(0xFFEF476F)),
+    (icon: Icons.no_flash_rounded,          label: 'Éviter le flash',      color: Color(0xFFa5b4fc)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: _slide,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 2, bottom: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.tips_and_updates_rounded,
+                      size: 14, color: AppTheme.accent),
+                  SizedBox(width: 6),
+                  Text(
+                    'CONSEILS PHOTO',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.muted,
+                      letterSpacing: 0.8,
                     ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 84,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(right: 4),
+                itemCount: _tips.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (_, i) {
+                  final tip = _tips[i];
+                  return _TipCard(
+                    icon:  tip.icon,
+                    label: tip.label,
+                    color: tip.color,
+                    delay: Duration(milliseconds: 80 * i),
                   );
                 },
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TipCard extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Duration delay;
+  const _TipCard(
+      {required this.icon,
+      required this.label,
+      required this.color,
+      required this.delay});
+
+  @override
+  State<_TipCard> createState() => _TipCardState();
+}
+
+class _TipCardState extends State<_TipCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double>   _scale;
+  late final Animation<double>   _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _scale = Tween<double>(begin: 0.7, end: 1.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack));
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
+    Future.delayed(widget.delay, () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: ScaleTransition(
+        scale: _scale,
+        child: Container(
+          width: 82,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: widget.color.withAlpha(18),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: widget.color.withAlpha(60)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(widget.icon, size: 22, color: widget.color),
+              const SizedBox(height: 7),
+              Text(
+                widget.label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: widget.color.withAlpha(220),
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -868,6 +1206,52 @@ class _ScanRingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ScanRingPainter old) => false;
+}
+
+// ── Animated Result Card wrapper ──────────────────────────────────────────────
+
+class _AnimatedResultCard extends StatefulWidget {
+  final FoodResult result;
+  const _AnimatedResultCard({required this.result});
+
+  @override
+  State<_AnimatedResultCard> createState() => _AnimatedResultCardState();
+}
+
+class _AnimatedResultCardState extends State<_AnimatedResultCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double>   _fade;
+  late final Animation<Offset>   _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..forward();
+    _fade  = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _slide = Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: _slide,
+        child: _ResultCard(result: widget.result),
+      ),
+    );
+  }
 }
 
 // ── Result Card ────────────────────────────────────────────────────────────────

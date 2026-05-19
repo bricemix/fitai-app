@@ -202,7 +202,7 @@ class VerifyResult {
 
   factory VerifyResult.fromJson(Map<String, dynamic> j) => VerifyResult(
         paid:            j['paid'] as bool? ?? false,
-        plan:            (j['plan'] as String? ?? 'free').toLowerCase(),
+        plan:            SubscriptionStatus.normalizePlan(j['plan'] as String? ?? 'free'),
         webhookReceived: j['webhook_received'] as bool? ?? false,
         invoiceSent:     j['invoice_sent'] as bool? ?? false,
         emailSent:       j['email_sent'] as bool? ?? false,
@@ -224,10 +224,22 @@ class SubscriptionStatus {
     this.subscriptionEndsAt,
   });
 
+  /// Normalise un slug de plan en niveau de plan standard.
+  /// "starter_12m" → "starter", "premium-annual" → "premium", etc.
+  static String normalizePlan(String raw) {
+    final p = raw.toLowerCase().trim();
+    if (p.isEmpty || p == 'free') return 'free';
+    if (p.contains('premium')) return 'premium';
+    if (p.startsWith('pro'))    return 'pro';
+    if (p.startsWith('starter')) return 'starter';
+    return p;
+  }
+
   /// Parse intelligemment les champs retournés par /auth/me.
   /// Compatible avec plusieurs conventions de nommage backend.
   factory SubscriptionStatus.fromJson(Map<String, dynamic> data) {
-    final plan = (data['plan'] as String? ?? 'free').toLowerCase();
+    final raw  = data['plan'] as String? ?? 'free';
+    final plan = normalizePlan(raw);
 
     // ── is_active : plusieurs noms possibles ──────────────────────────────
     bool isActive = plan != 'free'; // par défaut : plan payant = actif
@@ -283,16 +295,22 @@ class SubscriptionStatus {
 
   /// True → l'utilisateur doit souscrire pour accéder à l'app.
   ///
-  /// Logique conservative : on ne bloque QUE si on est sûr que le trial a expiré.
-  /// Si le backend ne retourne pas de date de trial, on ne bloque pas.
+  /// Règles :
+  ///  • Plan payant actif (starter/pro/premium + isActive) → accès autorisé.
+  ///  • Pro/Premium inactif → paiement direct requis (pas de période d'essai).
+  ///  • Starter inactif avec subscriptionEndsAt connu → abonnement expiré → paiement.
+  ///  • Free/Starter en trial : bloquer seulement si le trial est explicitement expiré.
+  ///  • Pas d'info trial → ne pas bloquer (conservateur).
   bool get needsPayment {
-    // Plan payant et actif → accès autorisé
+    // Plan payant et actif (trial Starter compte comme actif) → accès autorisé
     if (plan != 'free' && isActive) return false;
-    // Abonnement payant expiré → bloquer
-    if (plan != 'free' && !isActive && subscriptionEndsAt != null) return true;
-    // Plan free : bloquer seulement si trial explicitement expiré
+    // Pro/Premium sans abonnement actif → paiement direct requis (pas de trial)
+    if ((plan == 'pro' || plan == 'premium') && !isActive) return true;
+    // Starter dont l'abonnement est connu et expiré → paiement requis
+    if (plan == 'starter' && !isActive && subscriptionEndsAt != null) return true;
+    // Free/Starter en trial expiré → paiement requis
     if (trialExpired) return true;
-    // Pas d'info trial → ne pas bloquer (conservateur)
+    // Pas d'info → ne pas bloquer
     return false;
   }
 
