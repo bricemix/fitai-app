@@ -77,6 +77,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final currentWeight = double.tryParse(widget.profile.weight) ?? 70.0;
     final goalKg = widget.profile.goalKgPerWeek;
 
@@ -90,7 +91,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
       _Scenario(
         label: l10n.balancedScenario,
         tag: l10n.scenarioRecommended,
-        color: AppTheme.accent,
+        color: c.accent,
         weeklyKgPerWeek: goalKg,
       ),
       _Scenario(
@@ -110,8 +111,8 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
     });
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.surface,
+      decoration: BoxDecoration(
+        color: c.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -122,7 +123,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
             child: Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.border,
+                color: c.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -140,10 +141,10 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                     Container(
                       width: 48, height: 48,
                       decoration: BoxDecoration(
-                        color: AppTheme.accent.withAlpha(20),
+                        color: c.accent.withAlpha(20),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(Icons.trending_up_rounded, color: AppTheme.accent, size: 24),
+                      child: Icon(Icons.trending_up_rounded, color: c.accent, size: 24),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -151,9 +152,9 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(l10n.progressForecast,
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: c.text)),
                           Text(l10n.projectionBasis,
-                              style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                              style: TextStyle(fontSize: 12, color: c.muted)),
                         ],
                       ),
                     ),
@@ -162,10 +163,10 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                       child: Container(
                         width: 32, height: 32,
                         decoration: BoxDecoration(
-                          color: AppTheme.surface2,
+                          color: c.surface2,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.close_rounded, size: 18, color: AppTheme.muted),
+                        child: Icon(Icons.close_rounded, size: 18, color: c.muted),
                       ),
                     ),
                   ],
@@ -177,9 +178,9 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: AppTheme.surface2,
+                    color: c.surface2,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: c.border),
                   ),
                   child: Row(
                     children: List.generate(3, (i) {
@@ -205,7 +206,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                      color: isSelected ? s.color : AppTheme.muted,
+                                      color: isSelected ? s.color : c.muted,
                                     )),
                                 const SizedBox(height: 2),
                                 Container(
@@ -217,7 +218,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                                   child: Text(s.tag,
                                       style: TextStyle(
                                         fontSize: 9,
-                                        color: isSelected ? s.color : AppTheme.muted.withAlpha(150),
+                                        color: isSelected ? s.color : c.muted.withAlpha(150),
                                       )),
                                 ),
                               ],
@@ -235,18 +236,18 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                 Container(
                   padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.surface2,
+                    color: c.surface2,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: c.border),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(l10n.weightEvolution,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.text)),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: c.text)),
                       const SizedBox(height: 4),
                       Text(l10n.todayWeightLabel + ': ${currentWeight.toStringAsFixed(1)} kg',
-                          style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                          style: TextStyle(fontSize: 11, color: c.muted)),
                       const SizedBox(height: 14),
                       SizedBox(
                         height: 120,
@@ -264,7 +265,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(9, (i) => Text(
                           i == 0 ? 'Today' : 'W$i',
-                          style: const TextStyle(fontSize: 9, color: AppTheme.muted),
+                          style: TextStyle(fontSize: 9, color: c.muted),
                         )),
                       ),
                     ],
@@ -276,9 +277,9 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                 // ── Week-by-week table ────────────────────────────────────────
                 Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.surface2,
+                    color: c.surface2,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: c.border),
                   ),
                   child: Column(
                     children: [
@@ -290,24 +291,24 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                             Expanded(
                               flex: 2,
                               child: Text(l10n.weekLabel,
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.muted)),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: c.muted)),
                             ),
                             Expanded(
                               flex: 3,
                               child: Text(l10n.estimatedWeight,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.muted)),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: c.muted)),
                             ),
                             Expanded(
                               flex: 2,
                               child: Text('Δ',
                                   textAlign: TextAlign.right,
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.muted)),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: c.muted)),
                             ),
                           ],
                         ),
                       ),
-                      const Divider(color: AppTheme.border, height: 1),
+                      Divider(color: c.border, height: 1),
                       ...List.generate(8, (i) {
                         final isEven = i.isEven;
                         final w = weeks[i + 1];
@@ -315,7 +316,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                         final sign = delta >= 0 ? '+' : '';
                         final isToday = i == 0;
                         return Container(
-                          color: isEven ? Colors.transparent : AppTheme.surface.withAlpha(80),
+                          color: isEven ? Colors.transparent : c.surface.withAlpha(80),
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                           child: Row(
                             children: [
@@ -326,7 +327,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
-                                    color: isToday ? selected.color : AppTheme.text,
+                                    color: isToday ? selected.color : c.text,
                                   ),
                                 ),
                               ),
@@ -338,7 +339,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: isToday ? selected.color : AppTheme.text,
+                                    color: isToday ? selected.color : c.text,
                                   ),
                                 ),
                               ),
@@ -354,7 +355,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                                         ? const Color(0xFF6BCB77)
                                         : delta > 0
                                             ? const Color(0xFF4DA1FF)
-                                            : AppTheme.muted,
+                                            : c.muted,
                                   ),
                                 ),
                               ),
@@ -377,8 +378,8 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                       widget.onBalanced?.call();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accent,
-                      foregroundColor: AppTheme.bg,
+                      backgroundColor: c.accent,
+                      foregroundColor: c.bg,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       elevation: 0,
@@ -401,7 +402,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFF6BCB77),
-                          side: const BorderSide(color: AppTheme.border),
+                          side: BorderSide(color: c.border),
                           padding: const EdgeInsets.symmetric(vertical: 13),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
@@ -419,7 +420,7 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFFF6B6B),
-                          side: const BorderSide(color: AppTheme.border),
+                          side: BorderSide(color: c.border),
                           padding: const EdgeInsets.symmetric(vertical: 13),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),

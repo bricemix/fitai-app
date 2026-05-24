@@ -158,10 +158,11 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: AppTheme.bg,
+      backgroundColor: c.bg,
       body: AnimatedBuilder(
         animation: _ctrl,
         builder: (_, __) => Opacity(
@@ -183,8 +184,8 @@ class _SplashScreenState extends State<SplashScreen>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            AppTheme.accent.withAlpha(45),
-                            AppTheme.accent.withAlpha(12),
+                            c.accent.withAlpha(45),
+                            c.accent.withAlpha(12),
                             Colors.transparent,
                           ],
                           stops: const [0.0, 0.42, 1.0],
@@ -205,7 +206,7 @@ class _SplashScreenState extends State<SplashScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppTheme.accent,
+                          color: c.accent,
                           width: 1.5,
                         ),
                       ),
@@ -224,7 +225,7 @@ class _SplashScreenState extends State<SplashScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppTheme.accent,
+                          color: c.accent,
                           width: 1.0,
                         ),
                       ),
@@ -277,8 +278,8 @@ class _SplashScreenState extends State<SplashScreen>
                                 height: 1.0,
                               ),
                               children: [
-                                TextSpan(text: 'Diet', style: TextStyle(color: AppTheme.text)),
-                                TextSpan(text: 'Vision', style: TextStyle(color: AppTheme.accent)),
+                                TextSpan(text: 'Diet', style: TextStyle(color: c.text)),
+                                TextSpan(text: 'Vision', style: TextStyle(color: c.accent)),
                               ],
                             ),
                           ),
@@ -299,7 +300,7 @@ class _SplashScreenState extends State<SplashScreen>
                               fontFamily: 'Space Grotesk',
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.muted.withAlpha(160),
+                              color: c.muted.withAlpha(160),
                               letterSpacing: 3.0,
                             ),
                           );
@@ -354,6 +355,7 @@ class _LoadingDotsState extends State<_LoadingDots>
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (_, __) {
@@ -371,9 +373,9 @@ class _LoadingDotsState extends State<_LoadingDots>
                 child: Container(
                   width: 5,
                   height: 5,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.accent,
+                    color: c.accent,
                   ),
                 ),
               ),

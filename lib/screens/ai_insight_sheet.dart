@@ -66,6 +66,7 @@ class _AiInsightSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
 
     final IconData headerIcon;
     final Color headerColor;
@@ -95,7 +96,7 @@ class _AiInsightSheet extends StatelessWidget {
           ),
           _ActionCardData(
             icon: Icons.skip_next_rounded,
-            color: AppTheme.muted,
+            color: c.muted,
             title: l10n.insightIgnoreToday,
             detail: '',
           ),
@@ -122,7 +123,7 @@ class _AiInsightSheet extends StatelessWidget {
           ),
           _ActionCardData(
             icon: Icons.skip_next_rounded,
-            color: AppTheme.muted,
+            color: c.muted,
             title: l10n.insightIgnoreToday,
             detail: '',
           ),
@@ -149,7 +150,7 @@ class _AiInsightSheet extends StatelessWidget {
           ),
           _ActionCardData(
             icon: Icons.skip_next_rounded,
-            color: AppTheme.muted,
+            color: c.muted,
             title: l10n.insightIgnoreToday,
             detail: '',
           ),
@@ -158,19 +159,19 @@ class _AiInsightSheet extends StatelessWidget {
 
       case InsightType.noScan:
         headerIcon = Icons.document_scanner_rounded;
-        headerColor = AppTheme.muted;
+        headerColor = c.muted;
         analysisText = l10n.insightWhyNoScan;
         whyText = l10n.insightWhyNoScan;
         actions = [
           _ActionCardData(
             icon: Icons.qr_code_scanner_rounded,
-            color: AppTheme.accent,
+            color: c.accent,
             title: l10n.insightAction1Protein,
             detail: l10n.insightAction1ProteinDetail,
           ),
           _ActionCardData(
             icon: Icons.skip_next_rounded,
-            color: AppTheme.muted,
+            color: c.muted,
             title: l10n.insightIgnoreToday,
             detail: '',
           ),
@@ -191,7 +192,7 @@ class _AiInsightSheet extends StatelessWidget {
           ),
           _ActionCardData(
             icon: Icons.skip_next_rounded,
-            color: AppTheme.muted,
+            color: c.muted,
             title: l10n.insightIgnoreToday,
             detail: '',
           ),
@@ -200,8 +201,8 @@ class _AiInsightSheet extends StatelessWidget {
     }
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.surface,
+      decoration: BoxDecoration(
+        color: c.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -212,7 +213,7 @@ class _AiInsightSheet extends StatelessWidget {
             child: Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.border,
+                color: c.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -234,14 +235,14 @@ class _AiInsightSheet extends StatelessWidget {
                         color: headerColor.withAlpha(25),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(Icons.psychology_rounded, color: AppTheme.accent, size: 24),
+                      child: Icon(Icons.psychology_rounded, color: c.accent, size: 24),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         l10n.aiInsightTitle,
-                        style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.text,
+                        style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w800, color: c.text,
                         ),
                       ),
                     ),
@@ -250,10 +251,10 @@ class _AiInsightSheet extends StatelessWidget {
                       child: Container(
                         width: 32, height: 32,
                         decoration: BoxDecoration(
-                          color: AppTheme.surface2,
+                          color: c.surface2,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.close_rounded, size: 18, color: AppTheme.muted),
+                        child: Icon(Icons.close_rounded, size: 18, color: c.muted),
                       ),
                     ),
                   ],
@@ -280,7 +281,7 @@ class _AiInsightSheet extends StatelessWidget {
                     children: [
                       Text(
                         analysisText,
-                        style: const TextStyle(fontSize: 14, color: AppTheme.text, height: 1.5),
+                        style: TextStyle(fontSize: 14, color: c.text, height: 1.5),
                       ),
                       const SizedBox(height: 12),
                       // Metrics row
@@ -292,12 +293,12 @@ class _AiInsightSheet extends StatelessWidget {
                             color: headerColor,
                           ),
                           const SizedBox(width: 8),
-                          const Icon(Icons.arrow_forward_rounded, size: 14, color: AppTheme.muted),
+                          Icon(Icons.arrow_forward_rounded, size: 14, color: c.muted),
                           const SizedBox(width: 8),
                           _MetricPill(
                             label: '${targetKcal} kcal',
                             sublabel: 'target',
-                            color: AppTheme.muted,
+                            color: c.muted,
                           ),
                         ],
                       ),
@@ -311,12 +312,12 @@ class _AiInsightSheet extends StatelessWidget {
                               color: const Color(0xFF4DA1FF),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward_rounded, size: 14, color: AppTheme.muted),
+                            Icon(Icons.arrow_forward_rounded, size: 14, color: c.muted),
                             const SizedBox(width: 8),
                             _MetricPill(
                               label: '${targetProtein}g',
                               sublabel: 'protein target',
-                              color: AppTheme.muted,
+                              color: c.muted,
                             ),
                           ],
                         ),
@@ -330,26 +331,26 @@ class _AiInsightSheet extends StatelessWidget {
                 // ── Why it matters ───────────────────────────────────────────
                 _SectionTitle(
                   icon: Icons.info_outline_rounded,
-                  color: AppTheme.accent,
+                  color: c.accent,
                   title: l10n.insightWhyTitle,
                 ),
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: AppTheme.surface2,
+                    color: c.surface2,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: c.border),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.lightbulb_outline_rounded, size: 18, color: AppTheme.accent),
+                      Icon(Icons.lightbulb_outline_rounded, size: 18, color: c.accent),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           whyText,
-                          style: const TextStyle(fontSize: 13, color: AppTheme.muted, height: 1.5),
+                          style: TextStyle(fontSize: 13, color: c.muted, height: 1.5),
                         ),
                       ),
                     ],
@@ -361,7 +362,7 @@ class _AiInsightSheet extends StatelessWidget {
                 // ── Actions ──────────────────────────────────────────────────
                 _SectionTitle(
                   icon: Icons.bolt_rounded,
-                  color: AppTheme.accent,
+                  color: c.accent,
                   title: l10n.insightActionsTitle,
                 ),
                 const SizedBox(height: 10),
@@ -381,8 +382,8 @@ class _AiInsightSheet extends StatelessWidget {
                       onApply?.call();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accent,
-                      foregroundColor: AppTheme.bg,
+                      backgroundColor: c.accent,
+                      foregroundColor: c.bg,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       elevation: 0,
@@ -403,13 +404,13 @@ class _AiInsightSheet extends StatelessWidget {
                           onAlternatives?.call();
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.text,
-                          side: const BorderSide(color: AppTheme.border),
+                          foregroundColor: c.text,
+                          side: BorderSide(color: c.border),
                           padding: const EdgeInsets.symmetric(vertical: 13),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         child: Text(l10n.showAlternatives,
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -417,8 +418,8 @@ class _AiInsightSheet extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.muted,
-                          side: const BorderSide(color: AppTheme.border),
+                          foregroundColor: c.muted,
+                          side: BorderSide(color: c.border),
                           padding: const EdgeInsets.symmetric(vertical: 13),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
@@ -462,6 +463,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Row(
       children: [
         Icon(icon, size: 16, color: color),
@@ -486,6 +488,7 @@ class _MetricPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -498,7 +501,7 @@ class _MetricPill extends StatelessWidget {
           Text(label,
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)),
           Text(sublabel,
-              style: const TextStyle(fontSize: 10, color: AppTheme.muted)),
+              style: TextStyle(fontSize: 10, color: c.muted)),
         ],
       ),
     );
@@ -511,12 +514,13 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surface2,
+        color: c.surface2,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
@@ -534,18 +538,18 @@ class _ActionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(data.title,
-                    style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.text,
+                    style: TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w700, color: c.text,
                     )),
                 if (data.detail.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(data.detail,
-                      style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                      style: TextStyle(fontSize: 12, color: c.muted)),
                 ],
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, size: 18, color: AppTheme.muted),
+          Icon(Icons.chevron_right_rounded, size: 18, color: c.muted),
         ],
       ),
     );

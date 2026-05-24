@@ -113,6 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // regardent LocaleProvider indépendamment)
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     // Initialize default activity lazily from l10n
     if (_activity.isEmpty) _activity = l10n.activityModerate;
     return Scaffold(
@@ -140,7 +141,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           GestureDetector(
             onTap: () => setState(() => _step--),
-            child: const Icon(Icons.arrow_back_ios, size: 20, color: AppTheme.muted),
+            child: Icon(Icons.arrow_back_ios, size: 20, color: c.muted),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -150,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   margin: const EdgeInsets.only(right: 6),
                   height: 4,
                   decoration: BoxDecoration(
-                    color: _step > i ? AppTheme.accent : AppTheme.surface2,
+                    color: _step > i ? c.accent : c.surface2,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -193,11 +194,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 110,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.accent.withAlpha(16),
-              border: Border.all(color: AppTheme.accent.withAlpha(60), width: 1.5),
+              color: c.accent.withAlpha(16),
+              border: Border.all(color: c.accent.withAlpha(60), width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.accent.withAlpha(70),
+                  color: c.accent.withAlpha(70),
                   blurRadius: 40,
                   spreadRadius: 6,
                 ),
@@ -220,11 +221,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             l10n.welcomeTo,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Syne',
               fontSize: 26,
               fontWeight: FontWeight.w700,
-              color: AppTheme.text,
+              color: c.text,
               height: 1.1,
             ),
           ),
@@ -236,7 +237,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               fontFamily: 'Syne',
               fontSize: 34,
               fontWeight: FontWeight.w900,
-              color: AppTheme.accent,
+              color: c.accent,
               height: 1.1,
             ),
           ),
@@ -246,13 +247,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
-              style: const TextStyle(
-                fontSize: 14, color: AppTheme.muted, height: 1.55),
+              style: TextStyle(
+                fontSize: 14, color: c.muted, height: 1.55),
               children: [
                 TextSpan(text: l10n.onboardingIntro),
                 TextSpan(
                   text: l10n.onboardingPersonalize,
-                  style: const TextStyle(color: AppTheme.accent, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: c.accent, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -283,24 +284,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(12),
+              color: c.accent.withAlpha(12),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.accent.withAlpha(40)),
+              border: Border.all(color: c.accent.withAlpha(40)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.verified_rounded, size: 16, color: AppTheme.accent),
+                Icon(Icons.verified_rounded, size: 16, color: c.accent),
                 const SizedBox(width: 10),
                 Expanded(
                   child: RichText(
                     text: TextSpan(
-                      style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.5),
+                      style: TextStyle(fontSize: 12, color: c.muted, height: 1.5),
                       children: [
                         TextSpan(text: l10n.aiNoteText),
                         TextSpan(
                           text: l10n.aiNoteHighlight,
-                          style: const TextStyle(color: AppTheme.accent, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: c.accent, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -327,10 +328,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             children: [
               Text(
                 l10n.nextStepLabel,
-                style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+                style: TextStyle(fontSize: 12, color: c.muted),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right_rounded, size: 16, color: AppTheme.muted),
+              Icon(Icons.chevron_right_rounded, size: 16, color: c.muted),
             ],
           ),
         ],
@@ -348,7 +349,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Text(l10n.profileTitle, style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 4),
         Text(l10n.profileSubtitle,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.muted)),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.muted)),
         const SizedBox(height: 20),
 
         _inputField(l10n.yourFirstName, hint: l10n.firstNameEx, onChanged: (v) => _name = v),
@@ -406,7 +407,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Text(l10n.goalLabel, style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 8),
         Text(l10n.goalQuestion,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.muted)),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: c.muted)),
         const SizedBox(height: 16),
 
         ...goals.map((g) => Padding(
@@ -434,10 +435,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 duration: const Duration(milliseconds: 180),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: _goalKgPerWeek == opt.$1 ? AppTheme.accent.withAlpha(20) : AppTheme.surface2,
+                  color: _goalKgPerWeek == opt.$1 ? c.accent.withAlpha(20) : c.surface2,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: _goalKgPerWeek == opt.$1 ? AppTheme.accent : AppTheme.border,
+                    color: _goalKgPerWeek == opt.$1 ? c.accent : c.border,
                   ),
                 ),
                 child: Row(
@@ -449,21 +450,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           Text(opt.$2, style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: _goalKgPerWeek == opt.$1 ? AppTheme.accent : AppTheme.text,
+                            color: _goalKgPerWeek == opt.$1 ? c.accent : c.text,
                           )),
                           Text('${opt.$1.abs().toStringAsFixed(2)} kg/semaine',
-                              style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                              style: TextStyle(fontSize: 12, color: c.muted)),
                         ],
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppTheme.accent.withAlpha(20),
+                        color: c.accent.withAlpha(20),
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(opt.$3,
-                          style: const TextStyle(fontSize: 12, color: AppTheme.accent, fontWeight: FontWeight.w600)),
+                          style: TextStyle(fontSize: 12, color: c.accent, fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),
@@ -477,16 +478,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               margin: const EdgeInsets.only(top: 4),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppTheme.accent3.withAlpha(20),
+                color: c.accent3.withAlpha(20),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.accent3.withAlpha(80)),
+                border: Border.all(color: c.accent3.withAlpha(80)),
               ),
               child: Row(children: [
-                const Icon(Icons.info_outline_rounded, size: 16, color: AppTheme.accent3),
+                Icon(Icons.info_outline_rounded, size: 16, color: c.accent3),
                 const SizedBox(width: 8),
                 Expanded(child: Text(
                   l10n.aggressiveWarning,
-                  style: const TextStyle(fontSize: 12, color: AppTheme.accent3),
+                  style: TextStyle(fontSize: 12, color: c.accent3),
                 )),
               ]),
             ),
@@ -573,8 +574,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         _label(label),
         TextFormField(
           keyboardType: numeric ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
-          decoration: InputDecoration(hintText: hint, hintStyle: const TextStyle(color: AppTheme.muted)),
-          style: const TextStyle(color: AppTheme.text),
+          decoration: InputDecoration(hintText: hint, hintStyle: TextStyle(color: c.muted)),
+          style: TextStyle(color: c.text),
           onChanged: onChanged,
         ),
         const SizedBox(height: 4),
@@ -585,7 +586,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _label(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 6),
     child: Text(text.toUpperCase(),
-        style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+        style: TextStyle(fontSize: 11, color: c.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
   );
 }
 
@@ -597,7 +598,7 @@ class _OnboardingLangButton extends StatelessWidget {
     final localeProvider = context.read<LocaleProvider>();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => Padding(
@@ -610,7 +611,7 @@ class _OnboardingLangButton extends StatelessWidget {
               child: Container(
                 width: 36, height: 4,
                 decoration: BoxDecoration(
-                    color: AppTheme.border,
+                    color: c.border,
                     borderRadius: BorderRadius.circular(2)),
               ),
             ),
@@ -626,13 +627,13 @@ class _OnboardingLangButton extends StatelessWidget {
               final isSelected = localeProvider.locale.languageCode == lang.$1;
               return ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Text(lang.$3, style: const TextStyle(fontSize: 26)),
+                leading: Text(lang.$3, style: TextStyle(fontSize: 26)),
                 title: Text(lang.$2,
                     style: TextStyle(
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
-                        color: isSelected ? AppTheme.accent : AppTheme.text)),
+                        color: isSelected ? c.accent : c.text)),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle, color: AppTheme.accent, size: 20)
+                    ? Icon(Icons.check_circle, color: c.accent, size: 20)
                     : null,
                 onTap: () {
                   localeProvider.setLocale(Locale(lang.$1));
@@ -649,6 +650,7 @@ class _OnboardingLangButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final c = AppTheme.of(context);
     final currentLang = LocaleProvider.supportedLanguages.firstWhere(
       (l) => l.$1 == localeProvider.locale.languageCode,
       orElse: () => LocaleProvider.supportedLanguages.first,
@@ -658,20 +660,20 @@ class _OnboardingLangButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: c.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: c.border),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(currentLang.$3, style: const TextStyle(fontSize: 15)),
+            Text(currentLang.$3, style: TextStyle(fontSize: 15)),
             const SizedBox(width: 4),
             Text(currentLang.$1.toUpperCase(),
-                style: const TextStyle(
-                    fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.muted)),
+                style: TextStyle(
+                    fontSize: 11, fontWeight: FontWeight.w700, color: c.muted)),
             const SizedBox(width: 2),
-            const Icon(Icons.expand_more, size: 13, color: AppTheme.muted),
+            Icon(Icons.expand_more, size: 13, color: c.muted),
           ],
         ),
       ),
@@ -688,13 +690,14 @@ class _WelcomeInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
@@ -702,10 +705,10 @@ class _WelcomeInfoCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(20),
+              color: c.accent.withAlpha(20),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: AppTheme.accent, size: 20),
+            child: Icon(icon, color: c.accent, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -713,15 +716,15 @@ class _WelcomeInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 14, color: AppTheme.text)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 14, color: c.text)),
                 const SizedBox(height: 2),
                 Text(subtitle,
-                    style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 12, color: c.muted)),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, size: 18, color: AppTheme.muted),
+          Icon(Icons.chevron_right_rounded, size: 18, color: c.muted),
         ],
       ),
     );
@@ -738,22 +741,23 @@ class _GenderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.accent : AppTheme.surface2,
+          color: selected ? c.accent : c.surface2,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: selected ? AppTheme.accent : AppTheme.border),
+          border: Border.all(color: selected ? c.accent : c.border),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 18, color: selected ? AppTheme.bg : AppTheme.muted),
+            Icon(icon, size: 18, color: selected ? c.bg : c.muted),
             const SizedBox(height: 2),
-            Text(label, style: TextStyle(fontSize: 11, color: selected ? AppTheme.bg : AppTheme.muted, fontWeight: FontWeight.w600)),
+            Text(label, style: TextStyle(fontSize: 11, color: selected ? c.bg : c.muted, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -770,6 +774,7 @@ class _SelectTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -777,12 +782,12 @@ class _SelectTile extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.accent : AppTheme.surface2,
+          color: selected ? c.accent : c.surface2,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: selected ? AppTheme.accent : AppTheme.border),
+          border: Border.all(color: selected ? c.accent : c.border),
         ),
         child: Text(label, style: TextStyle(
-          color: selected ? AppTheme.bg : AppTheme.text,
+          color: selected ? c.bg : c.text,
           fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
           fontSize: 14,
         )),
@@ -800,19 +805,20 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.accent : AppTheme.surface2,
+          color: selected ? c.accent : c.surface2,
           borderRadius: BorderRadius.circular(100),
-          border: Border.all(color: selected ? AppTheme.accent : AppTheme.border),
+          border: Border.all(color: selected ? c.accent : c.border),
         ),
         child: Text(label, style: TextStyle(
           fontSize: 12,
-          color: selected ? AppTheme.bg : AppTheme.text,
+          color: selected ? c.bg : c.text,
           fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
         )),
       ),

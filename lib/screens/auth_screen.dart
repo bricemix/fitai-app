@@ -250,7 +250,7 @@ class _AuthScreenState extends State<AuthScreen>
     final localeProvider = context.read<LocaleProvider>();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -264,7 +264,7 @@ class _AuthScreenState extends State<AuthScreen>
             Center(
               child: Container(
                 width: 36, height: 4,
-                decoration: BoxDecoration(color: AppTheme.border, borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(color: c.border, borderRadius: BorderRadius.circular(2)),
               ),
             ),
             const SizedBox(height: 16),
@@ -278,13 +278,13 @@ class _AuthScreenState extends State<AuthScreen>
               final isSelected = localeProvider.locale.languageCode == lang.$1;
               return ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Text(lang.$3, style: const TextStyle(fontSize: 26)),
+                leading: Text(lang.$3, style: TextStyle(fontSize: 26)),
                 title: Text(lang.$2,
                     style: TextStyle(
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
-                        color: isSelected ? AppTheme.accent : AppTheme.text)),
+                        color: isSelected ? c.accent : c.text)),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle, color: AppTheme.accent, size: 20)
+                    ? Icon(Icons.check_circle, color: c.accent, size: 20)
                     : null,
                 onTap: () {
                   localeProvider.setLocale(Locale(lang.$1));
@@ -301,6 +301,7 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final c = AppTheme.of(context);
     final currentLang = LocaleProvider.supportedLanguages.firstWhere(
       (l) => l.$1 == localeProvider.locale.languageCode,
       orElse: () => LocaleProvider.supportedLanguages.first,
@@ -323,22 +324,22 @@ class _AuthScreenState extends State<AuthScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                     decoration: BoxDecoration(
-                      color: AppTheme.surface,
+                      color: c.surface,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppTheme.border),
+                      border: Border.all(color: c.border),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(currentLang.$3, style: const TextStyle(fontSize: 16)),
+                        Text(currentLang.$3, style: TextStyle(fontSize: 16)),
                         const SizedBox(width: 6),
                         Text(currentLang.$1.toUpperCase(),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.muted)),
+                                color: c.muted)),
                         const SizedBox(width: 4),
-                        const Icon(Icons.expand_more, size: 14, color: AppTheme.muted),
+                        Icon(Icons.expand_more, size: 14, color: c.muted),
                       ],
                     ),
                   ),
@@ -354,22 +355,22 @@ class _AuthScreenState extends State<AuthScreen>
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppTheme.surface,
+                  color: c.surface,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: c.border),
                 ),
                 child: Builder(builder: (ctx) {
                   final l10n = AppLocalizations.of(ctx);
                   return TabBar(
                     controller: _tab,
                     indicator: BoxDecoration(
-                      color: AppTheme.accent,
+                      color: c.accent,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
                     dividerColor: Colors.transparent,
-                    labelColor: AppTheme.bg,
-                    unselectedLabelColor: AppTheme.muted,
+                    labelColor: c.bg,
+                    unselectedLabelColor: c.muted,
                     labelStyle: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 14),
                     tabs: [
@@ -407,6 +408,7 @@ class _AuthScreenState extends State<AuthScreen>
 class _DietVisionLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Column(
       children: [
         ClipRRect(
@@ -427,7 +429,7 @@ class _DietVisionLogo extends StatelessWidget {
                     fontFamily: 'Syne',
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.text),
+                    color: c.text),
               ),
               TextSpan(
                 text: 'Vision',
@@ -435,7 +437,7 @@ class _DietVisionLogo extends StatelessWidget {
                     fontFamily: 'Syne',
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.accent),
+                    color: c.accent),
               ),
             ],
           ),
@@ -445,7 +447,7 @@ class _DietVisionLogo extends StatelessWidget {
           final l10n = AppLocalizations.of(ctx);
           return Text(
             l10n.appSubtitle,
-            style: const TextStyle(fontSize: 13, color: AppTheme.muted),
+            style: TextStyle(fontSize: 13, color: c.muted),
           );
         }),
       ],
@@ -497,6 +499,7 @@ class _LoginFormState extends State<_LoginForm> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Form(
       key: _formKey,
       child: Column(
@@ -511,10 +514,10 @@ class _LoginFormState extends State<_LoginForm> {
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             autocorrect: false,
-            style: const TextStyle(color: AppTheme.text),
+            style: TextStyle(color: c.text),
             decoration: InputDecoration(
               hintText: l10n.emailHint,
-              prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.muted, size: 18),
+              prefixIcon: Icon(Icons.email_outlined, color: c.muted, size: 18),
             ),
             validator: (v) {
               if (v == null || v.trim().isEmpty) return l10n.emailRequired;
@@ -531,14 +534,14 @@ class _LoginFormState extends State<_LoginForm> {
             obscureText: _obscure,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _submit(),
-            style: const TextStyle(color: AppTheme.text),
+            style: TextStyle(color: c.text),
             decoration: InputDecoration(
               hintText: l10n.passwordHint,
-              prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.muted, size: 18),
+              prefixIcon: Icon(Icons.lock_outline, color: c.muted, size: 18),
               suffixIcon: IconButton(
                 icon: Icon(
                     _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: AppTheme.muted,
+                    color: c.muted,
                     size: 18),
                 onPressed: () => setState(() => _obscure = !_obscure),
               ),
@@ -562,7 +565,7 @@ class _LoginFormState extends State<_LoginForm> {
               ),
               child: Text(
                 l10n.forgotPassword,
-                style: const TextStyle(color: AppTheme.muted, fontSize: 13),
+                style: TextStyle(color: c.muted, fontSize: 13),
               ),
             ),
           ),
@@ -573,11 +576,11 @@ class _LoginFormState extends State<_LoginForm> {
             child: ElevatedButton(
               onPressed: _loading ? null : _submit,
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          color: AppTheme.bg, strokeWidth: 2))
+                          color: c.bg, strokeWidth: 2))
                   : Text(l10n.loginButton),
             ),
           ),
@@ -645,13 +648,13 @@ class _RegisterFormState extends State<_RegisterForm> {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.dark(
-            primary: AppTheme.accent,
+            primary: c.accent,
             onPrimary: Colors.black,
             surface: Color(0xFF1C1C1E),
             onSurface: Colors.white,
           ),
           textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(foregroundColor: AppTheme.accent),
+            style: TextButton.styleFrom(foregroundColor: c.accent),
           ),
         ),
         child: child!,
@@ -688,7 +691,7 @@ class _RegisterFormState extends State<_RegisterForm> {
             Text(
               l10n.underageTitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -708,7 +711,7 @@ class _RegisterFormState extends State<_RegisterForm> {
             child: TextButton(
               onPressed: () => Navigator.pop(ctx),
               style: TextButton.styleFrom(
-                backgroundColor: AppTheme.accent,
+                backgroundColor: c.accent,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -728,7 +731,7 @@ class _RegisterFormState extends State<_RegisterForm> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -750,7 +753,7 @@ class _RegisterFormState extends State<_RegisterForm> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -809,6 +812,7 @@ class _RegisterFormState extends State<_RegisterForm> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Form(
       key: _formKey,
       child: Column(
@@ -823,10 +827,10 @@ class _RegisterFormState extends State<_RegisterForm> {
             controller: _nameCtrl,
             textInputAction: TextInputAction.next,
             textCapitalization: TextCapitalization.words,
-            style: const TextStyle(color: AppTheme.text),
+            style: TextStyle(color: c.text),
             decoration: InputDecoration(
               hintText: l10n.firstNameHint,
-              prefixIcon: const Icon(Icons.person_outline, color: AppTheme.muted, size: 18),
+              prefixIcon: Icon(Icons.person_outline, color: c.muted, size: 18),
             ),
             validator: (v) {
               if (v == null || v.trim().length < 2) return l10n.firstNameRequired;
@@ -843,17 +847,17 @@ class _RegisterFormState extends State<_RegisterForm> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
               decoration: BoxDecoration(
-                color: AppTheme.surface,
+                color: c.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _birthDate != null
-                      ? AppTheme.accent.withValues(alpha: 0.5)
+                      ? c.accent.withValues(alpha: 0.5)
                       : Colors.transparent,
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.cake_outlined, color: AppTheme.muted, size: 18),
+                  Icon(Icons.cake_outlined, color: c.muted, size: 18),
                   const SizedBox(width: 10),
                   Text(
                     _birthDate != null
@@ -862,13 +866,13 @@ class _RegisterFormState extends State<_RegisterForm> {
                           '${_birthDate!.year}'
                         : l10n.birthDateHint,
                     style: TextStyle(
-                      color: _birthDate != null ? AppTheme.text : AppTheme.muted,
+                      color: _birthDate != null ? c.text : c.muted,
                       fontSize: 15,
                     ),
                   ),
                   const Spacer(),
-                  const Icon(Icons.calendar_today_outlined,
-                      color: AppTheme.muted, size: 16),
+                  Icon(Icons.calendar_today_outlined,
+                      color: c.muted, size: 16),
                 ],
               ),
             ),
@@ -883,10 +887,10 @@ class _RegisterFormState extends State<_RegisterForm> {
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             autocorrect: false,
-            style: const TextStyle(color: AppTheme.text),
+            style: TextStyle(color: c.text),
             decoration: InputDecoration(
               hintText: l10n.emailHint,
-              prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.muted, size: 18),
+              prefixIcon: Icon(Icons.email_outlined, color: c.muted, size: 18),
             ),
             validator: (v) {
               if (v == null || v.trim().isEmpty) return l10n.emailRequired;
@@ -903,10 +907,10 @@ class _RegisterFormState extends State<_RegisterForm> {
             controller: _phoneCtrl,
             keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.next,
-            style: const TextStyle(color: AppTheme.text),
+            style: TextStyle(color: c.text),
             decoration: InputDecoration(
               hintText: l10n.phoneHint,
-              prefixIcon: const Icon(Icons.phone_outlined, color: AppTheme.muted, size: 18),
+              prefixIcon: Icon(Icons.phone_outlined, color: c.muted, size: 18),
             ),
           ),
           const SizedBox(height: 14),
@@ -920,20 +924,20 @@ class _RegisterFormState extends State<_RegisterForm> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               decoration: BoxDecoration(
-                color: AppTheme.surface2,
+                color: c.surface2,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.border),
+                border: Border.all(color: c.border),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.public_outlined, color: AppTheme.muted, size: 18),
+                  Icon(Icons.public_outlined, color: c.muted, size: 18),
                   const SizedBox(width: 10),
                   Text(
                     '$_countryFlag  $_countryName',
-                    style: const TextStyle(color: AppTheme.text, fontSize: 14),
+                    style: TextStyle(color: c.text, fontSize: 14),
                   ),
                   const Spacer(),
-                  const Icon(Icons.expand_more, color: AppTheme.muted, size: 20),
+                  Icon(Icons.expand_more, color: c.muted, size: 20),
                 ],
               ),
             ),
@@ -949,32 +953,32 @@ class _RegisterFormState extends State<_RegisterForm> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               decoration: BoxDecoration(
-                color: AppTheme.surface2,
+                color: c.surface2,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.border),
+                border: Border.all(color: c.border),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.currency_exchange_rounded, color: AppTheme.muted, size: 18),
+                  Icon(Icons.currency_exchange_rounded, color: c.muted, size: 18),
                   const SizedBox(width: 10),
                   Text(
                     '${_currency.flag}  ${_currency.name}',
-                    style: const TextStyle(color: AppTheme.text, fontSize: 14),
+                    style: TextStyle(color: c.text, fontSize: 14),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: AppTheme.accent.withAlpha(28),
+                      color: c.accent.withAlpha(28),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       _currency.code,
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: c.accent),
                     ),
                   ),
                   const Spacer(),
-                  const Icon(Icons.expand_more, color: AppTheme.muted, size: 20),
+                  Icon(Icons.expand_more, color: c.muted, size: 20),
                 ],
               ),
             ),
@@ -988,14 +992,14 @@ class _RegisterFormState extends State<_RegisterForm> {
             controller: _passCtrl,
             obscureText: _obscurePass,
             textInputAction: TextInputAction.next,
-            style: const TextStyle(color: AppTheme.text),
+            style: TextStyle(color: c.text),
             decoration: InputDecoration(
               hintText: l10n.passwordHint,
-              prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.muted, size: 18),
+              prefixIcon: Icon(Icons.lock_outline, color: c.muted, size: 18),
               suffixIcon: IconButton(
                 icon: Icon(
                     _obscurePass ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: AppTheme.muted,
+                    color: c.muted,
                     size: 18),
                 onPressed: () => setState(() => _obscurePass = !_obscurePass),
               ),
@@ -1021,14 +1025,14 @@ class _RegisterFormState extends State<_RegisterForm> {
             obscureText: _obscureConfirm,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _submit(),
-            style: const TextStyle(color: AppTheme.text),
+            style: TextStyle(color: c.text),
             decoration: InputDecoration(
               hintText: l10n.passwordHint,
-              prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.muted, size: 18),
+              prefixIcon: Icon(Icons.lock_outline, color: c.muted, size: 18),
               suffixIcon: IconButton(
                 icon: Icon(
                     _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: AppTheme.muted,
+                    color: c.muted,
                     size: 18),
                 onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
               ),
@@ -1051,30 +1055,30 @@ class _RegisterFormState extends State<_RegisterForm> {
                   height: 22,
                   margin: const EdgeInsets.only(top: 1),
                   decoration: BoxDecoration(
-                    color: _consentChecked ? AppTheme.accent : Colors.transparent,
+                    color: _consentChecked ? c.accent : Colors.transparent,
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: _consentChecked ? AppTheme.accent : AppTheme.muted,
+                      color: _consentChecked ? c.accent : c.muted,
                       width: 2,
                     ),
                   ),
                   child: _consentChecked
-                      ? const Icon(Icons.check, size: 14, color: AppTheme.bg)
+                      ? Icon(Icons.check, size: 14, color: c.bg)
                       : null,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: RichText(
                     text: TextSpan(
-                      style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.4),
+                      style: TextStyle(fontSize: 12, color: c.muted, height: 1.4),
                       children: [
                         TextSpan(text: l10n.iAcceptThe),
                         TextSpan(
                           text: l10n.privacyPolicyLink,
-                          style: const TextStyle(
-                            color: AppTheme.accent,
+                          style: TextStyle(
+                            color: c.accent,
                             decoration: TextDecoration.underline,
-                            decorationColor: AppTheme.accent,
+                            decorationColor: c.accent,
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () => Navigator.push(
@@ -1098,11 +1102,11 @@ class _RegisterFormState extends State<_RegisterForm> {
             child: ElevatedButton(
               onPressed: _loading ? null : _submit,
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          color: AppTheme.bg, strokeWidth: 2))
+                          color: c.bg, strokeWidth: 2))
                   : Text(l10n.registerButton),
             ),
           ),
@@ -1121,6 +1125,7 @@ class _PasswordStrengthHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final hasLength  = password.length >= 8;
     final hasUpper   = password.contains(RegExp(r'[A-Z]'));
     final hasNumSym  = password.contains(RegExp(r'[\d!@#$%^&*()\-_=+\[\]{};:,.<>/?\\|~]'));
@@ -1134,10 +1139,10 @@ class _PasswordStrengthHint extends StatelessWidget {
           Icon(
             ok ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
             size: 14,
-            color: ok ? AppTheme.accent : AppTheme.muted,
+            color: ok ? c.accent : c.muted,
           ),
           const SizedBox(width: 6),
-          Text(text, style: TextStyle(fontSize: 12, color: ok ? AppTheme.accent : AppTheme.muted)),
+          Text(text, style: TextStyle(fontSize: 12, color: ok ? c.accent : c.muted)),
         ],
       ),
     );
@@ -1228,6 +1233,7 @@ class _SocialButtonsState extends State<_SocialButtons> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     // Sur Android, Apple n'est pas disponible → on masque toute la section
     if (!SocialAuthService.isAppleAvailable) return const SizedBox.shrink();
 
@@ -1236,15 +1242,15 @@ class _SocialButtonsState extends State<_SocialButtons> {
         // ── Séparateur "Ou continuer avec" ────────────────────────────────
         Row(
           children: [
-            const Expanded(child: Divider(color: AppTheme.border)),
+            Expanded(child: Divider(color: c.border)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 l10n.orContinueWith,
-                style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+                style: TextStyle(fontSize: 12, color: c.muted),
               ),
             ),
-            const Expanded(child: Divider(color: AppTheme.border)),
+            Expanded(child: Divider(color: c.border)),
           ],
         ),
         const SizedBox(height: 14),
@@ -1275,7 +1281,7 @@ class _SocialButtonsState extends State<_SocialButtons> {
 
   Widget _facebookIcon() => const Icon(Icons.facebook, color: Color(0xFF1877F2), size: 22);
 
-  Widget _appleIcon() => const Icon(Icons.apple, color: AppTheme.text, size: 22);
+  Widget _appleIcon() => Icon(Icons.apple, color: c.text, size: 22);
 }
 
 class _SocialIconButton extends StatelessWidget {
@@ -1291,6 +1297,7 @@ class _SocialIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Tooltip(
       message: label,
       child: InkWell(
@@ -1300,9 +1307,9 @@ class _SocialIconButton extends StatelessWidget {
           width: 56,
           height: 52,
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: c.surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppTheme.border),
+            border: Border.all(color: c.border),
           ),
           child: Center(child: icon),
         ),
@@ -1400,6 +1407,7 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final viewInsets = MediaQuery.of(context).viewInsets;
     return Padding(
       padding: EdgeInsets.only(bottom: viewInsets.bottom),
@@ -1413,7 +1421,7 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.border,
+                color: c.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1428,8 +1436,8 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
                   children: [
                     Text(
                       l10n.chooseCountry,
-                      style: const TextStyle(
-                        color: AppTheme.text,
+                      style: TextStyle(
+                        color: c.text,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -1448,13 +1456,13 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
                 child: TextField(
                   controller: _searchCtrl,
                   autofocus: false,
-                  style: const TextStyle(color: AppTheme.text, fontSize: 14),
+                  style: TextStyle(color: c.text, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: l10n.searchCountry,
-                    prefixIcon: const Icon(Icons.search, color: AppTheme.muted, size: 18),
+                    prefixIcon: Icon(Icons.search, color: c.muted, size: 18),
                     suffixIcon: _searchCtrl.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: AppTheme.muted, size: 16),
+                            icon: Icon(Icons.clear, color: c.muted, size: 16),
                             onPressed: () {
                               _searchCtrl.clear();
                             },
@@ -1469,7 +1477,7 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
             const SizedBox(height: 8),
 
             // Divider
-            const Divider(color: AppTheme.border, height: 1),
+            Divider(color: c.border, height: 1),
 
             // Country list
             Expanded(
@@ -1486,21 +1494,21 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
                           horizontal: 20, vertical: 13),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppTheme.accent.withAlpha(18)
+                            ? c.accent.withAlpha(18)
                             : Colors.transparent,
                       ),
                       child: Row(
                         children: [
                           Text(country.$2,
-                              style: const TextStyle(fontSize: 20)),
+                              style: TextStyle(fontSize: 20)),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Text(
                               country.$3,
                               style: TextStyle(
                                 color: isSelected
-                                    ? AppTheme.accent
-                                    : AppTheme.text,
+                                    ? c.accent
+                                    : c.text,
                                 fontSize: 14,
                                 fontWeight: isSelected
                                     ? FontWeight.w600
@@ -1509,8 +1517,8 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
                             ),
                           ),
                           if (isSelected)
-                            const Icon(Icons.check_circle,
-                                color: AppTheme.accent, size: 18),
+                            Icon(Icons.check_circle,
+                                color: c.accent, size: 18),
                         ],
                       ),
                     ),
@@ -1574,6 +1582,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final viewInsets = MediaQuery.of(context).viewInsets;
     return Padding(
       padding: EdgeInsets.only(bottom: viewInsets.bottom),
@@ -1584,7 +1593,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
             const SizedBox(height: 10),
             Container(
               width: 36, height: 4,
-              decoration: BoxDecoration(color: AppTheme.border, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(color: c.border, borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(height: 14),
             Builder(builder: (ctx) {
@@ -1593,10 +1602,10 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    const Icon(Icons.currency_exchange_rounded, color: AppTheme.accent, size: 18),
+                    Icon(Icons.currency_exchange_rounded, color: c.accent, size: 18),
                     const SizedBox(width: 8),
                     Text(l10n.chooseCurrency,
-                        style: const TextStyle(color: AppTheme.text, fontSize: 16, fontWeight: FontWeight.w700)),
+                        style: TextStyle(color: c.text, fontSize: 16, fontWeight: FontWeight.w700)),
                   ],
                 ),
               );
@@ -1609,13 +1618,13 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                 child: TextField(
                   controller: _searchCtrl,
                   autofocus: false,
-                  style: const TextStyle(color: AppTheme.text, fontSize: 14),
+                  style: TextStyle(color: c.text, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: l10n.searchCurrency,
-                    prefixIcon: const Icon(Icons.search, color: AppTheme.muted, size: 18),
+                    prefixIcon: Icon(Icons.search, color: c.muted, size: 18),
                     suffixIcon: _searchCtrl.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: AppTheme.muted, size: 16),
+                            icon: Icon(Icons.clear, color: c.muted, size: 16),
                             onPressed: _searchCtrl.clear,
                           )
                         : null,
@@ -1625,7 +1634,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
               );
             }),
             const SizedBox(height: 8),
-            const Divider(color: AppTheme.border, height: 1),
+            Divider(color: c.border, height: 1),
             Expanded(
               child: ListView.builder(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -1638,11 +1647,11 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppTheme.accent.withAlpha(15) : Colors.transparent,
+                        color: isSelected ? c.accent.withAlpha(15) : Colors.transparent,
                       ),
                       child: Row(
                         children: [
-                          Text(c.flag, style: const TextStyle(fontSize: 20)),
+                          Text(c.flag, style: TextStyle(fontSize: 20)),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
@@ -1652,12 +1661,12 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: isSelected ? AppTheme.accent : AppTheme.text,
+                                      color: isSelected ? c.accent : c.text,
                                     )),
                                 Text(c.code,
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: isSelected ? AppTheme.accent.withAlpha(180) : AppTheme.muted,
+                                      color: isSelected ? c.accent.withAlpha(180) : c.muted,
                                     )),
                               ],
                             ),
@@ -1667,12 +1676,12 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: isSelected ? AppTheme.accent : AppTheme.muted,
+                              color: isSelected ? c.accent : c.muted,
                             ),
                           ),
                           const SizedBox(width: 10),
                           if (isSelected)
-                            const Icon(Icons.check_circle, color: AppTheme.accent, size: 18)
+                            Icon(Icons.check_circle, color: c.accent, size: 18)
                           else
                             const SizedBox(width: 18),
                         ],
@@ -1697,11 +1706,12 @@ class _Label extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
           fontSize: 11,
-          color: AppTheme.muted,
+          color: c.muted,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.6),
     );
@@ -1714,21 +1724,22 @@ class _ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppTheme.accent3.withAlpha(18),
+        color: c.accent3.withAlpha(18),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.accent3.withAlpha(64)),
+        border: Border.all(color: c.accent3.withAlpha(64)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppTheme.accent3, size: 16),
+          Icon(Icons.error_outline, color: c.accent3, size: 16),
           const SizedBox(width: 10),
           Expanded(
             child: Text(message,
-                style: const TextStyle(fontSize: 13, color: AppTheme.accent3)),
+                style: TextStyle(fontSize: 13, color: c.accent3)),
           ),
         ],
       ),

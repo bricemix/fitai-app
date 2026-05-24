@@ -116,26 +116,26 @@ class _ConsentScreenState extends State<ConsentScreen> {
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surface,
+        backgroundColor: c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           l10n.leaveApp,
-          style: const TextStyle(fontFamily: 'Syne', fontWeight: FontWeight.w700),
+          style: TextStyle(fontFamily: 'Syne', fontWeight: FontWeight.w700),
         ),
         content: Text(
           l10n.leaveAppDesc,
-          style: const TextStyle(color: AppTheme.muted, fontSize: 13, height: 1.5),
+          style: TextStyle(color: c.muted, fontSize: 13, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(l10n.cancel,
-                style: const TextStyle(color: AppTheme.muted)),
+                style: TextStyle(color: c.muted)),
           ),
           TextButton(
             onPressed: () => SystemNavigator.pop(),
             child: Text(l10n.quit,
-                style: const TextStyle(color: AppTheme.accent3,
+                style: TextStyle(color: c.accent3,
                     fontWeight: FontWeight.w700)),
           ),
         ],
@@ -147,6 +147,7 @@ class _ConsentScreenState extends State<ConsentScreen> {
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final canAccept = _scrolledToBottom && _checked;
 
     return Scaffold(
@@ -157,10 +158,10 @@ class _ConsentScreenState extends State<ConsentScreen> {
             Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              decoration: const BoxDecoration(
-                color: AppTheme.surface,
+              decoration: BoxDecoration(
+                color: c.surface,
                 border:
-                    Border(bottom: BorderSide(color: AppTheme.border)),
+                    Border(bottom: BorderSide(color: c.border)),
               ),
               child: Row(
                 children: [
@@ -180,15 +181,15 @@ class _ConsentScreenState extends State<ConsentScreen> {
                       children: [
                         Text(
                           l10n.beforeStart,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontFamily: 'Syne',
                               fontSize: 17,
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
                           l10n.privacyTitle,
-                          style: const TextStyle(
-                              color: AppTheme.muted, fontSize: 12),
+                          style: TextStyle(
+                              color: c.muted, fontSize: 12),
                         ),
                       ],
                     ),
@@ -216,7 +217,7 @@ class _ConsentScreenState extends State<ConsentScreen> {
                               _rgpdVersion != null
                                   ? '${l10n.rgpdLabel} v$_rgpdVersion'
                                   : l10n.rgpdLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 10,
                                   color: Color(0xFF88AAFF),
                                   fontWeight: FontWeight.w700,
@@ -231,11 +232,11 @@ class _ConsentScreenState extends State<ConsentScreen> {
                           onTap: _openRgpd,
                           child: Text(
                             l10n.officialDoc,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: AppTheme.accent,
+                              color: c.accent,
                               decoration: TextDecoration.underline,
-                              decorationColor: AppTheme.accent,
+                              decorationColor: c.accent,
                             ),
                           ),
                         ),
@@ -251,17 +252,17 @@ class _ConsentScreenState extends State<ConsentScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 8),
-                color: AppTheme.accent.withAlpha(12),
+                color: c.accent.withAlpha(12),
                 child: Row(
                   children: [
-                    const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: AppTheme.accent, size: 16),
+                    Icon(Icons.keyboard_arrow_down_rounded,
+                        color: c.accent, size: 16),
                     const SizedBox(width: 6),
                     Text(
                       l10n.scrollToAccept,
                       style: TextStyle(
                           fontSize: 12,
-                          color: AppTheme.accent.withAlpha(200)),
+                          color: c.accent.withAlpha(200)),
                     ),
                   ],
                 ),
@@ -306,9 +307,9 @@ class _ConsentScreenState extends State<ConsentScreen> {
             // ── Checkbox + actions ───────────────────────────────────────────
             Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              decoration: const BoxDecoration(
-                color: AppTheme.surface,
-                border: Border(top: BorderSide(color: AppTheme.border)),
+              decoration: BoxDecoration(
+                color: c.surface,
+                border: Border(top: BorderSide(color: c.border)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,21 +329,21 @@ class _ConsentScreenState extends State<ConsentScreen> {
                           margin: const EdgeInsets.only(top: 1),
                           decoration: BoxDecoration(
                             color: _checked
-                                ? AppTheme.accent
+                                ? c.accent
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                               color: _scrolledToBottom
                                   ? (_checked
-                                      ? AppTheme.accent
-                                      : AppTheme.muted)
-                                  : AppTheme.border,
+                                      ? c.accent
+                                      : c.muted)
+                                  : c.border,
                               width: 2,
                             ),
                           ),
                           child: _checked
-                              ? const Icon(Icons.check,
-                                  size: 14, color: AppTheme.bg)
+                              ? Icon(Icons.check,
+                                  size: 14, color: c.bg)
                               : null,
                         ),
                         const SizedBox(width: 12),
@@ -352,8 +353,8 @@ class _ConsentScreenState extends State<ConsentScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               color: _scrolledToBottom
-                                  ? AppTheme.text
-                                  : AppTheme.muted,
+                                  ? c.text
+                                  : c.muted,
                               height: 1.45,
                             ),
                           ),
@@ -371,15 +372,15 @@ class _ConsentScreenState extends State<ConsentScreen> {
                         child: OutlinedButton(
                           onPressed: _refuse,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppTheme.muted,
-                            side: const BorderSide(color: AppTheme.border),
+                            foregroundColor: c.muted,
+                            side: BorderSide(color: c.border),
                             padding:
                                 const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
                           ),
                           child: Text(l10n.refuseButton,
-                              style: const TextStyle(fontSize: 14)),
+                              style: TextStyle(fontSize: 14)),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -394,10 +395,10 @@ class _ConsentScreenState extends State<ConsentScreen> {
                                 ? _accept
                                 : null,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.accent,
-                              foregroundColor: AppTheme.bg,
-                              disabledBackgroundColor: AppTheme.accent,
-                              disabledForegroundColor: AppTheme.bg,
+                              backgroundColor: c.accent,
+                              foregroundColor: c.bg,
+                              disabledBackgroundColor: c.accent,
+                              disabledForegroundColor: c.bg,
                               padding:
                                   const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
@@ -408,9 +409,9 @@ class _ConsentScreenState extends State<ConsentScreen> {
                                     width: 18,
                                     height: 18,
                                     child: CircularProgressIndicator(
-                                        color: AppTheme.bg, strokeWidth: 2))
+                                        color: c.bg, strokeWidth: 2))
                                 : Text(l10n.acceptButton,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700)),
                           ),
@@ -427,7 +428,7 @@ class _ConsentScreenState extends State<ConsentScreen> {
                         l10n.scrollToBottom,
                         style: TextStyle(
                             fontSize: 11,
-                            color: AppTheme.muted.withAlpha(160)),
+                            color: c.muted.withAlpha(160)),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -453,37 +454,38 @@ class _PolicySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: AppTheme.accent),
+              Icon(icon, size: 16, color: c.accent),
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                     fontFamily: 'Syne',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.text),
+                    color: c.text),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Text(
             body,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 13,
-                color: AppTheme.muted,
+                color: c.muted,
                 height: 1.55),
           ),
         ],
@@ -500,24 +502,25 @@ class _ScrollEndMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppTheme.accent.withAlpha(14),
+        color: c.accent.withAlpha(14),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.accent.withAlpha(40)),
+        border: Border.all(color: c.accent.withAlpha(40)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.check_circle_outline,
-              color: AppTheme.accent, size: 15),
+          Icon(Icons.check_circle_outline,
+              color: c.accent, size: 15),
           const SizedBox(width: 8),
           Text(
             l10n.youReachedEnd,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 12,
-                color: AppTheme.accent,
+                color: c.accent,
                 fontWeight: FontWeight.w600),
           ),
         ],

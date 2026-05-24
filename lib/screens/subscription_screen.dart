@@ -104,7 +104,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Future<void> _showCheckoutSheet(Plan plan, SubscribeResult result) async {
     final paid = await showModalBottomSheet<bool>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       isScrollControlled: true,
@@ -126,7 +126,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   void _snack(String msg, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
-      backgroundColor: error ? Colors.red.shade800 : AppTheme.surface,
+      backgroundColor: error ? Colors.red.shade800 : c.surface,
     ));
   }
 
@@ -134,19 +134,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Scaffold(
-      backgroundColor: AppTheme.bg,
+      backgroundColor: c.bg,
       appBar: AppBar(
-        backgroundColor: AppTheme.surface,
+        backgroundColor: c.surface,
         title: Text(l10n.premiumTitle,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.accent))
+          ? Center(child: CircularProgressIndicator(color: c.accent))
           : _error != null
               ? _ErrorView(error: _error!, onRetry: _loadPlans)
               : _PlanList(
@@ -297,7 +298,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
       action: retry
           ? SnackBarAction(
               label: l10n.retryVerification,
-              textColor: AppTheme.accent,
+              textColor: c.accent,
               onPressed: _confirmPayment,
             )
           : null,
@@ -309,13 +310,13 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surface,
+        backgroundColor: c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Builder(builder: (ctx) {
           final l10n = AppLocalizations.of(ctx);
           return Row(
             children: [
-              const Icon(Icons.workspace_premium_rounded, color: AppTheme.accent, size: 22),
+              Icon(Icons.workspace_premium_rounded, color: c.accent, size: 22),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(l10n.paymentVerifiedTitle,
@@ -331,18 +332,18 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(l10n.paymentVerifiedDesc,
-                  style: const TextStyle(color: AppTheme.muted, height: 1.5, fontSize: 13)),
+                  style: TextStyle(color: c.muted, height: 1.5, fontSize: 13)),
               const SizedBox(height: 16),
               // Récapitulatif des étapes
               _VerifyStepRow(
                 icon: Icons.check_circle_rounded,
-                color: AppTheme.accent,
+                color: c.accent,
                 label: l10n.stepPaymentConfirmed,
               ),
               const SizedBox(height: 8),
               _VerifyStepRow(
                 icon: Icons.check_circle_rounded,
-                color: AppTheme.accent,
+                color: c.accent,
                 label: l10n.stepServerNotified,
               ),
               const SizedBox(height: 8),
@@ -350,7 +351,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                 icon: invoiceSent
                     ? Icons.check_circle_rounded
                     : Icons.info_outline_rounded,
-                color: invoiceSent ? AppTheme.accent : AppTheme.muted,
+                color: invoiceSent ? c.accent : c.muted,
                 label: l10n.stepInvoiceSent,
               ),
             ],
@@ -370,8 +371,8 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                                   // → SubscriptionScreen voit le résultat et se ferme aussi
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accent,
-                foregroundColor: AppTheme.bg,
+                backgroundColor: c.accent,
+                foregroundColor: c.bg,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: Text(l10n.start,
@@ -386,6 +387,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
           24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 32),
@@ -398,7 +400,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
             child: Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.border,
+                color: c.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -411,11 +413,11 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(20),
+                  color: c.accent.withAlpha(20),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.workspace_premium_rounded,
-                    color: AppTheme.accent, size: 22),
+                child: Icon(Icons.workspace_premium_rounded,
+                    color: c.accent, size: 22),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -429,7 +431,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                             fontSize: 16)),
                     Text(
                       '${widget.plan.displayPrice(widget.currency)} · ${widget.plan.frequencyLabel}',
-                      style: const TextStyle(color: AppTheme.muted, fontSize: 13),
+                      style: TextStyle(color: c.muted, fontSize: 13),
                     ),
                   ],
                 ),
@@ -442,12 +444,12 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
           if (!_opened) ...[
             Text(
               l10n.paymentReady,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
             ),
             const SizedBox(height: 6),
             Text(
               l10n.paymentMethods,
-              style: const TextStyle(color: AppTheme.muted, height: 1.5, fontSize: 13),
+              style: TextStyle(color: c.muted, height: 1.5, fontSize: 13),
             ),
             const SizedBox(height: 16),
 
@@ -455,18 +457,18 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: AppTheme.accent.withAlpha(12),
+                color: c.accent.withAlpha(12),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.accent.withAlpha(40)),
+                border: Border.all(color: c.accent.withAlpha(40)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.local_offer_rounded, color: AppTheme.accent, size: 16),
+                  Icon(Icons.local_offer_rounded, color: c.accent, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       l10n.promoCode,
-                      style: const TextStyle(color: AppTheme.accent, fontSize: 12, height: 1.4),
+                      style: TextStyle(color: c.accent, fontSize: 12, height: 1.4),
                     ),
                   ),
                 ],
@@ -479,7 +481,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
               child: ElevatedButton.icon(
                 onPressed: _openStripe,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accent,
+                  backgroundColor: c.accent,
                   foregroundColor: const Color(0xFF0A0A0F),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -487,7 +489,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                 ),
                 icon: const Icon(Icons.lock_rounded, size: 18),
                 label: Text(l10n.payNow,
-                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
               ),
             ),
           ] else ...[
@@ -495,18 +497,18 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.accent.withAlpha(15),
+                color: c.accent.withAlpha(15),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.accent.withAlpha(60)),
+                border: Border.all(color: c.accent.withAlpha(60)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.open_in_browser_rounded, color: AppTheme.accent, size: 20),
+                  Icon(Icons.open_in_browser_rounded, color: c.accent, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       l10n.openingBrowser,
-                      style: const TextStyle(color: AppTheme.accent, fontSize: 13, height: 1.4),
+                      style: TextStyle(color: c.accent, fontSize: 13, height: 1.4),
                     ),
                   ),
                 ],
@@ -522,8 +524,8 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                     ? Icons.radio_button_unchecked
                     : (_stepPayment! ? Icons.check_circle_rounded : Icons.cancel_rounded),
                 color: _stepPayment == null
-                    ? AppTheme.muted
-                    : (_stepPayment! ? AppTheme.accent : Colors.redAccent),
+                    ? c.muted
+                    : (_stepPayment! ? c.accent : Colors.redAccent),
                 label: l10n.stepPaymentConfirmed,
                 loading: _stepPayment == null,
               ),
@@ -535,8 +537,8 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                     ? Icons.radio_button_unchecked
                     : (_stepServer! ? Icons.check_circle_rounded : Icons.cancel_rounded),
                 color: _stepServer == null
-                    ? AppTheme.muted
-                    : (_stepServer! ? AppTheme.accent : Colors.orangeAccent),
+                    ? c.muted
+                    : (_stepServer! ? c.accent : Colors.orangeAccent),
                 label: (_stepServer == null && _stepPayment == true && _webhookAttempt > 0)
                     ? l10n.webhookPolling(_webhookAttempt, _webhookMaxAttempts)
                     : (_stepServer == true
@@ -552,8 +554,8 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                     ? Icons.radio_button_unchecked
                     : (_stepInvoice! ? Icons.check_circle_rounded : Icons.info_outline_rounded),
                 color: _stepInvoice == null
-                    ? AppTheme.muted
-                    : (_stepInvoice! ? AppTheme.accent : AppTheme.muted),
+                    ? c.muted
+                    : (_stepInvoice! ? c.accent : c.muted),
                 label: l10n.stepInvoiceSent,
                 loading: _stepServer == true && _stepInvoice == null,
               ),
@@ -565,7 +567,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
               child: ElevatedButton(
                 onPressed: _checking ? null : _confirmPayment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accent,
+                  backgroundColor: c.accent,
                   foregroundColor: const Color(0xFF0A0A0F),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -581,7 +583,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
                           ),
                           const SizedBox(width: 10),
                           Text(l10n.verifyingPayment,
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                         ],
                       )
                     : Text(l10n.iHavePaid,
@@ -593,7 +595,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
               child: TextButton(
                 onPressed: _checking ? null : _openStripe,
                 child: Text(l10n.reopenPayment,
-                    style: const TextStyle(color: AppTheme.muted, fontSize: 13)),
+                    style: TextStyle(color: c.muted, fontSize: 13)),
               ),
             ),
           ],
@@ -603,10 +605,10 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.lock_outline_rounded, size: 13, color: AppTheme.muted),
+              Icon(Icons.lock_outline_rounded, size: 13, color: c.muted),
               const SizedBox(width: 5),
               Text(l10n.securedByStripe,
-                  style: const TextStyle(color: AppTheme.muted, fontSize: 11)),
+                  style: TextStyle(color: c.muted, fontSize: 11)),
             ],
           ),
         ],
@@ -679,9 +681,10 @@ class _PlanList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     if (plans.isEmpty) {
       return Center(
-          child: Text(l10n.noPlanAvailable, style: const TextStyle(color: AppTheme.muted)));
+          child: Text(l10n.noPlanAvailable, style: TextStyle(color: c.muted)));
     }
 
     final groups = _groupedPlans();
@@ -693,11 +696,11 @@ class _PlanList extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(l10n.goPremiumButton,
-              style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
+              style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
           Text(
             l10n.premiumDesc,
-            style: const TextStyle(color: AppTheme.muted, height: 1.5),
+            style: TextStyle(color: c.muted, height: 1.5),
           ),
           const SizedBox(height: 20),
 
@@ -718,7 +721,7 @@ class _PlanList extends StatelessWidget {
                   Expanded(
                     child: Text(
                       savingsBanner,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.greenAccent,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -773,18 +776,18 @@ class _PlanList extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: c.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: c.border),
             ),
             child: Row(
               children: [
-                const Icon(Icons.lock_outline_rounded, color: AppTheme.muted, size: 18),
+                Icon(Icons.lock_outline_rounded, color: c.muted, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     l10n.securityNote,
-                    style: const TextStyle(color: AppTheme.muted, fontSize: 12, height: 1.5),
+                    style: TextStyle(color: c.muted, fontSize: 12, height: 1.5),
                   ),
                 ),
               ],
@@ -875,6 +878,7 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final plan = _selectedPlan;
     final isCurrentPlan = widget.currentPlan != null &&
         plan.slug.toLowerCase() == widget.currentPlan!.toLowerCase();
@@ -888,14 +892,14 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: isCurrentPlan ? AppTheme.surface2 : AppTheme.surface,
+          color: isCurrentPlan ? c.surface2 : c.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isCurrentPlan
-                ? AppTheme.border
+                ? c.border
                 : isRecommended
-                    ? AppTheme.accent.withAlpha(160)
-                    : AppTheme.border,
+                    ? c.accent.withAlpha(160)
+                    : c.border,
             width: isRecommended ? 1.5 : 1,
           ),
         ),
@@ -907,18 +911,18 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 7),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Color(0xFF1E2A1E),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.check_circle_rounded, size: 13, color: AppTheme.accent),
+                    Icon(Icons.check_circle_rounded, size: 13, color: c.accent),
                     const SizedBox(width: 6),
                     Text(l10n.yourCurrentPlan,
-                        style: const TextStyle(
-                            color: AppTheme.accent, fontSize: 11,
+                        style: TextStyle(
+                            color: c.accent, fontSize: 11,
                             fontWeight: FontWeight.w800, letterSpacing: 1.2)),
                   ],
                 ),
@@ -929,7 +933,7 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                 padding: const EdgeInsets.symmetric(vertical: 7),
                 decoration: BoxDecoration(
                   color: isRecommended
-                      ? AppTheme.accent.withAlpha(25)
+                      ? c.accent.withAlpha(25)
                       : Colors.blue.withAlpha(25),
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(15)),
@@ -942,7 +946,7 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                           ? Icons.star_rounded
                           : Icons.local_fire_department_rounded,
                       size: 13,
-                      color: isRecommended ? AppTheme.accent : Colors.blueAccent,
+                      color: isRecommended ? c.accent : Colors.blueAccent,
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -951,7 +955,7 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                           : l10n.popular.toUpperCase(),
                       style: TextStyle(
                           color: isRecommended
-                              ? AppTheme.accent
+                              ? c.accent
                               : Colors.blueAccent,
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -1046,7 +1050,7 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                                           child: Text(
                                             l10n.bestOffer,
                                             textAlign: TextAlign.center,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 9,
                                               fontWeight: FontWeight.w900,
@@ -1066,17 +1070,17 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                                             vertical: 8, horizontal: 4),
                                         decoration: BoxDecoration(
                                           color: sel
-                                              ? AppTheme.accent.withAlpha(30)
+                                              ? c.accent.withAlpha(30)
                                               : isBest
                                                   ? const Color(0xFF2A2000)
-                                                  : AppTheme.surface2,
+                                                  : c.surface2,
                                           borderRadius: BorderRadius.circular(10),
                                           border: Border.all(
                                             color: sel
-                                                ? AppTheme.accent.withAlpha(180)
+                                                ? c.accent.withAlpha(180)
                                                 : isBest
                                                     ? const Color(0xFFFFD700).withAlpha(120)
-                                                    : AppTheme.border,
+                                                    : c.border,
                                             width: sel || isBest ? 1.5 : 1,
                                           ),
                                         ),
@@ -1090,10 +1094,10 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w700,
                                                 color: sel
-                                                    ? AppTheme.accent
+                                                    ? c.accent
                                                     : isBest
                                                         ? const Color(0xFFFFD700)
-                                                        : AppTheme.muted,
+                                                        : c.muted,
                                               ),
                                             ),
                                             const SizedBox(height: 3),
@@ -1104,7 +1108,7 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w900,
-                                                color: sel ? Colors.white : AppTheme.muted,
+                                                color: sel ? Colors.white : c.muted,
                                               ),
                                             ),
                                             if (savings != null) ...[
@@ -1161,8 +1165,8 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                     children: [
                       Text(
                         plan.displayPrice(widget.currency),
-                        style: const TextStyle(
-                            color: AppTheme.accent,
+                        style: TextStyle(
+                            color: c.accent,
                             fontSize: 30,
                             fontWeight: FontWeight.w900,
                             height: 1),
@@ -1172,7 +1176,7 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                         padding: const EdgeInsets.only(bottom: 5),
                         child: Text(
                           '/ ${plan.frequencyLabel.toLowerCase()}',
-                          style: const TextStyle(color: AppTheme.muted, fontSize: 13),
+                          style: TextStyle(color: c.muted, fontSize: 13),
                         ),
                       ),
                     ],
@@ -1192,12 +1196,12 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(l.perDay(dailyStr),
-                              style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
+                              style: TextStyle(color: c.muted, fontSize: 12)),
                           if (widget.currency.rateFromUsd > 0 &&
                               (daily / widget.currency.rateFromUsd) < 0.50)
                             Text(l.lessThanCoffee,
-                                style: const TextStyle(
-                                    color: AppTheme.accent,
+                                style: TextStyle(
+                                    color: c.accent,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600)),
                         ],
@@ -1208,8 +1212,8 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                   if (plan.description.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(plan.description,
-                        style: const TextStyle(
-                            color: AppTheme.muted, fontSize: 13, height: 1.4)),
+                        style: TextStyle(
+                            color: c.muted, fontSize: 13, height: 1.4)),
                   ],
                   if (plan.features.isNotEmpty) ...[
                     const SizedBox(height: 14),
@@ -1217,12 +1221,12 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                           padding: const EdgeInsets.only(bottom: 7),
                           child: Row(
                             children: [
-                              const Icon(Icons.check_circle_rounded,
-                                  color: AppTheme.accent, size: 16),
+                              Icon(Icons.check_circle_rounded,
+                                  color: c.accent, size: 16),
                               const SizedBox(width: 8),
                               Expanded(
                                   child: Text(f,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: Colors.white, fontSize: 13))),
                             ],
                           ),
@@ -1237,15 +1241,15 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                         ? OutlinedButton.icon(
                             onPressed: null,
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppTheme.border),
-                              disabledForegroundColor: AppTheme.muted,
+                              side: BorderSide(color: c.border),
+                              disabledForegroundColor: c.muted,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
                             ),
                             icon: const Icon(Icons.check_rounded, size: 16),
                             label: Text(l10n.currentPlanLabel,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontWeight: FontWeight.w700, fontSize: 15)),
                           )
                         : ElevatedButton(
@@ -1254,10 +1258,10 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
                                 : () => widget.onSubscribe(plan),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: plan.stripeAvailable
-                                  ? AppTheme.accent
-                                  : AppTheme.border,
+                                  ? c.accent
+                                  : c.border,
                               foregroundColor: const Color(0xFF0A0A0F),
-                              disabledBackgroundColor: AppTheme.border,
+                              disabledBackgroundColor: c.border,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
@@ -1305,12 +1309,13 @@ class _VerifyStepRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Row(
       children: [
         loading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 16, height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accent),
+                child: CircularProgressIndicator(strokeWidth: 2, color: c.accent),
               )
             : Icon(icon, size: 16, color: color),
         const SizedBox(width: 10),
@@ -1335,20 +1340,21 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.wifi_off_rounded, color: AppTheme.muted, size: 48),
+            Icon(Icons.wifi_off_rounded, color: c.muted, size: 48),
             const SizedBox(height: 16),
             Text(l10n.cannotLoadPlans,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
                 textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(error,
-                style: const TextStyle(color: AppTheme.muted, fontSize: 12),
+                style: TextStyle(color: c.muted, fontSize: 12),
                 textAlign: TextAlign.center),
             const SizedBox(height: 24),
             ElevatedButton.icon(

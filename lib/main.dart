@@ -30,6 +30,7 @@ import 'screens/profile_screen.dart';
 import 'theme.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/locale_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,8 +42,11 @@ void main() async {
   // Init notifications (does not request permission yet)
   await NotificationService.init();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => LocaleProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
       child: const FitAIApp(),
     ),
   );
@@ -54,9 +58,24 @@ class FitAIApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final themeProvider  = context.watch<ThemeProvider>();
+    // Adapter la barre de statut selon le thème
+    SystemChrome.setSystemUIOverlayStyle(themeProvider.isDark
+        ? const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarBrightness: Brightness.dark,
+            statusBarIconBrightness: Brightness.light,
+          )
+        : const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarBrightness: Brightness.light,
+            statusBarIconBrightness: Brightness.dark,
+          ));
     return MaterialApp(
       title: 'DietVision',
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.mode,
       debugShowCheckedModeBanner: false,
       locale: localeProvider.locale,
       localizationsDelegates: const [
@@ -137,7 +156,7 @@ class _AppLoaderState extends State<_AppLoader> {
                 const Icon(Icons.devices_other_rounded, color: Colors.orangeAccent, size: 22),
                 const SizedBox(width: 10),
                 Text(l10n.sessionExpired,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
               ],
             ),
             content: Text(
@@ -148,8 +167,8 @@ class _AppLoaderState extends State<_AppLoader> {
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accent,
-                  foregroundColor: AppTheme.bg,
+                  backgroundColor: c.accent,
+                  foregroundColor: c.bg,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Text(l10n.reconnect, style: const TextStyle(fontWeight: FontWeight.w800)),
@@ -368,6 +387,7 @@ class _AppLoaderState extends State<_AppLoader> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     // ── 1. Splash (toujours, à chaque ouverture) ───────────────────────────
     if (!_splashDone) {
       return SplashScreen(onDone: () => setState(() => _splashDone = true));
@@ -386,8 +406,8 @@ class _AppLoaderState extends State<_AppLoader> {
     // ── 3. Chargement des données ──────────────────────────────────────────
     if (_loading) {
       return const Scaffold(
-        backgroundColor: AppTheme.bg,
-        body: Center(child: CircularProgressIndicator(color: AppTheme.accent)),
+        backgroundColor: c.bg,
+        body: Center(child: CircularProgressIndicator(color: c.accent)),
       );
     }
 
@@ -553,12 +573,13 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final daysLeft = widget.subscriptionStatus.trialDaysRemaining;
     final (countH, countM) = _countdown();
     final offerActive = countH > 0 || countM > 0;
 
     return Scaffold(
-      backgroundColor: AppTheme.bg,
+      backgroundColor: c.bg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -571,9 +592,9 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(20),
+                  color: c.accent.withAlpha(20),
                   borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: AppTheme.accent.withAlpha(60)),
+                  border: Border.all(color: c.accent.withAlpha(60)),
                 ),
                 padding: const EdgeInsets.all(14),
                 child: SvgPicture.asset('assets/logo/dietvision-icon.svg'),
@@ -583,7 +604,7 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
               // ── Titre ────────────────────────────────────────────────────
               Text(
                 l10n.trialExpiredTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Syne',
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
@@ -593,8 +614,8 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
               const SizedBox(height: 12),
               Text(
                 l10n.trialExpiredSubtitle,
-                style: const TextStyle(
-                  color: AppTheme.muted,
+                style: TextStyle(
+                  color: c.muted,
                   fontSize: 14,
                   height: 1.6,
                 ),
@@ -607,16 +628,16 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppTheme.surface,
+                  color: c.surface,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: c.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       l10n.trialSummaryTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
@@ -625,21 +646,21 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Icon(Icons.restaurant_rounded, size: 14, color: AppTheme.accent),
+                        Icon(Icons.restaurant_rounded, size: 14, color: c.accent),
                         const SizedBox(width: 6),
                         Text(
                           l10n.mealsScannedCount(_mealsCount),
-                          style: const TextStyle(color: AppTheme.muted, fontSize: 13),
+                          style: TextStyle(color: c.muted, fontSize: 13),
                         ),
                         if (daysLeft != null) ...[
                           const SizedBox(width: 16),
-                          const Icon(Icons.schedule_rounded, size: 14, color: AppTheme.accent3),
+                          Icon(Icons.schedule_rounded, size: 14, color: c.accent3),
                           const SizedBox(width: 6),
                           Text(
                             daysLeft == 0
                                 ? l10n.trialExpiredToday
                                 : l10n.trialExpiredDaysAgo(daysLeft),
-                            style: const TextStyle(fontSize: 13, color: AppTheme.accent3),
+                            style: TextStyle(fontSize: 13, color: c.accent3),
                           ),
                         ],
                       ],
@@ -658,14 +679,14 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [AppTheme.accent3.withAlpha(30), AppTheme.accent.withAlpha(20)],
+                          colors: [c.accent3.withAlpha(30), c.accent.withAlpha(20)],
                         ),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppTheme.accent3.withAlpha(80)),
+                        border: Border.all(color: c.accent3.withAlpha(80)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.local_fire_department_rounded, color: AppTheme.accent3, size: 20),
+                          Icon(Icons.local_fire_department_rounded, color: c.accent3, size: 20),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Column(
@@ -673,8 +694,8 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                               children: [
                                 Text(
                                   l10n.specialOffer,
-                                  style: const TextStyle(
-                                    color: AppTheme.accent3,
+                                  style: TextStyle(
+                                    color: c.accent3,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 13,
                                     letterSpacing: 0.5,
@@ -682,7 +703,7 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                                 ),
                                 Text(
                                   l10n.offerExpiresIn(h, m),
-                                  style: const TextStyle(color: AppTheme.muted, fontSize: 12),
+                                  style: TextStyle(color: c.muted, fontSize: 12),
                                 ),
                               ],
                             ),
@@ -700,14 +721,14 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.accent3.withAlpha(18),
+                    color: c.accent3.withAlpha(18),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline_rounded, size: 16, color: AppTheme.accent3),
+                      Icon(Icons.info_outline_rounded, size: 16, color: c.accent3),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(_errorMsg!, style: const TextStyle(fontSize: 13, color: AppTheme.accent3))),
+                      Expanded(child: Text(_errorMsg!, style: TextStyle(fontSize: 13, color: c.accent3))),
                     ],
                   ),
                 ),
@@ -720,15 +741,15 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                 child: ElevatedButton.icon(
                   onPressed: _checking ? null : _openSubscription,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.accent,
-                    foregroundColor: AppTheme.bg,
+                    backgroundColor: c.accent,
+                    foregroundColor: c.bg,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     elevation: 0,
                   ),
                   icon: const Icon(Icons.workspace_premium_rounded, size: 20),
                   label: Text(l10n.upgradeNow,
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                 ),
               ),
               const SizedBox(height: 12),
@@ -739,7 +760,7 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                 child: OutlinedButton(
                   onPressed: _checking ? null : _recheck,
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppTheme.border),
+                    side: BorderSide(color: c.border),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
@@ -747,13 +768,13 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accent)),
+                            SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: c.accent)),
                             const SizedBox(width: 10),
-                            Text(l10n.checkingSubscription, style: const TextStyle(fontSize: 13, color: AppTheme.muted)),
+                            Text(l10n.checkingSubscription, style: TextStyle(fontSize: 13, color: c.muted)),
                           ],
                         )
                       : Text(l10n.alreadyPaidCheck,
-                          style: const TextStyle(fontSize: 13, color: AppTheme.muted)),
+                          style: TextStyle(fontSize: 13, color: c.muted)),
                 ),
               ),
               const SizedBox(height: 20),
@@ -763,7 +784,7 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
                 onPressed: () => widget.onLogout(),
                 child: Text(
                   l10n.logout,
-                  style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+                  style: TextStyle(fontSize: 12, color: c.muted),
                 ),
               ),
               const SizedBox(height: 24),
@@ -865,6 +886,7 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     // Watch locale so HomeShell rebuilds when language changes
     context.watch<LocaleProvider>();
+    final c = AppTheme.of(context);
     // IndexedStack préserve l'état de chaque onglet sans recréer les widgets
     return Scaffold(
       body: SafeArea(
@@ -936,6 +958,7 @@ class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final labels = [
       l10n.navHome,
       l10n.navScan,
@@ -944,9 +967,9 @@ class _BottomNav extends StatelessWidget {
       l10n.navProfile,
     ];
     return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.surface,
-        border: Border(top: BorderSide(color: AppTheme.border)),
+      decoration: BoxDecoration(
+        color: c.surface,
+        border: Border(top: BorderSide(color: c.border)),
       ),
       child: SafeArea(
         top: false,
@@ -961,16 +984,16 @@ class _BottomNav extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: active ? AppTheme.accent.withAlpha(24) : Colors.transparent,
+                    color: active ? c.accent.withAlpha(24) : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(_icons[i], size: 22, color: active ? AppTheme.accent : AppTheme.muted),
+                      Icon(_icons[i], size: 22, color: active ? c.accent : c.muted),
                       const SizedBox(height: 4),
-                      Text(labels[i], style: TextStyle(fontSize: 10, color: active ? AppTheme.accent : AppTheme.muted)),
+                      Text(labels[i], style: TextStyle(fontSize: 10, color: active ? c.accent : c.muted)),
                     ],
                   ),
                 ),

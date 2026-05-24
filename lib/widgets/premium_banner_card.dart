@@ -69,6 +69,7 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final trialLabel = _trialLabel(l10n);
     final mainTitle  = _mainTitle(l10n, trialLabel);
 
@@ -88,7 +89,7 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
                   const Color(0xFF1A2A1A),
                   Color.lerp(
                         const Color(0xFF1A2A1A),
-                        AppTheme.accent.withAlpha(60),
+                        c.accent.withAlpha(60),
                         glow * 0.5,
                       ) ??
                       const Color(0xFF1A2A1A),
@@ -99,13 +100,13 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.accent
+                color: c.accent
                     .withAlpha((80 + (glow * 100).round()).clamp(0, 255)),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.accent
+                  color: c.accent
                       .withAlpha((30 + (glow * 60).round()).clamp(0, 255)),
                   blurRadius: 12 + glow * 8,
                   spreadRadius: glow * 2,
@@ -126,13 +127,13 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: AppTheme.accent
+                    color: c.accent
                         .withAlpha((30 + (_glowAnim.value * 40).round())),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.rocket_launch_rounded,
-                    color: AppTheme.accent,
+                    color: c.accent,
                     size: 22,
                   ),
                 ),
@@ -144,7 +145,7 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
                   children: [
                     Text(
                       mainTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
@@ -174,8 +175,8 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
                         l10n.premiumDesc,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color: AppTheme.muted, fontSize: 12),
+                        style: TextStyle(
+                            color: c.muted, fontSize: 12),
                       ),
                     ],
                   ],
@@ -189,7 +190,7 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppTheme.accent.withAlpha(
+                    color: c.accent.withAlpha(
                         (180 + (_glowAnim.value * 75).round()).clamp(0, 255)),
                     borderRadius: BorderRadius.circular(20),
                   ),

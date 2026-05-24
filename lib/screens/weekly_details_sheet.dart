@@ -81,6 +81,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n  = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final today = DayPlan.todayKey();
     final now   = DateTime.now();
 
@@ -100,7 +101,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
     final dayShorts = [l10n.dayMon, l10n.dayTue, l10n.dayWed, l10n.dayThu, l10n.dayFri, l10n.daySat, l10n.daySun];
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFF12121f),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -108,25 +109,25 @@ class _WeeklyDetailsSheet extends StatelessWidget {
         children: [
           // Handle
           const SizedBox(height: 12),
-          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.border, borderRadius: BorderRadius.circular(2)))),
+          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: c.border, borderRadius: BorderRadius.circular(2)))),
           const SizedBox(height: 16),
           // Title bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                const Icon(Icons.calendar_month_rounded, color: AppTheme.accent, size: 20),
+                Icon(Icons.calendar_month_rounded, color: c.accent, size: 20),
                 const SizedBox(width: 10),
-                Text(l10n.weeklyDetails, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                Text(l10n.weeklyDetails, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: c.text)),
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_rounded, color: AppTheme.muted, size: 20),
+                  icon: Icon(Icons.close_rounded, color: c.muted, size: 20),
                 ),
               ],
             ),
           ),
-          const Divider(color: AppTheme.border, height: 1),
+          Divider(color: c.border, height: 1),
           // Scrollable content
           Expanded(
             child: ListView(
@@ -145,12 +146,12 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.accent.withAlpha(40)),
+                    border: Border.all(color: c.accent.withAlpha(40)),
                   ),
                   child: Column(
                     children: [
                       _SummaryRow(label: l10n.avgKcalPerDay,   value: '$avgKcal kcal/day',  accent: true),
-                      const Divider(color: AppTheme.border, height: 16),
+                      Divider(color: c.border, height: 16),
                       _SummaryRow(label: l10n.targetKcalDay2,  value: '$targetKcal kcal/day'),
                       const SizedBox(height: 8),
                       _SummaryRow(
@@ -196,10 +197,10 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
-                      color: isToday ? AppTheme.accent.withAlpha(12) : AppTheme.surface,
+                      color: isToday ? c.accent.withAlpha(12) : c.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isToday ? AppTheme.accent.withAlpha(60) : AppTheme.border,
+                        color: isToday ? c.accent.withAlpha(60) : c.border,
                         width: isToday ? 1.5 : 1,
                       ),
                     ),
@@ -220,15 +221,15 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                           children: [
                             Text(
                               i < dayShorts.length ? dayShorts[i] : 'Day ${i + 1}',
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                             ),
                             const SizedBox(width: 8),
-                            Text(_formatDate(plan.date), style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
+                            Text(_formatDate(plan.date), style: TextStyle(color: c.muted, fontSize: 12)),
                             if (isToday) ...[
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(color: AppTheme.accent, borderRadius: BorderRadius.circular(6)),
+                                decoration: BoxDecoration(color: c.accent, borderRadius: BorderRadius.circular(6)),
                                 child: Text(l10n.todayLabel, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Color(0xFF0A0A0F))),
                               ),
                             ],
@@ -238,7 +239,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             children: [
-                              Text('${plan.targetKcal} kcal', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.accent)),
+                              Text('${plan.targetKcal} kcal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: c.accent)),
                               const SizedBox(width: 10),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -252,7 +253,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                           ),
                         ),
                         children: [
-                          const Divider(color: AppTheme.border, height: 1),
+                          Divider(color: c.border, height: 1),
                           const SizedBox(height: 10),
                           // Macros
                           Row(
@@ -269,11 +270,11 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                           if (!isFuture && dayMeals.isNotEmpty)
                             Row(
                               children: [
-                                const Icon(Icons.check_circle_rounded, size: 14, color: AppTheme.accent),
+                                Icon(Icons.check_circle_rounded, size: 14, color: c.accent),
                                 const SizedBox(width: 6),
-                                Text(l10n.completedOfTotal(checkCount, 6), style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                                Text(l10n.completedOfTotal(checkCount, 6), style: TextStyle(fontSize: 12, color: c.muted)),
                                 const Spacer(),
-                                Text('$kcalUsed / ${plan.targetKcal} kcal', style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                                Text('$kcalUsed / ${plan.targetKcal} kcal', style: TextStyle(fontSize: 12, color: c.muted)),
                               ],
                             ),
                           // kcal progress bar
@@ -283,7 +284,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
                                 value: (kcalUsed / plan.targetKcal).clamp(0.0, 1.0),
-                                backgroundColor: AppTheme.surface2,
+                                backgroundColor: c.surface2,
                                 valueColor: AlwaysStoppedAnimation<Color>(statusColor),
                                 minHeight: 5,
                               ),
@@ -315,7 +316,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                       onBalanceWeek();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accent,
+                      backgroundColor: c.accent,
                       foregroundColor: const Color(0xFF0A0A0F),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -348,7 +349,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
       case _DayStatus.onTrack:    return const Color(0xFF6BCB77);
       case _DayStatus.attention:  return const Color(0xFFFFB347);
       case _DayStatus.offTrack:   return const Color(0xFFFF5252);
-      case _DayStatus.notStarted: return AppTheme.muted;
+      case _DayStatus.notStarted: return c.muted;
     }
   }
 
@@ -380,7 +381,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
         title,
-        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.accent, letterSpacing: 1.2),
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.accent, letterSpacing: 1.2),
       );
 }
 
@@ -394,13 +395,13 @@ class _SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
         children: [
-          Expanded(child: Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.muted))),
+          Expanded(child: Text(label, style: TextStyle(fontSize: 13, color: c.muted))),
           Text(
             value,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: color ?? (accent ? AppTheme.accent : AppTheme.text),
+              color: color ?? (accent ? c.accent : c.text),
             ),
           ),
         ],
@@ -421,7 +422,7 @@ class _MacroChip extends StatelessWidget {
           child: Row(
             children: [
               Text('$label: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
-              Expanded(child: Text(value, style: const TextStyle(fontSize: 11, color: AppTheme.muted), overflow: TextOverflow.ellipsis)),
+              Expanded(child: Text(value, style: TextStyle(fontSize: 11, color: c.muted), overflow: TextOverflow.ellipsis)),
             ],
           ),
         ),
@@ -440,16 +441,16 @@ class _ActionChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: AppTheme.surface2,
+            color: c.surface2,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.border),
+            border: Border.all(color: c.border),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 13, color: AppTheme.muted),
+              Icon(icon, size: 13, color: c.muted),
               const SizedBox(width: 5),
-              Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.muted, fontWeight: FontWeight.w600)),
+              Text(label, style: TextStyle(fontSize: 12, color: c.muted, fontWeight: FontWeight.w600)),
             ],
           ),
         ),

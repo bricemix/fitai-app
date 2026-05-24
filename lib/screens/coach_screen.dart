@@ -76,6 +76,7 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Column(
       children: [
         Padding(
@@ -91,7 +92,7 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(l10n.coachTitle, style: Theme.of(context).textTheme.headlineMedium),
-                        Text(l10n.coachSubtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.muted)),
+                        Text(l10n.coachSubtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.muted)),
                       ],
                     ),
                   ),
@@ -101,11 +102,11 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
                     icon: Container(
                       width: 40, height: 40,
                       decoration: BoxDecoration(
-                        color: AppTheme.surface2,
+                        color: c.surface2,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.border),
+                        border: Border.all(color: c.border),
                       ),
-                      child: const Icon(Icons.notifications_outlined, color: AppTheme.text, size: 20),
+                      child: Icon(Icons.notifications_outlined, color: c.text, size: 20),
                     ),
                   ),
                 ],
@@ -113,21 +114,21 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
               const SizedBox(height: 14),
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.surface2,
+                  color: c.surface2,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 padding: const EdgeInsets.all(4),
                 child: TabBar(
                   controller: _tabController,
                   indicator: BoxDecoration(
-                    color: AppTheme.accent,
+                    color: c.accent,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   dividerColor: Colors.transparent,
-                  labelColor: AppTheme.bg,
-                  unselectedLabelColor: AppTheme.muted,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                  labelColor: c.bg,
+                  unselectedLabelColor: c.muted,
+                  labelStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                   unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
                   tabs: [
                     Tab(
@@ -183,7 +184,7 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
                               const Padding(
                                 padding: EdgeInsets.only(left: 4),
                                 child: Icon(Icons.workspace_premium_rounded,
-                                    size: 11, color: AppTheme.accent),
+                                    size: 11, color: c.accent),
                               ),
                           ],
                         ),
@@ -272,7 +273,7 @@ class _PlanGateState extends State<_PlanGate> {
   }
 
   Color get _color =>
-      widget.requiredPlan == 'Premium' ? AppTheme.accent : Colors.orangeAccent;
+      widget.requiredPlan == 'Premium' ? c.accent : Colors.orangeAccent;
 
   String get _currentPlanLabel =>
       widget.currentPlan.isEmpty || widget.currentPlan == 'free'
@@ -289,6 +290,7 @@ class _PlanGateState extends State<_PlanGate> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return widget.requiredPlan == 'Pro'
         ? _buildProGate(context)
         : _buildPremiumGate(context);
@@ -376,7 +378,7 @@ class _PlanGateState extends State<_PlanGate> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: AppTheme.surface,
+                color: c.surface,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: color.withAlpha(50)),
               ),
@@ -401,13 +403,13 @@ class _PlanGateState extends State<_PlanGate> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(l10n.proGateHeroTitle,
-                                  style: const TextStyle(fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.text, height: 1.2)),
+                                  style: TextStyle(fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w900, color: c.text, height: 1.2)),
                               const SizedBox(height: 4),
                               Text(l10n.proGateHeroAvail,
                                   style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w700)),
                               const SizedBox(height: 8),
                               Text(l10n.proGateHeroDesc,
-                                  style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.4)),
+                                  style: TextStyle(fontSize: 12, color: c.muted, height: 1.4)),
                             ],
                           ),
                         ),
@@ -477,9 +479,9 @@ class _PlanGateState extends State<_PlanGate> {
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: AppTheme.surface,
+                color: c.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.border),
+                border: Border.all(color: c.border),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -526,19 +528,19 @@ class _PlanGateState extends State<_PlanGate> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: AppTheme.surface,
+                color: c.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.border),
+                border: Border.all(color: c.border),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, size: 16, color: AppTheme.muted),
+                  Icon(Icons.info_outline_rounded, size: 16, color: c.muted),
                   const SizedBox(width: 8),
-                  Text('${l10n.currentPlanLabel} : ', style: const TextStyle(fontSize: 13, color: AppTheme.muted)),
+                  Text('${l10n.currentPlanLabel} : ', style: TextStyle(fontSize: 13, color: c.muted)),
                   Text(_currentPlanLabel,
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
                   const Spacer(),
-                  const Icon(Icons.chevron_right_rounded, size: 18, color: AppTheme.muted),
+                  Icon(Icons.chevron_right_rounded, size: 18, color: c.muted),
                 ],
               ),
             ),
@@ -561,7 +563,7 @@ class _PlanGateState extends State<_PlanGate> {
                 ),
                 icon: const Icon(Icons.workspace_premium_rounded, size: 20),
                 label: Text(l10n.proGateCta,
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
               ),
             ),
           ),
@@ -574,14 +576,14 @@ class _PlanGateState extends State<_PlanGate> {
               Icon(Icons.verified_rounded, size: 12, color: color.withAlpha(160)),
               const SizedBox(width: 4),
               Text(l10n.freeTrialDays, style: TextStyle(fontSize: 11, color: color.withAlpha(160))),
-              Text('  •  ', style: TextStyle(fontSize: 11, color: AppTheme.muted.withAlpha(100))),
-              Icon(Icons.verified_rounded, size: 12, color: AppTheme.muted.withAlpha(140)),
+              Text('  •  ', style: TextStyle(fontSize: 11, color: c.muted.withAlpha(100))),
+              Icon(Icons.verified_rounded, size: 12, color: c.muted.withAlpha(140)),
               const SizedBox(width: 4),
-              Text(l10n.noCommitment.split(' · ').first, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
-              Text('  •  ', style: TextStyle(fontSize: 11, color: AppTheme.muted.withAlpha(100))),
-              Icon(Icons.cancel_rounded, size: 12, color: AppTheme.muted.withAlpha(140)),
+              Text(l10n.noCommitment.split(' · ').first, style: TextStyle(fontSize: 11, color: c.muted)),
+              Text('  •  ', style: TextStyle(fontSize: 11, color: c.muted.withAlpha(100))),
+              Icon(Icons.cancel_rounded, size: 12, color: c.muted.withAlpha(140)),
               const SizedBox(width: 4),
-              Text(l10n.cancelAnytime, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+              Text(l10n.cancelAnytime, style: TextStyle(fontSize: 11, color: c.muted)),
             ],
           ),
           const SizedBox(height: 8),
@@ -594,7 +596,7 @@ class _PlanGateState extends State<_PlanGate> {
   // PAGE PREMIUM — Planning nutritionnel (vert)
   // ══════════════════════════════════════════════════════════════════
   Widget _buildPremiumGate(BuildContext context) {
-    final color = AppTheme.accent;
+    final color = c.accent;
     final l10n  = AppLocalizations.of(context);
 
     return SingleChildScrollView(
@@ -651,7 +653,7 @@ class _PlanGateState extends State<_PlanGate> {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: c.surface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: color.withAlpha(50)),
             ),
@@ -676,13 +678,13 @@ class _PlanGateState extends State<_PlanGate> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text('Planning nutritionnel',
-                                style: TextStyle(fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.text, height: 1.2)),
+                                style: TextStyle(fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w900, color: c.text, height: 1.2)),
                             const SizedBox(height: 4),
                             Text(l10n.premiumGateHeroAvail,
                                 style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w700)),
                             const SizedBox(height: 8),
                             Text(l10n.premiumGateHeroDesc,
-                                style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.4)),
+                                style: TextStyle(fontSize: 12, color: c.muted, height: 1.4)),
                           ],
                         ),
                       ),
@@ -720,7 +722,7 @@ class _PlanGateState extends State<_PlanGate> {
                         imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
                         child: Container(
                           width: double.infinity,
-                          color: AppTheme.surface2,
+                          color: c.surface2,
                           padding: const EdgeInsets.all(14),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -731,7 +733,7 @@ class _PlanGateState extends State<_PlanGate> {
                                   Icon(Icons.auto_awesome_rounded, size: 13, color: color),
                                   const SizedBox(width: 6),
                                   Text(l10n.premiumGatePreviewTitle,
-                                      style: const TextStyle(fontSize: 12, color: AppTheme.muted, fontWeight: FontWeight.w600)),
+                                      style: TextStyle(fontSize: 12, color: c.muted, fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 10),
@@ -744,7 +746,7 @@ class _PlanGateState extends State<_PlanGate> {
                                       margin: const EdgeInsets.symmetric(horizontal: 2),
                                       padding: const EdgeInsets.symmetric(vertical: 5),
                                       decoration: BoxDecoration(
-                                        color: isToday ? color : AppTheme.surface,
+                                        color: isToday ? color : c.surface,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(d,
@@ -752,7 +754,7 @@ class _PlanGateState extends State<_PlanGate> {
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w700,
-                                            color: isToday ? const Color(0xFF0A0A0F) : AppTheme.muted,
+                                            color: isToday ? Color(0xFF0A0A0F) : c.muted,
                                           )),
                                     ),
                                   );
@@ -767,7 +769,7 @@ class _PlanGateState extends State<_PlanGate> {
                                     children: [
                                       Icon(Icons.restaurant_rounded, size: 13, color: color.withAlpha(160)),
                                       const SizedBox(width: 8),
-                                      Text(r.$1, style: const TextStyle(fontSize: 12, color: AppTheme.text)),
+                                      Text(r.$1, style: TextStyle(fontSize: 12, color: c.text)),
                                       const Spacer(),
                                       if (r.$2)
                                         Icon(Icons.check_circle_rounded, size: 14, color: color)
@@ -776,7 +778,7 @@ class _PlanGateState extends State<_PlanGate> {
                                           width: 14, height: 14,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            border: Border.all(color: AppTheme.border),
+                                            border: Border.all(color: c.border),
                                           ),
                                         ),
                                     ],
@@ -831,9 +833,9 @@ class _PlanGateState extends State<_PlanGate> {
             width: double.infinity,
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: c.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: c.border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -858,15 +860,15 @@ class _PlanGateState extends State<_PlanGate> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: c.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: c.border),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, size: 16, color: AppTheme.muted),
+                Icon(Icons.info_outline_rounded, size: 16, color: c.muted),
                 const SizedBox(width: 8),
-                Text('${l10n.currentPlanLabel} : ', style: const TextStyle(fontSize: 13, color: AppTheme.muted)),
+                Text('${l10n.currentPlanLabel} : ', style: TextStyle(fontSize: 13, color: c.muted)),
                 Text(_currentPlanLabel,
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
               ],
@@ -924,7 +926,7 @@ class _PlanGateState extends State<_PlanGate> {
               ),
               icon: const Icon(Icons.workspace_premium_rounded, size: 20),
               label: Text(l10n.premiumGateCta,
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
             ),
           ),
           const SizedBox(height: 12),
@@ -936,10 +938,10 @@ class _PlanGateState extends State<_PlanGate> {
               Icon(Icons.verified_rounded, size: 12, color: color.withAlpha(180)),
               const SizedBox(width: 4),
               Text(l10n.freeTrialDays, style: TextStyle(fontSize: 11, color: color.withAlpha(180))),
-              Text('  •  ', style: TextStyle(fontSize: 11, color: AppTheme.muted.withAlpha(100))),
-              const Icon(Icons.cancel_rounded, size: 12, color: AppTheme.muted),
+              Text('  •  ', style: TextStyle(fontSize: 11, color: c.muted.withAlpha(100))),
+              Icon(Icons.cancel_rounded, size: 12, color: c.muted),
               const SizedBox(width: 4),
-              Text(l10n.cancelAnytime, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+              Text(l10n.cancelAnytime, style: TextStyle(fontSize: 11, color: c.muted)),
             ],
           ),
         ],
@@ -964,6 +966,7 @@ class _GatePreviewDishCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Stack(
       children: [
         // Photo de fond
@@ -1046,6 +1049,7 @@ class _GateBenefit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Expanded(
       child: Column(
         children: [
@@ -1060,7 +1064,7 @@ class _GateBenefit extends StatelessWidget {
           const SizedBox(height: 8),
           Text(label,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 11, color: AppTheme.muted, height: 1.35)),
+              style: TextStyle(fontSize: 11, color: c.muted, height: 1.35)),
         ],
       ),
     );
@@ -1082,11 +1086,12 @@ class _ComparisonTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         children: [
@@ -1097,7 +1102,7 @@ class _ComparisonTable extends StatelessWidget {
               children: List.generate(headers.length, (i) {
                 if (i == 0) {
                   return Expanded(flex: 3,
-                    child: Text(headers[i], style: const TextStyle(fontSize: 12, color: AppTheme.muted, fontWeight: FontWeight.w700)));
+                    child: Text(headers[i], style: TextStyle(fontSize: 12, color: c.muted, fontWeight: FontWeight.w700)));
                 }
                 final isHL = (i - 1) == (highlightCol - 1);
                 return Expanded(
@@ -1116,7 +1121,7 @@ class _ComparisonTable extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 13, fontWeight: FontWeight.w800,
-                              color: isHL ? accentColor : AppTheme.text,
+                              color: isHL ? accentColor : c.text,
                             )),
                         if (isHL) ...[
                           const SizedBox(height: 2),
@@ -1137,7 +1142,7 @@ class _ComparisonTable extends StatelessWidget {
               }),
             ),
           ),
-          const Divider(height: 1, color: AppTheme.border),
+          Divider(height: 1, color: c.border),
           // Data rows
           ...rows.asMap().entries.map((e) {
             final i = e.key;
@@ -1154,10 +1159,10 @@ class _ComparisonTable extends StatelessWidget {
                         flex: 3,
                         child: Row(
                           children: [
-                            Icon(_featureIcon(i), size: 14, color: AppTheme.muted),
+                            Icon(_featureIcon(i), size: 14, color: c.muted),
                             const SizedBox(width: 8),
                             Expanded(child: Text(row[0] as String,
-                                style: const TextStyle(fontSize: 11, color: AppTheme.text))),
+                                style: TextStyle(fontSize: 11, color: c.text))),
                           ],
                         ),
                       ),
@@ -1186,7 +1191,7 @@ class _ComparisonTable extends StatelessWidget {
                                   ? Icon(Icons.check_circle_rounded,
                                       size: 18,
                                       color: ci == 2 ? const Color(0xFF818CF8) : accentColor)
-                                  : const Text('—', style: TextStyle(fontSize: 14, color: AppTheme.muted)),
+                                  : Text('—', style: TextStyle(fontSize: 14, color: c.muted)),
                             ),
                           ),
                         );
@@ -1194,7 +1199,7 @@ class _ComparisonTable extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (!isLast) const Divider(height: 1, color: AppTheme.border),
+                if (!isLast) Divider(height: 1, color: c.border),
               ],
             );
           }),
@@ -1228,13 +1233,14 @@ class _PlanMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isHighlighted ? color.withAlpha(18) : AppTheme.surface,
+        color: isHighlighted ? color.withAlpha(18) : c.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isHighlighted ? color : AppTheme.border,
+          color: isHighlighted ? color : c.border,
           width: isHighlighted ? 1.5 : 1,
         ),
       ),
@@ -1247,7 +1253,7 @@ class _PlanMiniCard extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 14,
-                    color: isHighlighted ? color : AppTheme.text,
+                    color: isHighlighted ? color : c.text,
                   )),
               if (isHighlighted) ...[
                 const Spacer(),
@@ -1255,12 +1261,12 @@ class _PlanMiniCard extends StatelessWidget {
               ] else ...[
                 const Spacer(),
                 Container(width: 8, height: 8,
-                    decoration: BoxDecoration(color: AppTheme.muted.withAlpha(80), shape: BoxShape.circle)),
+                    decoration: BoxDecoration(color: c.muted.withAlpha(80), shape: BoxShape.circle)),
               ],
             ],
           ),
           const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(fontSize: 10, color: AppTheme.muted, height: 1.3)),
+          Text(subtitle, style: TextStyle(fontSize: 10, color: c.muted, height: 1.3)),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -1295,6 +1301,7 @@ class _GateMacroChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
@@ -1308,7 +1315,7 @@ class _GateMacroChip extends StatelessWidget {
           children: [
             Text(label, style: TextStyle(fontSize: 9, color: color.withAlpha(200))),
             const SizedBox(height: 2),
-            Text(value, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.text)),
+            Text(value, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: c.text)),
           ],
         ),
       ),
@@ -1439,8 +1446,8 @@ class _ChatTabState extends State<_ChatTab> {
         minChildSize: 0.4,
         maxChildSize: 0.92,
         builder: (_, sc) => Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.surface,
+          decoration: BoxDecoration(
+            color: c.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -1450,7 +1457,7 @@ class _ChatTabState extends State<_ChatTab> {
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
                 width: 40, height: 4,
                 decoration: BoxDecoration(
-                  color: AppTheme.border,
+                  color: c.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1462,27 +1469,27 @@ class _ChatTabState extends State<_ChatTab> {
                     Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: AppTheme.accent.withAlpha(25),
+                        color: c.accent.withAlpha(25),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.today_rounded, size: 18, color: AppTheme.accent),
+                      child: Icon(Icons.today_rounded, size: 18, color: c.accent),
                     ),
                     const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(AppLocalizations.of(context).dayBilan,
-                            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: c.text)),
                         Text(
                           '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                          style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+                          style: TextStyle(fontSize: 12, color: c.muted),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const Divider(color: AppTheme.border, height: 1),
+              Divider(color: c.border, height: 1),
               Expanded(
                 child: ListView(
                   controller: sc,
@@ -1494,7 +1501,7 @@ class _ChatTabState extends State<_ChatTab> {
                       current: todayKcal.toDouble(),
                       target: targetKcal.toDouble(),
                       unit: 'kcal',
-                      color: AppTheme.accent,
+                      color: c.accent,
                       icon: Icons.local_fire_department_rounded,
                     ),
                     const SizedBox(height: 14),
@@ -1528,21 +1535,21 @@ class _ChatTabState extends State<_ChatTab> {
                     const SizedBox(height: 20),
                     // ── Repas du jour ─────────────────────────────────────
                     Text(AppLocalizations.of(context).dayMeals,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: c.text)),
                     const SizedBox(height: 10),
                     if (todayMeals.isEmpty)
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surface2,
+                          color: c.surface2,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Row(
                           children: [
-                            Icon(Icons.no_food_rounded, size: 18, color: AppTheme.muted),
+                            Icon(Icons.no_food_rounded, size: 18, color: c.muted),
                             SizedBox(width: 10),
                             Text('Aucun repas enregistré aujourd\'hui',
-                                style: TextStyle(fontSize: 13, color: AppTheme.muted)),
+                                style: TextStyle(fontSize: 13, color: c.muted)),
                           ],
                         ),
                       )
@@ -1561,6 +1568,7 @@ class _ChatTabState extends State<_ChatTab> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
 
     // ── Compute context data ────────────────────────────────────────────────
     final todayMeals    = widget.meals.where((m) => m.isToday).toList();
@@ -1591,7 +1599,7 @@ class _ChatTabState extends State<_ChatTab> {
             prompt: chatInSurplus
                 ? l10n.promptCreatePlanSurplus(chatSurplus, dietLabel)
                 : l10n.promptCreatePlanNormal(remaining, dietLabel),
-            icon: Icons.calendar_today_rounded, color: AppTheme.accent,
+            icon: Icons.calendar_today_rounded, color: c.accent,
           ),
           _MsgAction(label: l10n.actionFixMacros,       prompt: l10n.promptFixMacros,        icon: Icons.pie_chart_rounded,   color: const Color(0xFF4DA1FF)),
           _MsgAction(label: l10n.actionAnalyzeProgress, prompt: l10n.promptAnalyzeProgress,  icon: Icons.trending_up_rounded, color: const Color(0xFF6BCB77)),
@@ -1606,7 +1614,7 @@ class _ChatTabState extends State<_ChatTab> {
             line1: l10n.smartSurplusTitle(chatSurplus), line2: l10n.smartSurplusSub,
             prompt: l10n.promptSurplusBalance(chatSurplus, tdee))
       else
-        _SmartAction(icon: Icons.local_fire_department_rounded, color: AppTheme.accent,
+        _SmartAction(icon: Icons.local_fire_department_rounded, color: c.accent,
             line1: l10n.smartBuildDay, line2: l10n.smartBuildDaySub(remaining),
             prompt: l10n.promptBuildDay(remaining, dietLabel)),
       _SmartAction(icon: Icons.fitness_center_rounded, color: const Color(0xFFE879F9),
@@ -1649,11 +1657,11 @@ class _ChatTabState extends State<_ChatTab> {
                 Row(
                   children: [
                     Text(l10n.smartActionsTitle,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.text)),
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: c.text)),
                     const Spacer(),
                     Text(l10n.viewAll,
-                        style: const TextStyle(fontSize: 12, color: AppTheme.accent, fontWeight: FontWeight.w600)),
-                    const Icon(Icons.chevron_right_rounded, size: 14, color: AppTheme.accent),
+                        style: TextStyle(fontSize: 12, color: c.accent, fontWeight: FontWeight.w600)),
+                    Icon(Icons.chevron_right_rounded, size: 14, color: c.accent),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -1686,19 +1694,19 @@ class _ChatTabState extends State<_ChatTab> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
                     children: [
-                      const Expanded(child: Divider(color: AppTheme.border)),
+                      Expanded(child: Divider(color: c.border)),
                       const SizedBox(width: 8),
                       GestureDetector(
                         onTap: () async {
                           final confirm = await showDialog<bool>(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              backgroundColor: AppTheme.surface2,
-                              title: Text(l10n.clearChatTitle, style: const TextStyle(color: AppTheme.text, fontWeight: FontWeight.w800)),
-                              content: Text(l10n.clearChatConfirm, style: const TextStyle(color: AppTheme.muted)),
+                              backgroundColor: c.surface2,
+                              title: Text(l10n.clearChatTitle, style: TextStyle(color: c.text, fontWeight: FontWeight.w800)),
+                              content: Text(l10n.clearChatConfirm, style: TextStyle(color: c.muted)),
                               actions: [
-                                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel, style: const TextStyle(color: AppTheme.muted))),
-                                TextButton(onPressed: () => Navigator.pop(ctx, true),  child: Text(l10n.clearChatConfirmBtn, style: TextStyle(color: AppTheme.accent3))),
+                                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel, style: TextStyle(color: c.muted))),
+                                TextButton(onPressed: () => Navigator.pop(ctx, true),  child: Text(l10n.clearChatConfirmBtn, style: TextStyle(color: c.accent3))),
                               ],
                             ),
                           );
@@ -1707,22 +1715,22 @@ class _ChatTabState extends State<_ChatTab> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppTheme.surface2,
+                            color: c.surface2,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppTheme.border),
+                            border: Border.all(color: c.border),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.delete_sweep_rounded, size: 12, color: AppTheme.muted),
+                              Icon(Icons.delete_sweep_rounded, size: 12, color: c.muted),
                               const SizedBox(width: 4),
-                              Text(l10n.newChat, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                              Text(l10n.newChat, style: TextStyle(fontSize: 11, color: c.muted)),
                             ],
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(child: Divider(color: AppTheme.border)),
+                      Expanded(child: Divider(color: c.border)),
                     ],
                   ),
                 ),
@@ -1857,12 +1865,13 @@ class _DishesTabState extends State<_DishesTab> {
     _QuickFilterData('local',        'Local',             Icons.place_rounded,           const Color(0xFF4DA1FF)),
     _QuickFilterData('low-carb',     l10n.filterLowCarb,  Icons.trending_down_rounded,   const Color(0xFF38BDF8)),
     _QuickFilterData('gluten-free',  l10n.dietGlutenFree, Icons.no_food_rounded,         const Color(0xFFFF8A65)),
-    _QuickFilterData('low-kcal',     l10n.filterLowKcal,  Icons.water_drop_rounded,      AppTheme.muted),
+    _QuickFilterData('low-kcal',     l10n.filterLowKcal,  Icons.water_drop_rounded,      c.muted),
   ];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final dietOptions = _buildDietOptions(l10n);
     final todayKcal   = widget.meals.where((m) => m.isToday).fold(0, (s, m) => s + m.result.calories);
     final rawRemaining = widget.profile.tdee.round() - todayKcal;
@@ -1914,10 +1923,10 @@ class _DishesTabState extends State<_DishesTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    const Icon(Icons.tune_rounded, size: 15, color: AppTheme.muted),
+                    Icon(Icons.tune_rounded, size: 15, color: c.muted),
                     const SizedBox(width: 6),
                     Text(l10n.personalizeLabel,
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppTheme.text)),
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: c.text)),
                   ],
                 ),
               ),
@@ -1940,18 +1949,18 @@ class _DishesTabState extends State<_DishesTab> {
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: selected ? opt.color : AppTheme.surface,
+                          color: selected ? opt.color : c.surface,
                           borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: selected ? opt.color : AppTheme.border),
+                          border: Border.all(color: selected ? opt.color : c.border),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(opt.icon, size: 13, color: selected ? AppTheme.bg : opt.color),
+                            Icon(opt.icon, size: 13, color: selected ? c.bg : opt.color),
                             const SizedBox(width: 5),
                             Text(opt.label,
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
-                                    color: selected ? AppTheme.bg : AppTheme.muted)),
+                                    color: selected ? c.bg : c.muted)),
                           ],
                         ),
                       ),
@@ -1990,18 +1999,18 @@ class _DishesTabState extends State<_DishesTab> {
                         duration: const Duration(milliseconds: 180),
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: active ? f.color.withAlpha(30) : AppTheme.surface,
+                          color: active ? f.color.withAlpha(30) : c.surface,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: active ? f.color : AppTheme.border),
+                          border: Border.all(color: active ? f.color : c.border),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(f.icon, size: 13, color: active ? f.color : AppTheme.muted),
+                            Icon(f.icon, size: 13, color: active ? f.color : c.muted),
                             const SizedBox(width: 5),
                             Text(f.label,
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
-                                    color: active ? f.color : AppTheme.muted)),
+                                    color: active ? f.color : c.muted)),
                           ],
                         ),
                       ),
@@ -2018,7 +2027,7 @@ class _DishesTabState extends State<_DishesTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(l10n.mealObjectiveLabel,
-                        style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w600)),
+                        style: TextStyle(fontSize: 11, color: c.muted, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     Row(
                       children: mealTypes.map((mt) {
@@ -2034,18 +2043,18 @@ class _DishesTabState extends State<_DishesTab> {
                                 duration: const Duration(milliseconds: 180),
                                 padding: const EdgeInsets.symmetric(vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: active ? AppTheme.accent.withAlpha(25) : AppTheme.surface,
+                                  color: active ? c.accent.withAlpha(25) : c.surface,
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: active ? AppTheme.accent : AppTheme.border),
+                                  border: Border.all(color: active ? c.accent : c.border),
                                 ),
                                 child: Column(
                                   children: [
                                     Icon(mt.icon, size: 16,
-                                        color: active ? AppTheme.accent : AppTheme.muted),
+                                        color: active ? c.accent : c.muted),
                                     const SizedBox(height: 3),
                                     Text(mt.label,
                                         style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700,
-                                            color: active ? AppTheme.accent : AppTheme.muted),
+                                            color: active ? c.accent : c.muted),
                                         overflow: TextOverflow.ellipsis),
                                   ],
                                 ),
@@ -2068,18 +2077,18 @@ class _DishesTabState extends State<_DishesTab> {
                     Icon(selectedOpt.icon, size: 15, color: selectedOpt.color),
                     const SizedBox(width: 6),
                     Text(l10n.generateDishes(selectedOpt.label),
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                     const Spacer(),
                     if (_dishes.isNotEmpty) ...[
                       Text(AppLocalizations.of(context).dishesResultCount(_dishes.length),
-                          style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                          style: TextStyle(fontSize: 12, color: c.muted)),
                       const SizedBox(width: 8),
                       GestureDetector(
                         onTap: _loading ? null : _fetch,
                         child: _loading
-                            ? const SizedBox(width: 14, height: 14,
-                                child: CircularProgressIndicator(color: AppTheme.accent, strokeWidth: 2))
-                            : const Icon(Icons.refresh_rounded, size: 16, color: AppTheme.accent),
+                            ? SizedBox(width: 14, height: 14,
+                                child: CircularProgressIndicator(color: c.accent, strokeWidth: 2))
+                            : Icon(Icons.refresh_rounded, size: 16, color: c.accent),
                       ),
                     ],
                   ],
@@ -2112,7 +2121,7 @@ class _DishesTabState extends State<_DishesTab> {
                               if (_loading)
                                 const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 12),
-                                  child: Center(child: CircularProgressIndicator(color: AppTheme.accent, strokeWidth: 2)),
+                                  child: Center(child: CircularProgressIndicator(color: c.accent, strokeWidth: 2)),
                                 ),
                             ],
                           ),
@@ -2141,7 +2150,7 @@ class _DishCardState extends State<_DishCard> {
     if (t == 'breakfast' || t.contains('petit-déj')) return const Color(0xFFFFB347);
     if (t == 'lunch'     || t == 'déjeuner')         return const Color(0xFF6BCB77);
     if (t == 'dinner'    || t == 'dîner')             return const Color(0xFF4DA1FF);
-    return AppTheme.accent;
+    return c.accent;
   }
 
   IconData get _typeIcon {
@@ -2163,15 +2172,16 @@ class _DishCardState extends State<_DishCard> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final dish = widget.dish;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: widget.isPreview
-            ? AppTheme.accent.withAlpha(40)
-            : AppTheme.border),
+            ? c.accent.withAlpha(40)
+            : c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2198,7 +2208,7 @@ class _DishCardState extends State<_DishCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(dish.name,
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                           Text(_localizedType(l10n),
                               style: TextStyle(fontSize: 12, color: _typeColor)),
                         ],
@@ -2207,11 +2217,11 @@ class _DishCardState extends State<_DishCard> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: AppTheme.accent.withAlpha(22),
+                        color: c.accent.withAlpha(22),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text('${dish.calories} kcal',
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.accent)),
+                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: c.accent)),
                     ),
                   ],
                 ),
@@ -2232,7 +2242,7 @@ class _DishCardState extends State<_DishCard> {
                 if (dish.description.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(dish.description,
-                      style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.4),
+                      style: TextStyle(fontSize: 12, color: c.muted, height: 1.4),
                       maxLines: _expanded ? null : 2,
                       overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis),
                 ],
@@ -2240,15 +2250,15 @@ class _DishCardState extends State<_DishCard> {
                 // ── Ingrédients (expandable) ────────────────────
                 if (_expanded && dish.ingredients.isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  const Divider(color: AppTheme.border, height: 1),
+                  Divider(color: c.border, height: 1),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      const Icon(Icons.format_list_bulleted_rounded, size: 13, color: AppTheme.muted),
+                      Icon(Icons.format_list_bulleted_rounded, size: 13, color: c.muted),
                       const SizedBox(width: 6),
                       Text(l10n.ingredients,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
-                              color: AppTheme.muted, letterSpacing: 0.3)),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
+                              color: c.muted, letterSpacing: 0.3)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -2258,12 +2268,12 @@ class _DishCardState extends State<_DishCard> {
                     children: dish.ingredients.map((ing) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: AppTheme.surface2,
+                        color: c.surface2,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppTheme.border),
+                        border: Border.all(color: c.border),
                       ),
                       child: Text('${ing.name}  ${ing.weightG}g',
-                          style: const TextStyle(fontSize: 12, color: AppTheme.text)),
+                          style: TextStyle(fontSize: 12, color: c.text)),
                     )).toList(),
                   ),
                 ],
@@ -2274,8 +2284,8 @@ class _DishCardState extends State<_DishCard> {
 
           // ── Action buttons ──────────────────────────────────────────────
           Container(
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: AppTheme.border)),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: c.border)),
             ),
             padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
             child: Row(
@@ -2287,18 +2297,18 @@ class _DishCardState extends State<_DishCard> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 9),
                       decoration: BoxDecoration(
-                        color: AppTheme.surface2,
+                        color: c.surface2,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppTheme.border),
+                        border: Border.all(color: c.border),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(_expanded ? Icons.expand_less_rounded : Icons.info_outline_rounded,
-                              size: 15, color: AppTheme.muted),
+                              size: 15, color: c.muted),
                           const SizedBox(width: 5),
                           Text(l10n.viewDetails,
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.muted)),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: c.muted)),
                         ],
                       ),
                     ),
@@ -2316,8 +2326,8 @@ class _DishCardState extends State<_DishCard> {
                       padding: const EdgeInsets.symmetric(vertical: 9),
                       decoration: BoxDecoration(
                         color: widget.isPreview
-                            ? AppTheme.accent.withAlpha(30)
-                            : AppTheme.accent,
+                            ? c.accent.withAlpha(30)
+                            : c.accent,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -2328,7 +2338,7 @@ class _DishCardState extends State<_DishCard> {
                                 ? Icons.auto_awesome_rounded
                                 : Icons.menu_book_rounded,
                             size: 15,
-                            color: widget.isPreview ? AppTheme.accent : AppTheme.bg,
+                            color: widget.isPreview ? c.accent : c.bg,
                           ),
                           const SizedBox(width: 5),
                           Text(
@@ -2336,7 +2346,7 @@ class _DishCardState extends State<_DishCard> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: widget.isPreview ? AppTheme.accent : AppTheme.bg,
+                              color: widget.isPreview ? c.accent : c.bg,
                             ),
                           ),
                         ],
@@ -2361,6 +2371,7 @@ class _MacroBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -2459,7 +2470,7 @@ class _PlanningTabState extends State<_PlanningTab> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Color(0xFF12121f),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -2467,19 +2478,19 @@ class _PlanningTabState extends State<_PlanningTab> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.border, borderRadius: BorderRadius.circular(2))),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: c.border, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text(l10n.adjustWeekSheetTitle, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: AppTheme.text)),
+            Text(l10n.adjustWeekSheetTitle, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: c.text)),
             const SizedBox(height: 16),
             ...options.map((opt) => ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               leading: Container(
                 width: 40, height: 40,
-                decoration: BoxDecoration(color: AppTheme.accent.withAlpha(18), borderRadius: BorderRadius.circular(10)),
-                child: Icon(opt.$1, color: AppTheme.accent, size: 20),
+                decoration: BoxDecoration(color: c.accent.withAlpha(18), borderRadius: BorderRadius.circular(10)),
+                child: Icon(opt.$1, color: c.accent, size: 20),
               ),
-              title: Text(opt.$2, style: const TextStyle(fontSize: 14, color: AppTheme.text)),
-              trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.muted, size: 20),
+              title: Text(opt.$2, style: TextStyle(fontSize: 14, color: c.text)),
+              trailing: Icon(Icons.chevron_right_rounded, color: c.muted, size: 20),
               onTap: () {
                 Navigator.pop(context);
                 _generateWithPreference(opt.$2);
@@ -2519,6 +2530,7 @@ class _PlanningTabState extends State<_PlanningTab> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final dayNamesShort = [l10n.dayMon, l10n.dayTue, l10n.dayWed, l10n.dayThu, l10n.dayFri, l10n.daySat, l10n.daySun];
     final today = DayPlan.todayKey();
 
@@ -2639,14 +2651,14 @@ class _PlanningTabState extends State<_PlanningTab> {
             child: ElevatedButton.icon(
               onPressed: () => _showAdjustSheet(context, l10n),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accent,
-                foregroundColor: AppTheme.bg,
+                backgroundColor: c.accent,
+                foregroundColor: c.bg,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
               ),
               icon: const Icon(Icons.tune_rounded, size: 18),
-              label: Text(l10n.adjustWeekBtn, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+              label: Text(l10n.adjustWeekBtn, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
             ),
           ),
           const SizedBox(height: 10),
@@ -2655,13 +2667,13 @@ class _PlanningTabState extends State<_PlanningTab> {
             child: OutlinedButton.icon(
               onPressed: _loading ? null : _generate,
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppTheme.muted,
-                side: const BorderSide(color: AppTheme.border),
+                foregroundColor: c.muted,
+                side: BorderSide(color: c.border),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               icon: _loading
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: AppTheme.accent, strokeWidth: 2))
+                  ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: c.accent, strokeWidth: 2))
                   : const Icon(Icons.refresh_rounded, size: 18),
               label: Text(_loading ? l10n.generating : l10n.regenerate,
                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
@@ -2698,6 +2710,7 @@ class _WeeklyScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -2707,7 +2720,7 @@ class _WeeklyScoreCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.accent.withAlpha(40)),
+        border: Border.all(color: c.accent.withAlpha(40)),
       ),
       child: Row(
         children: [
@@ -2727,12 +2740,12 @@ class _WeeklyScoreCard extends StatelessWidget {
                   children: [
                     Text(
                       loading ? '…' : '$score',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 26, fontWeight: FontWeight.w900,
-                        color: AppTheme.accent, height: 1,
+                        color: c.accent, height: 1,
                       ),
                     ),
-                    const Text('/100', style: TextStyle(fontSize: 11, color: AppTheme.muted)),
+                    Text('/100', style: TextStyle(fontSize: 11, color: c.muted)),
                   ],
                 ),
               ],
@@ -2745,29 +2758,29 @@ class _WeeklyScoreCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.weeklyBalanceScore,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
-                      color: AppTheme.accent, letterSpacing: 1.2),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
+                      color: c.accent, letterSpacing: 1.2),
                 ),
                 const SizedBox(height: 4),
                 Text(_headline(),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: c.text)),
                 const SizedBox(height: 2),
                 Text(_subtitle(),
-                    style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 12, color: c.muted)),
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppTheme.surface2,
+                    color: c.surface2,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.local_fire_department_rounded, size: 14, color: AppTheme.accent),
+                      Icon(Icons.local_fire_department_rounded, size: 14, color: c.accent),
                       const SizedBox(width: 6),
                       Text(l10n.todayKcalRemainingLabel(remaining),
-                          style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                          style: TextStyle(fontSize: 12, color: c.muted)),
                     ],
                   ),
                 ),
@@ -2835,28 +2848,29 @@ class _WeeklyStripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.calendar_month_rounded, size: 16, color: AppTheme.text),
+              Icon(Icons.calendar_month_rounded, size: 16, color: c.text),
               const SizedBox(width: 8),
-              Text(l10n.weekPlanning, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+              Text(l10n.weekPlanning, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
               const Spacer(),
               GestureDetector(
                 onTap: onViewDetails,
                 child: Row(
                   children: [
-                    Text(l10n.viewDetails, style: const TextStyle(fontSize: 12, color: AppTheme.accent, fontWeight: FontWeight.w600)),
+                    Text(l10n.viewDetails, style: TextStyle(fontSize: 12, color: c.accent, fontWeight: FontWeight.w600)),
                     const SizedBox(width: 2),
-                    const Icon(Icons.chevron_right_rounded, size: 16, color: AppTheme.accent),
+                    Icon(Icons.chevron_right_rounded, size: 16, color: c.accent),
                   ],
                 ),
               ),
@@ -2866,7 +2880,7 @@ class _WeeklyStripCard extends StatelessWidget {
           if (loading && plans.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
-              child: Center(child: CircularProgressIndicator(color: AppTheme.accent, strokeWidth: 2)),
+              child: Center(child: CircularProgressIndicator(color: c.accent, strokeWidth: 2)),
             )
           else
             Row(
@@ -2897,30 +2911,31 @@ class _DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: 42,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
       decoration: BoxDecoration(
-        color: isToday ? AppTheme.accent : AppTheme.surface2,
+        color: isToday ? c.accent : c.surface2,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isToday ? AppTheme.accent : AppTheme.border),
+        border: Border.all(color: isToday ? c.accent : c.border),
       ),
       child: Column(
         children: [
           Text(dayShort,
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700,
-                  color: isToday ? AppTheme.bg : AppTheme.muted)),
+                  color: isToday ? c.bg : c.muted)),
           const SizedBox(height: 3),
           Text(date,
-              style: TextStyle(fontSize: 9, color: isToday ? AppTheme.bg.withAlpha(200) : AppTheme.muted)),
+              style: TextStyle(fontSize: 9, color: isToday ? c.bg.withAlpha(200) : c.muted)),
           const SizedBox(height: 5),
           Text(kcal != null ? '$kcal' : '—',
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800,
-                  color: isToday ? AppTheme.bg : AppTheme.text)),
+                  color: isToday ? c.bg : c.text)),
           if (kcal != null)
             Text('kcal',
-                style: TextStyle(fontSize: 8, color: isToday ? AppTheme.bg.withAlpha(150) : AppTheme.muted)),
+                style: TextStyle(fontSize: 8, color: isToday ? c.bg.withAlpha(150) : c.muted)),
         ],
       ),
     );
@@ -2942,13 +2957,14 @@ class _TodayChecklist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final total = items.length;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2956,10 +2972,10 @@ class _TodayChecklist extends StatelessWidget {
           Row(
             children: [
               Text(l10n.todayChecklist,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
               const Spacer(),
               Text(l10n.completedOfTotal(completedCount, total),
-                  style: const TextStyle(fontSize: 12, color: AppTheme.accent, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 12, color: c.accent, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 10),
@@ -2968,8 +2984,8 @@ class _TodayChecklist extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: completedCount / total,
-              backgroundColor: AppTheme.surface2,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.accent),
+              backgroundColor: c.surface2,
+              valueColor: AlwaysStoppedAnimation<Color>(c.accent),
               minHeight: 6,
             ),
           ),
@@ -2997,10 +3013,10 @@ class _TodayChecklist extends StatelessWidget {
                       width: 22,
                       height: 22,
                       decoration: BoxDecoration(
-                        color: isDone ? AppTheme.accent : Colors.transparent,
+                        color: isDone ? c.accent : Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: isDone ? AppTheme.accent : AppTheme.border,
+                          color: isDone ? c.accent : c.border,
                           width: 1.5,
                         ),
                       ),
@@ -3015,9 +3031,9 @@ class _TodayChecklist extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: isDone ? AppTheme.muted : AppTheme.text,
+                          color: isDone ? c.muted : c.text,
                           decoration: isDone ? TextDecoration.lineThrough : null,
-                          decorationColor: AppTheme.muted,
+                          decorationColor: c.muted,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -3044,14 +3060,15 @@ class _AiInsightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
@@ -3059,10 +3076,10 @@ class _AiInsightCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(18),
+              color: c.accent.withAlpha(18),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.psychology_rounded, color: AppTheme.accent, size: 22),
+            child: Icon(Icons.psychology_rounded, color: c.accent, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -3070,15 +3087,15 @@ class _AiInsightCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.aiInsightTitle,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.accent)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: c.accent)),
                 const SizedBox(height: 4),
                 Text(insight,
-                    style: const TextStyle(fontSize: 13, color: AppTheme.text, height: 1.4)),
+                    style: TextStyle(fontSize: 13, color: c.text, height: 1.4)),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_right_rounded, color: AppTheme.muted, size: 20),
+          Icon(Icons.chevron_right_rounded, color: c.muted, size: 20),
         ],
       ),
       ),
@@ -3096,6 +3113,7 @@ class _ProjectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final isLoss  = weightChange < 0;
     final isGain  = weightChange > 0;
     final sign    = isGain ? '+' : '';
@@ -3115,18 +3133,18 @@ class _ProjectionCard extends StatelessWidget {
       child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(l10n.weekProjectionTitle,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 2),
           Text(l10n.projectionSubtitle,
-              style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+              style: TextStyle(fontSize: 12, color: c.muted)),
           const SizedBox(height: 14),
           // Mini trend line
           SizedBox(
@@ -3144,7 +3162,7 @@ class _ProjectionCard extends StatelessWidget {
                 icon: Icons.monitor_weight_outlined,
                 value: kgLabel,
                 label: l10n.weightChangeLbl,
-                color: isLoss ? const Color(0xFF6BCB77) : isGain ? const Color(0xFF4DA1FF) : AppTheme.muted,
+                color: isLoss ? Color(0xFF6BCB77) : isGain ? Color(0xFF4DA1FF) : c.muted,
               ),
               const SizedBox(width: 10),
               _ProjectionChip(
@@ -3158,7 +3176,7 @@ class _ProjectionCard extends StatelessWidget {
                 icon: Icons.bolt_rounded,
                 value: l10n.energyStableLbl,
                 label: 'Energy',
-                color: AppTheme.accent,
+                color: c.accent,
               ),
             ],
           ),
@@ -3178,20 +3196,21 @@ class _ProjectionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
-          color: AppTheme.surface2,
+          color: c.surface2,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: c.border),
         ),
         child: Column(
           children: [
             Icon(icon, size: 18, color: color),
             const SizedBox(height: 4),
             Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)),
-            Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.muted), textAlign: TextAlign.center),
+            Text(label, style: TextStyle(fontSize: 10, color: c.muted), textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -3297,6 +3316,7 @@ class _BubbleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final isUser = message.role == 'user';
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -3311,19 +3331,19 @@ class _BubbleRow extends StatelessWidget {
                   width: 30, height: 30,
                   margin: const EdgeInsets.only(right: 8, bottom: 2),
                   decoration: BoxDecoration(
-                    color: AppTheme.accent.withAlpha(20),
+                    color: c.accent.withAlpha(20),
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppTheme.accent.withAlpha(60)),
+                    border: Border.all(color: c.accent.withAlpha(60)),
                   ),
-                  child: const Icon(Icons.smart_toy_rounded, size: 15, color: AppTheme.accent),
+                  child: Icon(Icons.smart_toy_rounded, size: 15, color: c.accent),
                 ),
               Flexible(
                 child: Container(
                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isUser ? AppTheme.accent : AppTheme.surface,
-                    border: isUser ? null : Border.all(color: AppTheme.border),
+                    color: isUser ? c.accent : c.surface,
+                    border: isUser ? null : Border.all(color: c.border),
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(16),
                       topRight: const Radius.circular(16),
@@ -3333,7 +3353,7 @@ class _BubbleRow extends StatelessWidget {
                   ),
                   child: Text(
                     message.content,
-                    style: TextStyle(fontSize: 14, height: 1.5, color: isUser ? AppTheme.bg : AppTheme.text),
+                    style: TextStyle(fontSize: 14, height: 1.5, color: isUser ? c.bg : c.text),
                   ),
                 ),
               ),
@@ -3380,6 +3400,7 @@ class _TypingBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -3387,7 +3408,7 @@ class _TypingBubble extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: AppTheme.surface2,
+              color: c.surface2,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -3398,9 +3419,9 @@ class _TypingBubble extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: AppTheme.accent, strokeWidth: 2)),
+                SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: c.accent, strokeWidth: 2)),
                 const SizedBox(width: 8),
-                Text(l10n.typing, style: const TextStyle(color: AppTheme.muted, fontSize: 13)),
+                Text(l10n.typing, style: TextStyle(color: c.muted, fontSize: 13)),
               ],
             ),
           ),
@@ -3417,21 +3438,22 @@ class _SuggestionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: c.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: c.border),
         ),
         child: Row(
           children: [
-            const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: AppTheme.muted),
+            Icon(Icons.chat_bubble_outline_rounded, size: 14, color: c.muted),
             const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.text)),
+            Text(label, style: TextStyle(fontSize: 13, color: c.text)),
           ],
         ),
       ),
@@ -3460,12 +3482,13 @@ class _ContextDayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     // Protein status
     final String protStatus;
     final Color protColor;
     if (todayKcal == 0) {
       protStatus = '—';
-      protColor  = AppTheme.muted;
+      protColor  = c.muted;
     } else if (todayProtein < targetProtein * 0.5) {
       protStatus = l10n.protLow;
       protColor  = const Color(0xFFFFB347);
@@ -3506,7 +3529,7 @@ class _ContextDayCard extends StatelessWidget {
         _CtxMetric(icon: Icons.warning_amber_rounded, color: const Color(0xFFFF6B6B),
             value: '+$surplus', sub: l10n.kcalOver, subColor: const Color(0xFFFF6B6B))
       else
-        _CtxMetric(icon: Icons.local_fire_department_rounded, color: AppTheme.accent,
+        _CtxMetric(icon: Icons.local_fire_department_rounded, color: c.accent,
             value: '$remaining', sub: l10n.kcalRemaining),
       _CtxMetric(icon: Icons.show_chart_rounded, color: protColor,
           value: l10n.labelProteins, sub: protStatus, subColor: protColor),
@@ -3519,9 +3542,9 @@ class _ContextDayCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3532,14 +3555,14 @@ class _ContextDayCard extends StatelessWidget {
               Container(
                 width: 28, height: 28,
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(18),
+                  color: c.accent.withAlpha(18),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.sensors_rounded, size: 15, color: AppTheme.accent),
+                child: Icon(Icons.sensors_rounded, size: 15, color: c.accent),
               ),
               const SizedBox(width: 8),
               Text(l10n.contextDayTitle,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: c.text)),
               const Spacer(),
               GestureDetector(
                 onTap: onViewDetails,
@@ -3547,11 +3570,11 @@ class _ContextDayCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: onViewDetails != null
-                        ? AppTheme.accent.withAlpha(18)
-                        : AppTheme.surface2,
+                        ? c.accent.withAlpha(18)
+                        : c.surface2,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: onViewDetails != null ? AppTheme.accent.withAlpha(60) : AppTheme.border,
+                      color: onViewDetails != null ? c.accent.withAlpha(60) : c.border,
                     ),
                   ),
                   child: Row(
@@ -3560,12 +3583,12 @@ class _ContextDayCard extends StatelessWidget {
                       Text(AppLocalizations.of(context).seeDetails,
                           style: TextStyle(
                             fontSize: 11,
-                            color: onViewDetails != null ? AppTheme.accent : AppTheme.muted,
+                            color: onViewDetails != null ? c.accent : c.muted,
                             fontWeight: FontWeight.w600,
                           )),
                       const SizedBox(width: 2),
                       Icon(Icons.chevron_right_rounded, size: 13,
-                          color: onViewDetails != null ? AppTheme.accent : AppTheme.muted),
+                          color: onViewDetails != null ? c.accent : c.muted),
                     ],
                   ),
                 ),
@@ -3583,11 +3606,11 @@ class _ContextDayCard extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(m.value,
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,
-                          color: (m.subColor != null || m.color == AppTheme.accent) ? m.color : AppTheme.text),
+                          color: (m.subColor != null || m.color == c.accent) ? m.color : c.text),
                       textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 2),
                   Text(m.sub,
-                      style: TextStyle(fontSize: 11, color: m.subColor ?? AppTheme.muted,
+                      style: TextStyle(fontSize: 11, color: m.subColor ?? c.muted,
                           fontWeight: FontWeight.w600),
                       textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
                 ],
@@ -3600,16 +3623,16 @@ class _ContextDayCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppTheme.surface2,
+              color: c.surface2,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               children: [
-                const Icon(Icons.smart_toy_rounded, size: 14, color: AppTheme.accent),
+                Icon(Icons.smart_toy_rounded, size: 14, color: c.accent),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(desc,
-                      style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.4)),
+                      style: TextStyle(fontSize: 12, color: c.muted, height: 1.4)),
                 ),
               ],
             ),
@@ -3645,14 +3668,15 @@ class _DetailSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final pct = target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
     final over = current > target;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surface2,
+        color: c.surface2,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: over ? color.withAlpha(80) : AppTheme.border),
+        border: Border.all(color: over ? color.withAlpha(80) : c.border),
       ),
       child: Column(
         children: [
@@ -3661,7 +3685,7 @@ class _DetailSection extends StatelessWidget {
               Icon(icon, size: 16, color: color),
               const SizedBox(width: 8),
               Text(label,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.text)),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: c.text)),
               const Spacer(),
               RichText(
                 text: TextSpan(
@@ -3675,7 +3699,7 @@ class _DetailSection extends StatelessWidget {
                     ),
                     TextSpan(
                       text: ' / ${target.round()} $unit',
-                      style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+                      style: TextStyle(fontSize: 12, color: c.muted),
                     ),
                   ],
                 ),
@@ -3688,7 +3712,7 @@ class _DetailSection extends StatelessWidget {
             child: LinearProgressIndicator(
               value: pct,
               minHeight: 7,
-              backgroundColor: AppTheme.border,
+              backgroundColor: c.border,
               valueColor: AlwaysStoppedAnimation(over ? const Color(0xFFFF6B6B) : color),
             ),
           ),
@@ -3703,7 +3727,7 @@ class _DetailSection extends StatelessWidget {
                     style: const TextStyle(fontSize: 11, color: Color(0xFFFF6B6B), fontWeight: FontWeight.w600))
               else
                 Text('${(target - current).round()} $unit restants',
-                    style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 11, color: c.muted)),
             ],
           ),
         ],
@@ -3722,7 +3746,7 @@ Widget _buildMealThumb(Meal meal) {
       return Image.memory(base64Decode(meal.thumbnailBase64!), fit: BoxFit.cover);
     } catch (_) {}
   }
-  return const Icon(Icons.restaurant_rounded, size: 18, color: AppTheme.accent);
+  return Icon(Icons.restaurant_rounded, size: 18, color: c.accent);
 }
 
 class _MealDetailTile extends StatelessWidget {
@@ -3731,6 +3755,7 @@ class _MealDetailTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final r = meal.result;
     // Heure extraite depuis la date ISO
     final dt = DateTime.parse(meal.date);
@@ -3739,16 +3764,16 @@ class _MealDetailTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.surface2,
+        color: c.surface2,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
           Container(
             width: 38, height: 38,
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(18),
+              color: c.accent.withAlpha(18),
               borderRadius: BorderRadius.circular(10),
             ),
             clipBehavior: Clip.hardEdge,
@@ -3760,11 +3785,11 @@ class _MealDetailTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(r.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.text),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: c.text),
                     overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 3),
                 Text('P${r.protein.round()}g · G${r.carbs.round()}g · L${r.fat.round()}g',
-                    style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 11, color: c.muted)),
               ],
             ),
           ),
@@ -3773,10 +3798,10 @@ class _MealDetailTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('${r.calories} kcal',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.accent)),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: c.accent)),
               const SizedBox(height: 2),
               Text(hour,
-                  style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                  style: TextStyle(fontSize: 11, color: c.muted)),
             ],
           ),
         ],
@@ -3803,14 +3828,15 @@ class _SmartActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: c.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: c.border),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -3830,7 +3856,7 @@ class _SmartActionCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(action.line1,
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.text),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: c.text),
                       overflow: TextOverflow.ellipsis),
                   Text(action.line2,
                       style: TextStyle(fontSize: 11, color: action.color, fontWeight: FontWeight.w600),
@@ -3838,7 +3864,7 @@ class _SmartActionCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, size: 14, color: AppTheme.muted),
+            Icon(Icons.chevron_right_rounded, size: 14, color: c.muted),
           ],
         ),
       ),
@@ -3864,6 +3890,7 @@ class _QuickTipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     // Compute tip text + emoji
     final String tip;
     final String emoji;
@@ -3888,12 +3915,12 @@ class _QuickTipCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppTheme.accent.withAlpha(18), AppTheme.surface],
+          colors: [c.accent.withAlpha(18), c.surface],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.accent.withAlpha(40)),
+        border: Border.all(color: c.accent.withAlpha(40)),
       ),
       child: Row(
         children: [
@@ -3901,10 +3928,10 @@ class _QuickTipCard extends StatelessWidget {
           Container(
             width: 42, height: 42,
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(18),
+              color: c.accent.withAlpha(18),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.lightbulb_rounded, size: 20, color: AppTheme.accent),
+            child: Icon(Icons.lightbulb_rounded, size: 20, color: c.accent),
           ),
           const SizedBox(width: 12),
           // Text
@@ -3913,10 +3940,10 @@ class _QuickTipCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.quickTipLabel,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800,
-                        color: AppTheme.accent, letterSpacing: 0.5)),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800,
+                        color: c.accent, letterSpacing: 0.5)),
                 const SizedBox(height: 3),
-                Text(tip, style: const TextStyle(fontSize: 12, color: AppTheme.text, height: 1.4)),
+                Text(tip, style: TextStyle(fontSize: 12, color: c.text, height: 1.4)),
               ],
             ),
           ),
@@ -3925,9 +3952,9 @@ class _QuickTipCard extends StatelessWidget {
           Container(
             width: 44, height: 44,
             decoration: BoxDecoration(
-              color: AppTheme.surface2,
+              color: c.surface2,
               shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: c.border),
             ),
             alignment: Alignment.center,
             child: Text(emoji, style: const TextStyle(fontSize: 22)),
@@ -3949,23 +3976,24 @@ class _LoadingDishes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         children: [
           CircularProgressIndicator(color: color, strokeWidth: 3),
           const SizedBox(height: 16),
           Text(l10n.generatingRegime(dietLabel),
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
           const SizedBox(height: 4),
           Text(l10n.aiAdaptation,
-              style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
+              style: TextStyle(color: c.muted, fontSize: 12)),
         ],
       ),
     );
@@ -4068,7 +4096,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
       minChildSize: 0.5,
       maxChildSize: 0.95,
       builder: (_, ctrl) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Color(0xFF12121f),
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
@@ -4080,7 +4108,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
               child: Container(
                 width: 40, height: 4,
                 decoration: BoxDecoration(
-                  color: AppTheme.border,
+                  color: c.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -4103,17 +4131,17 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                               decoration: BoxDecoration(
-                                color: AppTheme.accent.withAlpha(20),
+                                color: c.accent.withAlpha(20),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: const Text('RECETTE',
                                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
-                                      color: AppTheme.accent, letterSpacing: 1.4)),
+                                      color: c.accent, letterSpacing: 1.4)),
                             ),
                             const SizedBox(height: 6),
                             Text(dish.name,
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900,
-                                    color: AppTheme.text, height: 1.2)),
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900,
+                                    color: c.text, height: 1.2)),
                           ],
                         ),
                       ),
@@ -4122,17 +4150,17 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: AppTheme.accent.withAlpha(18),
+                          color: c.accent.withAlpha(18),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppTheme.accent.withAlpha(50)),
+                          border: Border.all(color: c.accent.withAlpha(50)),
                         ),
                         child: Column(
                           children: [
                             Text('${dish.calories}',
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900,
-                                    color: AppTheme.accent)),
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900,
+                                    color: c.accent)),
                             const Text('kcal',
-                                style: TextStyle(fontSize: 10, color: AppTheme.muted)),
+                                style: TextStyle(fontSize: 10, color: c.muted)),
                           ],
                         ),
                       ),
@@ -4159,7 +4187,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
               ),
             ),
             const SizedBox(height: 4),
-            const Divider(color: AppTheme.border, height: 24),
+            Divider(color: c.border, height: 24),
 
             // ── Scrollable content ─────────────────────────────────────────
             Expanded(
@@ -4179,26 +4207,26 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                       children: dish.ingredients.map((ing) => Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                         decoration: BoxDecoration(
-                          color: AppTheme.surface,
+                          color: c.surface,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppTheme.border),
+                          border: Border.all(color: c.border),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(ing.name,
-                                style: const TextStyle(fontSize: 13, color: AppTheme.text,
+                                style: TextStyle(fontSize: 13, color: c.text,
                                     fontWeight: FontWeight.w500)),
                             const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppTheme.accent.withAlpha(18),
+                                color: c.accent.withAlpha(18),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text('${ing.weightG}g',
-                                  style: const TextStyle(fontSize: 11,
-                                      fontWeight: FontWeight.w700, color: AppTheme.accent)),
+                                  style: TextStyle(fontSize: 11,
+                                      fontWeight: FontWeight.w700, color: c.accent)),
                             ),
                           ],
                         ),
@@ -4233,23 +4261,23 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                                   width: 36, height: 36,
                                   decoration: BoxDecoration(
                                     color: isLast
-                                        ? AppTheme.accent.withAlpha(25)
-                                        : AppTheme.surface,
+                                        ? c.accent.withAlpha(25)
+                                        : c.surface,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: isLast ? AppTheme.accent : AppTheme.border,
+                                      color: isLast ? c.accent : c.border,
                                     ),
                                   ),
                                   alignment: Alignment.center,
                                   child: Text(emoji,
-                                      style: const TextStyle(fontSize: 16)),
+                                      style: TextStyle(fontSize: 16)),
                                 ),
                                 if (!isLast)
                                   Expanded(
                                     child: Container(
                                       width: 2,
                                       margin: const EdgeInsets.symmetric(vertical: 4),
-                                      color: AppTheme.border,
+                                      color: c.border,
                                     ),
                                   ),
                               ],
@@ -4267,13 +4295,13 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                                         style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w800,
-                                          color: isLast ? AppTheme.accent : AppTheme.muted,
+                                          color: isLast ? c.accent : c.muted,
                                           letterSpacing: 1.1,
                                         )),
                                     const SizedBox(height: 3),
                                     Text(text,
-                                        style: const TextStyle(
-                                            fontSize: 13, color: AppTheme.text, height: 1.5)),
+                                        style: TextStyle(
+                                            fontSize: 13, color: c.text, height: 1.5)),
                                   ],
                                 ),
                               ),
@@ -4325,11 +4353,11 @@ class _PrepSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, size: 15, color: AppTheme.accent),
+      Icon(icon, size: 15, color: c.accent),
       const SizedBox(width: 7),
       Text(label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800,
-              color: AppTheme.text, letterSpacing: 0.3)),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,
+              color: c.text, letterSpacing: 0.3)),
     ],
   );
 }
@@ -4379,13 +4407,14 @@ class _SmartSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     const surplusColor = Color(0xFFFF6B6B);
 
     final pills = <({IconData icon, String value, String sub, Color color})>[
       if (inSurplus)
         (icon: Icons.warning_amber_rounded, value: '+$surplus kcal', sub: 'de trop', color: surplusColor)
       else
-        (icon: Icons.local_fire_department_rounded, value: '$remaining kcal', sub: 'restantes', color: AppTheme.accent),
+        (icon: Icons.local_fire_department_rounded, value: '$remaining kcal', sub: 'restantes', color: c.accent),
       (icon: Icons.grass_rounded,                 value: dietLabel,            sub: 'Régime',      color: dietColor),
       (icon: Icons.restaurant_menu_rounded,       value: '$dishCount plats',   sub: 'à générer',   color: const Color(0xFF4DA1FF)),
       if (activeFiltersCount > 0)
@@ -4401,7 +4430,7 @@ class _SmartSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [dietColor.withAlpha(22), AppTheme.surface],
+          colors: [dietColor.withAlpha(22), c.surface],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -4423,9 +4452,9 @@ class _SmartSummaryCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                  color: AppTheme.surface2,
+                  color: c.surface2,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: c.border),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -4445,7 +4474,7 @@ class _SmartSummaryCard extends StatelessWidget {
                         child: Text('$n',
                             style: TextStyle(
                               fontSize: 12, fontWeight: FontWeight.w800,
-                              color: selected ? AppTheme.bg : AppTheme.muted,
+                              color: selected ? c.bg : c.muted,
                             )),
                       ),
                     );
@@ -4478,7 +4507,7 @@ class _SmartSummaryCard extends StatelessWidget {
                       Text(p.value,
                           style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: p.color)),
                       Text(p.sub,
-                          style: const TextStyle(fontSize: 10, color: AppTheme.muted)),
+                          style: TextStyle(fontSize: 10, color: c.muted)),
                     ],
                   ),
                 ],
@@ -4489,7 +4518,7 @@ class _SmartSummaryCard extends StatelessWidget {
 
           // ── Description ───────────────────────────────────────────────
           Text(description,
-              style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.5)),
+              style: TextStyle(fontSize: 12, color: c.muted, height: 1.5)),
           const SizedBox(height: 14),
 
           // ── CTA button ────────────────────────────────────────────────
@@ -4499,14 +4528,14 @@ class _SmartSummaryCard extends StatelessWidget {
               onPressed: loading ? null : onGenerate,
               style: ElevatedButton.styleFrom(
                 backgroundColor: dietColor,
-                foregroundColor: AppTheme.bg,
+                foregroundColor: c.bg,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
               ),
               icon: loading
-                  ? const SizedBox(width: 16, height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.bg))
+                  ? SizedBox(width: 16, height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: c.bg))
                   : const Icon(Icons.auto_awesome_rounded, size: 18),
               label: Text(
                 loading
@@ -4581,6 +4610,7 @@ class _PreviewDishCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final previews = _previewDishesForDiet(diet);
     return Column(
       children: [
@@ -4625,23 +4655,24 @@ class _ErrorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.accent3.withAlpha(80)),
+        border: Border.all(color: c.accent3.withAlpha(80)),
       ),
       child: Column(
         children: [
-          const Icon(Icons.wifi_off_rounded, color: AppTheme.muted, size: 36),
+          Icon(Icons.wifi_off_rounded, color: c.muted, size: 36),
           const SizedBox(height: 12),
           Text(l10n.error,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 6),
           Text(message,
-              style: const TextStyle(color: AppTheme.muted, fontSize: 12),
+              style: TextStyle(color: c.muted, fontSize: 12),
               textAlign: TextAlign.center),
           const SizedBox(height: 16),
           OutlinedButton.icon(
@@ -4665,8 +4696,9 @@ class _InputBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
-      color: AppTheme.bg,
+      color: c.bg,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       child: Row(
         children: [
@@ -4674,7 +4706,7 @@ class _InputBar extends StatelessWidget {
             child: TextField(
               controller: controller,
               decoration: InputDecoration(hintText: l10n.typingMessage),
-              style: const TextStyle(color: AppTheme.text),
+              style: TextStyle(color: c.text),
               onSubmitted: (_) => onSend(),
             ),
           ),
@@ -4684,8 +4716,8 @@ class _InputBar extends StatelessWidget {
             child: Container(
               width: 48,
               height: 48,
-              decoration: BoxDecoration(color: AppTheme.accent, borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.arrow_upward, color: AppTheme.bg),
+              decoration: BoxDecoration(color: c.accent, borderRadius: BorderRadius.circular(12)),
+              child: Icon(Icons.arrow_upward, color: c.bg),
             ),
           ),
         ],

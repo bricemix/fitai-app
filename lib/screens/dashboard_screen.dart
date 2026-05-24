@@ -77,6 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final today = widget.meals.where((m) => m.isToday).toList();
     final totalKcal    = today.fold(0, (s, m) => s + m.result.calories);
     final totalProtein = today.fold(0.0, (s, m) => s + m.result.protein);
@@ -137,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         Text(
                           l10n.readyToCrush,
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppTheme.muted),
+                              ?.copyWith(color: c.muted),
                         ),
                       ],
                     ),
@@ -151,21 +152,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                         Container(
                           width: 40, height: 40,
                           decoration: BoxDecoration(
-                            color: AppTheme.surface2,
+                            color: c.surface2,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppTheme.border),
+                            border: Border.all(color: c.border),
                           ),
-                          child: const Icon(Icons.notifications_outlined,
-                              size: 20, color: AppTheme.muted),
+                          child: Icon(Icons.notifications_outlined,
+                              size: 20, color: c.muted),
                         ),
                         Positioned(
                           right: 8, top: 8,
                           child: Container(
                             width: 8, height: 8,
                             decoration: BoxDecoration(
-                              color: AppTheme.accent,
+                              color: c.accent,
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppTheme.bg, width: 1.5),
+                              border: Border.all(color: c.bg, width: 1.5),
                             ),
                           ),
                         ),
@@ -284,18 +285,19 @@ class _CompactCheckInCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppTheme.accent3.withAlpha(22), AppTheme.accent3.withAlpha(6)],
+            colors: [c.accent3.withAlpha(22), c.accent3.withAlpha(6)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.accent3.withAlpha(80)),
+          border: Border.all(color: c.accent3.withAlpha(80)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,15 +309,15 @@ class _CompactCheckInCard extends StatelessWidget {
                 Container(
                   width: 34, height: 34,
                   decoration: BoxDecoration(
-                    color: AppTheme.accent3.withAlpha(40),
+                    color: c.accent3.withAlpha(40),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.swap_vert_rounded, size: 17, color: AppTheme.accent3),
+                  child: Icon(Icons.swap_vert_rounded, size: 17, color: c.accent3),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppTheme.accent3.withAlpha(30),
+                    color: c.accent3.withAlpha(30),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -324,14 +326,14 @@ class _CompactCheckInCard extends StatelessWidget {
                       Container(
                         width: 5, height: 5,
                         decoration: BoxDecoration(
-                          color: AppTheme.accent3,
+                          color: c.accent3,
                           shape: BoxShape.circle,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Text('À FAIRE',
                           style: TextStyle(
-                            fontSize: 8, color: AppTheme.accent3,
+                            fontSize: 8, color: c.accent3,
                             fontWeight: FontWeight.w800, letterSpacing: 0.5,
                           )),
                     ],
@@ -342,24 +344,24 @@ class _CompactCheckInCard extends StatelessWidget {
             const SizedBox(height: 14),
             // Title
             Text(l10n.dailyCheckIn,
-                style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.text,
+                style: TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w800, color: c.text,
                 )),
             const SizedBox(height: 5),
             // Subtitle
             Text(l10n.bodyMeasurementsSubtitle,
-                style: const TextStyle(fontSize: 10, color: AppTheme.muted),
+                style: TextStyle(fontSize: 10, color: c.muted),
                 overflow: TextOverflow.ellipsis),
             const SizedBox(height: 10),
             // CTA row
             Row(
               children: [
                 Text(l10n.toComplete,
-                    style: const TextStyle(
-                      fontSize: 11, color: AppTheme.accent3, fontWeight: FontWeight.w700,
+                    style: TextStyle(
+                      fontSize: 11, color: c.accent3, fontWeight: FontWeight.w700,
                     )),
                 const Spacer(),
-                const Icon(Icons.arrow_forward_rounded, size: 13, color: AppTheme.accent3),
+                Icon(Icons.arrow_forward_rounded, size: 13, color: c.accent3),
               ],
             ),
           ],
@@ -377,16 +379,17 @@ class _CompactCheckInDoneCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppTheme.accent.withAlpha(22), AppTheme.accent.withAlpha(6)],
+          colors: [c.accent.withAlpha(22), c.accent.withAlpha(6)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.accent.withAlpha(80)),
+        border: Border.all(color: c.accent.withAlpha(80)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,20 +401,20 @@ class _CompactCheckInDoneCard extends StatelessWidget {
               Container(
                 width: 34, height: 34,
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(35),
+                  color: c.accent.withAlpha(35),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.check_rounded, size: 17, color: AppTheme.accent),
+                child: Icon(Icons.check_rounded, size: 17, color: c.accent),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(30),
+                  color: c.accent.withAlpha(30),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text('✓ FAIT',
                     style: TextStyle(
-                      fontSize: 8, color: AppTheme.accent,
+                      fontSize: 8, color: c.accent,
                       fontWeight: FontWeight.w800, letterSpacing: 0.5,
                     )),
               ),
@@ -419,20 +422,20 @@ class _CompactCheckInDoneCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(l10n.checkInDone,
-              style: const TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.accent,
+              style: TextStyle(
+                fontSize: 13, fontWeight: FontWeight.w800, color: c.accent,
               )),
           const SizedBox(height: 5),
           Text(l10n.dataUpToDate,
-              style: const TextStyle(fontSize: 10, color: AppTheme.muted),
+              style: TextStyle(fontSize: 10, color: c.muted),
               maxLines: 2, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.verified_rounded, size: 12, color: AppTheme.accent),
+              Icon(Icons.verified_rounded, size: 12, color: c.accent),
               const SizedBox(width: 5),
               Text(l10n.syncedLabel,
-                  style: const TextStyle(fontSize: 11, color: AppTheme.accent, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 11, color: c.accent, fontWeight: FontWeight.w600)),
             ],
           ),
         ],
@@ -464,6 +467,7 @@ class _CompactGoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final isLoss  = profile.goalKgPerWeek < 0;
     final days    = _daysToNextKg();
     final date    = _milestoneDate(days);
@@ -517,16 +521,16 @@ class _CompactGoalCard extends StatelessWidget {
             // Days row
             RichText(
               text: TextSpan(
-                style: const TextStyle(fontFamily: 'Syne'),
+                style: TextStyle(fontFamily: 'Syne'),
                 children: [
                   const TextSpan(
                     text: 'dans ',
-                    style: TextStyle(fontSize: 12, color: AppTheme.muted),
+                    style: TextStyle(fontSize: 12, color: c.muted),
                   ),
                   TextSpan(
                     text: '$days jours',
-                    style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.text,
+                    style: TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w700, color: c.text,
                     ),
                   ),
                 ],
@@ -580,6 +584,7 @@ class _GoalCountdownPulseState extends State<_GoalCountdownPulse>
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return AnimatedBuilder(
       animation: _glow,
       builder: (_, child) => Container(
@@ -626,6 +631,7 @@ class _TodayMissionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final missions = [
       _MissionItem(label: l10n.checkScan2Meals,   done: m1, onTap: null),
       _MissionItem(label: '${l10n.checkProteinGoal} (${targetProtein}g)', done: m2, onTap: null),
@@ -639,12 +645,12 @@ class _TodayMissionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.accent.withAlpha(60), width: 1.5),
+        border: Border.all(color: c.accent.withAlpha(60), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.accent.withAlpha(20),
+            color: c.accent.withAlpha(20),
             blurRadius: 20,
             spreadRadius: 0,
           ),
@@ -659,7 +665,7 @@ class _TodayMissionCard extends StatelessWidget {
               Container(
                 width: 32, height: 32,
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(20),
+                  color: c.accent.withAlpha(20),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Center(
@@ -669,24 +675,24 @@ class _TodayMissionCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(l10n.todayMission,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: c.text)),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(25),
+                  color: c.accent.withAlpha(25),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '$doneCount / $total complétées',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.accent),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: c.accent),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Text(l10n.stayFocused,
-              style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+              style: TextStyle(fontSize: 12, color: c.muted)),
           const SizedBox(height: 16),
 
           // Checklist + circular arc
@@ -712,14 +718,14 @@ class _TodayMissionCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('$pctDisplay%',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontFamily: 'Syne',
                                 fontSize: 22,
                                 fontWeight: FontWeight.w800,
-                                color: AppTheme.accent)),
+                                color: c.accent)),
                         Text(l10n.dailyProgress,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 9, color: AppTheme.muted, height: 1.3)),
+                            style: TextStyle(fontSize: 9, color: c.muted, height: 1.3)),
                       ],
                     ),
                   ),
@@ -736,8 +742,8 @@ class _TodayMissionCard extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onSeePlan,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accent,
-                foregroundColor: AppTheme.bg,
+                backgroundColor: c.accent,
+                foregroundColor: c.bg,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
@@ -772,6 +778,7 @@ class _MissionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: item.onTap,
       child: Padding(
@@ -782,15 +789,15 @@ class _MissionRow extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               width: 22, height: 22,
               decoration: BoxDecoration(
-                color: item.done ? AppTheme.accent : Colors.transparent,
+                color: item.done ? c.accent : Colors.transparent,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: item.done ? AppTheme.accent : AppTheme.muted,
+                  color: item.done ? c.accent : c.muted,
                   width: 2,
                 ),
               ),
               child: item.done
-                  ? const Icon(Icons.check_rounded, size: 13, color: AppTheme.bg)
+                  ? Icon(Icons.check_rounded, size: 13, color: c.bg)
                   : null,
             ),
             const SizedBox(width: 10),
@@ -799,9 +806,9 @@ class _MissionRow extends StatelessWidget {
                 item.label,
                 style: TextStyle(
                   fontSize: 13,
-                  color: item.done ? AppTheme.muted : AppTheme.text,
+                  color: item.done ? c.muted : c.text,
                   decoration: item.done ? TextDecoration.lineThrough : null,
-                  decorationColor: AppTheme.muted,
+                  decorationColor: c.muted,
                 ),
               ),
             ),
@@ -877,15 +884,16 @@ class _AiRecommendationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     // Split text at the "Priorité" line for highlighting
     final parts = text.split('\n');
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -893,16 +901,16 @@ class _AiRecommendationCard extends StatelessWidget {
           // Header
           Row(
             children: [
-              const Icon(Icons.auto_awesome_rounded, size: 16, color: AppTheme.accent),
+              Icon(Icons.auto_awesome_rounded, size: 16, color: c.accent),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(l10n.aiRecommendation,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.text)),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: c.text)),
               ),
               GestureDetector(
                 onTap: onViewDishes,
                 child: Text(l10n.viewMore,
-                    style: const TextStyle(fontSize: 12, color: AppTheme.accent, fontWeight: FontWeight.w600)),
+                    style: TextStyle(fontSize: 12, color: c.accent, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -915,10 +923,10 @@ class _AiRecommendationCard extends StatelessWidget {
               Container(
                 width: 44, height: 44,
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withAlpha(18),
+                  color: c.accent.withAlpha(18),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.psychology_rounded, color: AppTheme.accent, size: 22),
+                child: Icon(Icons.psychology_rounded, color: c.accent, size: 22),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -928,34 +936,34 @@ class _AiRecommendationCard extends StatelessWidget {
                     // Stats line
                     Text(
                       '$currentKcal kcal consommées · ${currentProtein}g protéines',
-                      style: const TextStyle(fontSize: 11, color: AppTheme.muted),
+                      style: TextStyle(fontSize: 11, color: c.muted),
                     ),
                     const SizedBox(height: 4),
                     // Main text (with optional highlight)
                     if (parts.length > 1) ...[
                       Text(parts[0],
-                          style: const TextStyle(fontSize: 13, color: AppTheme.text, height: 1.4)),
+                          style: TextStyle(fontSize: 13, color: c.text, height: 1.4)),
                       const SizedBox(height: 4),
                       RichText(
                         text: TextSpan(
-                          style: const TextStyle(fontFamily: 'Syne', fontSize: 13, height: 1.4),
+                          style: TextStyle(fontFamily: 'Syne', fontSize: 13, height: 1.4),
                           children: [
                             TextSpan(
                               text: 'Priorité : ',
-                              style: const TextStyle(
-                                color: AppTheme.accent,
+                              style: TextStyle(
+                                color: c.accent,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             TextSpan(
                               text: parts[1].replaceFirst('Priorité : ', ''),
-                              style: const TextStyle(color: AppTheme.accent),
+                              style: TextStyle(color: c.accent),
                             ),
                           ],
                         ),
                       ),
                     ] else
-                      Text(text, style: const TextStyle(fontSize: 13, color: AppTheme.text, height: 1.4)),
+                      Text(text, style: TextStyle(fontSize: 13, color: c.text, height: 1.4)),
                   ],
                 ),
               ),
@@ -999,23 +1007,24 @@ class _QuickActionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: AppTheme.surface2,
+            color: c.surface2,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.border),
+            border: Border.all(color: c.border),
           ),
           child: Column(
             children: [
-              Icon(icon, size: 20, color: AppTheme.accent),
+              Icon(icon, size: 20, color: c.accent),
               const SizedBox(height: 4),
               Text(label,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 10, color: AppTheme.muted, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 10, color: c.muted, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -1043,16 +1052,17 @@ class _CalorieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.surface, Color(0xFF1a1a30)],
+        gradient: LinearGradient(
+          colors: [c.surface, Color(0xFF1a1a30)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
@@ -1064,14 +1074,14 @@ class _CalorieCard extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.local_fire_department_rounded,
-                        size: 16, color: AppTheme.accent),
+                    Icon(Icons.local_fire_department_rounded,
+                        size: 16, color: c.accent),
                     Text('$totalKcal',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontFamily: 'Syne', fontSize: 20,
-                            fontWeight: FontWeight.w800, color: AppTheme.text)),
+                            fontWeight: FontWeight.w800, color: c.text)),
                     const Text('kcal',
-                        style: TextStyle(fontSize: 10, color: AppTheme.muted)),
+                        style: TextStyle(fontSize: 10, color: c.muted)),
                   ],
                 ),
               ),
@@ -1085,45 +1095,45 @@ class _CalorieCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(l10n.objectifQuotidien,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.muted)),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: c.muted)),
                     if (fromPlanning) ...[
                       const SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppTheme.accent.withAlpha(30),
+                          color: c.accent.withAlpha(30),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(l10n.planning,
-                            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700,
-                                color: AppTheme.accent, letterSpacing: 0.3)),
+                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700,
+                                color: c.accent, letterSpacing: 0.3)),
                       ),
                     ],
                   ],
                 ),
                 Text('$target',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontFamily: 'Syne', fontSize: 36,
-                        fontWeight: FontWeight.w800, color: AppTheme.text, height: 1)),
+                        fontWeight: FontWeight.w800, color: c.text, height: 1)),
                 Text(l10n.kcalPerDay,
-                    style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 12, color: c.muted)),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(l10n.progression,
-                        style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                        style: TextStyle(fontSize: 12, color: c.muted)),
                     Text('${(pct * 100).round()}%',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.accent)),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: c.accent)),
                   ],
                 ),
                 const SizedBox(height: 4),
-                _ProgressBar(value: pct, color: pct > 0.9 ? AppTheme.accent3 : AppTheme.accent),
+                _ProgressBar(value: pct, color: pct > 0.9 ? c.accent3 : c.accent),
                 const SizedBox(height: 8),
                 Builder(builder: (ctx) {
                   final rem = _remaining;
                   final isOver = rem < 0;
-                  final color = isOver ? AppTheme.accent3 : AppTheme.accent;
+                  final color = isOver ? c.accent3 : c.accent;
                   return Row(
                     children: [
                       Icon(
@@ -1182,11 +1192,12 @@ class _ProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(100),
       child: LinearProgressIndicator(
         value: value,
-        backgroundColor: AppTheme.surface,
+        backgroundColor: c.surface,
         valueColor: AlwaysStoppedAnimation(color),
         minHeight: 5,
       ),
@@ -1205,14 +1216,15 @@ class _MacroRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final macros = [
-      (name: l10n.proteins, val: protein, color: AppTheme.accent2,
+      (name: l10n.proteins, val: protein, color: c.accent2,
         pct: (protein / (weight * 1.8)).clamp(0.0, 1.0),
         target: (weight * 1.8).round(), unit: 'g'),
-      (name: l10n.carbs, val: carbs, color: AppTheme.accent,
+      (name: l10n.carbs, val: carbs, color: c.accent,
         pct: (carbs / (target * 0.5 / 4)).clamp(0.0, 1.0),
         target: (target * 0.5 / 4).round(), unit: 'g'),
-      (name: l10n.fats, val: fat, color: AppTheme.accent3,
+      (name: l10n.fats, val: fat, color: c.accent3,
         pct: (fat / (target * 0.3 / 9)).clamp(0.0, 1.0),
         target: (target * 0.3 / 9).round(), unit: 'g'),
     ];
@@ -1226,7 +1238,7 @@ class _MacroRow extends StatelessWidget {
             margin: i < 2 ? const EdgeInsets.only(right: 8) : EdgeInsets.zero,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppTheme.surface2,
+              color: c.surface2,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
@@ -1239,16 +1251,16 @@ class _MacroRow extends StatelessWidget {
                         style: TextStyle(fontFamily: 'Syne', fontSize: 20,
                             fontWeight: FontWeight.w800, color: m.color)),
                     Text(' / ${m.target}${m.unit}',
-                        style: const TextStyle(fontSize: 10, color: AppTheme.muted)),
+                        style: TextStyle(fontSize: 10, color: c.muted)),
                   ],
                 ),
                 Text(m.name,
-                    style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 11, color: c.muted)),
                 const SizedBox(height: 8),
                 _ProgressBar(value: m.pct, color: m.color),
                 const SizedBox(height: 2),
                 Text('${(m.pct * 100).round()}%',
-                    style: const TextStyle(fontSize: 9, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 9, color: c.muted)),
               ],
             ),
           ),
@@ -1266,6 +1278,7 @@ class _WeeklyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
     final now = DateTime.now();
     final todayIdx = now.weekday - 1;
@@ -1288,9 +1301,9 @@ class _WeeklyChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1299,16 +1312,16 @@ class _WeeklyChart extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(l10n.last7Days,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
               ),
               if (avg > 0)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text('Moyenne', style: TextStyle(fontSize: 10, color: AppTheme.muted)),
+                    Text('Moyenne', style: TextStyle(fontSize: 10, color: c.muted)),
                     Text('$avg kcal',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800,
-                            color: AppTheme.accent, fontFamily: 'Syne')),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800,
+                            color: c.accent, fontFamily: 'Syne')),
                   ],
                 ),
             ],
@@ -1330,16 +1343,16 @@ class _WeeklyChart extends StatelessWidget {
                       children: [
                         if (isToday && kcal > 0)
                           Text('$kcal',
-                              style: const TextStyle(fontSize: 9, color: AppTheme.text,
+                              style: TextStyle(fontSize: 9, color: c.text,
                                   fontWeight: FontWeight.w700)),
                         const SizedBox(height: 2),
                         AnimatedContainer(
                           duration: Duration(milliseconds: 400 + i * 60),
                           height: heightPct > 0 ? 80 * heightPct : 4,
                           decoration: BoxDecoration(
-                            color: isToday ? AppTheme.accent
-                                : kcal > 0 ? AppTheme.accent.withAlpha(90)
-                                : AppTheme.surface2,
+                            color: isToday ? c.accent
+                                : kcal > 0 ? c.accent.withAlpha(90)
+                                : c.surface2,
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                           ),
                         ),
@@ -1347,7 +1360,7 @@ class _WeeklyChart extends StatelessWidget {
                         Text(days[i],
                             style: TextStyle(
                                 fontSize: 10,
-                                color: isToday ? AppTheme.accent : AppTheme.muted,
+                                color: isToday ? c.accent : c.muted,
                                 fontWeight: isToday ? FontWeight.w700 : FontWeight.normal)),
                       ],
                     ),
@@ -1370,12 +1383,13 @@ class _TodayMeals extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1393,21 +1407,22 @@ class _EmptyMeals extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         children: [
-          const Icon(Icons.restaurant_outlined, size: 40, color: AppTheme.muted),
+          Icon(Icons.restaurant_outlined, size: 40, color: c.muted),
           const SizedBox(height: 10),
           Text(l10n.noMealsToday,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.muted, height: 1.5)),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.muted, height: 1.5)),
         ],
       ),
     );
@@ -1421,6 +1436,7 @@ class _MealImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     // 1. Fichier local présent
     final file = meal.imagePath != null ? File(meal.imagePath!) : null;
     if (file != null && file.existsSync()) {
@@ -1434,7 +1450,7 @@ class _MealImage extends StatelessWidget {
       } catch (_) {}
     }
     // 3. Fallback icône
-    return const Icon(Icons.restaurant_rounded, color: AppTheme.muted);
+    return Icon(Icons.restaurant_rounded, color: c.muted);
   }
 }
 
@@ -1446,6 +1462,7 @@ class MealEntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -1454,7 +1471,7 @@ class MealEntryTile extends StatelessWidget {
           Container(
             width: 50, height: 50,
             decoration: BoxDecoration(
-              color: AppTheme.surface2,
+              color: c.surface2,
               borderRadius: BorderRadius.circular(12),
             ),
             clipBehavior: Clip.hardEdge,
@@ -1466,21 +1483,21 @@ class MealEntryTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(meal.result.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 if (showDate)
                   Text(_formatDate(meal.date),
-                      style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                      style: TextStyle(fontSize: 11, color: c.muted)),
                 Row(
                   children: [
                     Text('${meal.result.protein.round()}g P',
-                        style: const TextStyle(fontSize: 11, color: AppTheme.accent2)),
-                    const Text(' · ', style: TextStyle(fontSize: 11, color: AppTheme.muted)),
+                        style: TextStyle(fontSize: 11, color: c.accent2)),
+                    Text(' · ', style: TextStyle(fontSize: 11, color: c.muted)),
                     Text('${meal.result.carbs.round()}g G',
-                        style: TextStyle(fontSize: 11, color: AppTheme.accent)),
-                    const Text(' · ', style: TextStyle(fontSize: 11, color: AppTheme.muted)),
+                        style: TextStyle(fontSize: 11, color: c.accent)),
+                    Text(' · ', style: TextStyle(fontSize: 11, color: c.muted)),
                     Text('${meal.result.fat.round()}g L',
-                        style: TextStyle(fontSize: 11, color: AppTheme.accent3)),
+                        style: TextStyle(fontSize: 11, color: c.accent3)),
                   ],
                 ),
               ],
@@ -1490,9 +1507,9 @@ class MealEntryTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('${meal.result.calories}',
-                  style: const TextStyle(fontFamily: 'Syne', fontSize: 16,
-                      fontWeight: FontWeight.w700, color: AppTheme.accent)),
-              const Text(' kcal', style: TextStyle(fontSize: 10, color: AppTheme.muted)),
+                  style: TextStyle(fontFamily: 'Syne', fontSize: 16,
+                      fontWeight: FontWeight.w700, color: c.accent)),
+              Text(' kcal', style: TextStyle(fontSize: 10, color: c.muted)),
             ],
           ),
         ],

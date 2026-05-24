@@ -143,7 +143,7 @@ class _ScanScreenState extends State<ScanScreen> {
     if (_result == null) return;
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) =>
@@ -207,7 +207,7 @@ class _ScanScreenState extends State<ScanScreen> {
     if (!mounted) return;
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       isScrollControlled: true,
@@ -219,7 +219,7 @@ class _ScanScreenState extends State<ScanScreen> {
     final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => SafeArea(
@@ -229,7 +229,7 @@ class _ScanScreenState extends State<ScanScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.camera_alt, color: AppTheme.accent),
+                leading: Icon(Icons.camera_alt, color: c.accent),
                 title: Text(l10n.takePhoto),
                 onTap: () {
                   Navigator.pop(context);
@@ -238,7 +238,7 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
               ListTile(
                 leading:
-                    const Icon(Icons.photo_library, color: AppTheme.accent),
+                    Icon(Icons.photo_library, color: c.accent),
                 title: Text(l10n.chooseGallery),
                 onTap: () {
                   Navigator.pop(context);
@@ -256,6 +256,7 @@ class _ScanScreenState extends State<ScanScreen> {
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Stack(
       children: [
         SingleChildScrollView(
@@ -274,7 +275,7 @@ class _ScanScreenState extends State<ScanScreen> {
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
-                        ?.copyWith(color: AppTheme.muted),
+                        ?.copyWith(color: c.muted),
                   ),
                 ],
               ),
@@ -298,7 +299,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _analyze,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accent,
+                      backgroundColor: c.accent,
                       foregroundColor: const Color(0xFF0A0A0F),
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -378,11 +379,11 @@ class _ScanScreenState extends State<ScanScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                    color: AppTheme.accent,
+                    color: c.accent,
                     borderRadius: BorderRadius.circular(100)),
                 child: Text(_toast!,
-                    style: const TextStyle(
-                        color: AppTheme.bg,
+                    style: TextStyle(
+                        color: c.bg,
                         fontWeight: FontWeight.w700,
                         fontSize: 13)),
               ),
@@ -403,6 +404,7 @@ class _ConfirmMealSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
       child: Column(
@@ -412,41 +414,41 @@ class _ConfirmMealSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                  color: AppTheme.border,
+                  color: c.border,
                   borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(20),
+              color: c.accent.withAlpha(20),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.restaurant_rounded, size: 40, color: AppTheme.accent),
+            child: Icon(Icons.restaurant_rounded, size: 40, color: c.accent),
           ),
           const SizedBox(height: 12),
           Text(result.name,
-              style: const TextStyle(
+              style: TextStyle(
                   fontFamily: 'Syne',
                   fontSize: 22,
                   fontWeight: FontWeight.w800),
               textAlign: TextAlign.center),
           const SizedBox(height: 4),
           Text(l10n.portionEstimated(portionGrams),
-              style: const TextStyle(color: AppTheme.muted, fontSize: 13)),
+              style: TextStyle(color: c.muted, fontSize: 13)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _MacroChip(
-                  label: '${result.calories} kcal', color: AppTheme.accent),
+                  label: '${result.calories} kcal', color: c.accent),
               const SizedBox(width: 8),
               _MacroChip(
                   label: '${result.protein.round()}g prot',
-                  color: AppTheme.accent2),
+                  color: c.accent2),
               const SizedBox(width: 8),
               _MacroChip(
                   label: '${result.carbs.round()}g gl',
-                  color: AppTheme.accent3),
+                  color: c.accent3),
             ],
           ),
           const SizedBox(height: 24),
@@ -454,7 +456,7 @@ class _ConfirmMealSheet extends StatelessWidget {
             l10n.confirmEat,
             textAlign: TextAlign.center,
             style:
-                const TextStyle(color: AppTheme.muted, fontSize: 13, height: 1.5),
+                TextStyle(color: c.muted, fontSize: 13, height: 1.5),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -485,6 +487,7 @@ class _MacroChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -510,13 +513,14 @@ class _PortionPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(l10n.adjustPortion.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 11,
-                color: AppTheme.muted,
+                color: c.muted,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5)),
         const SizedBox(height: 8),
@@ -532,16 +536,16 @@ class _PortionPicker extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: sel ? AppTheme.accent : AppTheme.surface2,
+                  color: sel ? c.accent : c.surface2,
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(
-                      color: sel ? AppTheme.accent : AppTheme.border),
+                      color: sel ? c.accent : c.border),
                 ),
                 child: Text('${g}g',
                     style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: sel ? AppTheme.bg : AppTheme.muted)),
+                        color: sel ? c.bg : c.muted)),
               ),
             );
           }).toList(),
@@ -560,11 +564,12 @@ class _DescriptionField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Column(
@@ -572,14 +577,14 @@ class _DescriptionField extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.edit_note_rounded, size: 18, color: AppTheme.accent),
+              Icon(Icons.edit_note_rounded, size: 18, color: c.accent),
               const SizedBox(width: 8),
               Text(
                 l10n.precisions,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
-                  color: AppTheme.text,
+                  color: c.text,
                 ),
               ),
             ],
@@ -587,30 +592,30 @@ class _DescriptionField extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             l10n.precisionsHint,
-            style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+            style: TextStyle(fontSize: 12, color: c.muted),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: controller,
             maxLines: 2,
-            style: const TextStyle(color: AppTheme.text, fontSize: 14),
+            style: TextStyle(color: c.text, fontSize: 14),
             decoration: InputDecoration(
               hintText: l10n.precisionsPlaceholder,
-              hintStyle: const TextStyle(color: AppTheme.muted, fontSize: 13),
+              hintStyle: TextStyle(color: c.muted, fontSize: 13),
               filled: true,
-              fillColor: AppTheme.bg,
+              fillColor: c.bg,
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppTheme.border),
+                borderSide: BorderSide(color: c.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppTheme.border),
+                borderSide: BorderSide(color: c.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppTheme.accent, width: 1.5),
+                borderSide: BorderSide(color: c.accent, width: 1.5),
               ),
             ),
           ),
@@ -632,11 +637,11 @@ class _DescriptionField extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppTheme.surface2,
+                  color: c.surface2,
                   borderRadius: BorderRadius.circular(100),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: c.border),
                 ),
-                child: Text(s, style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                child: Text(s, style: TextStyle(fontSize: 12, color: c.muted)),
               ),
             )).toList(),
           ),
@@ -685,6 +690,7 @@ class _PhotoDropState extends State<_PhotoDrop>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
 
     if (widget.imageBytes != null) {
       // Image chargée : affichage simple avec bouton retake
@@ -709,20 +715,20 @@ class _PhotoDropState extends State<_PhotoDrop>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                   decoration: BoxDecoration(
-                    color: AppTheme.bg.withAlpha(200),
+                    color: c.bg.withAlpha(200),
                     borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: c.border),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.refresh_rounded, size: 14, color: AppTheme.accent),
+                      Icon(Icons.refresh_rounded, size: 14, color: c.accent),
                       const SizedBox(width: 5),
                       Text(l10n.change,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.text)),
+                              color: c.text)),
                     ],
                   ),
                 ),
@@ -741,15 +747,15 @@ class _PhotoDropState extends State<_PhotoDrop>
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: AppTheme.accent.withAlpha(8),
+            color: c.accent.withAlpha(8),
             border: Border.all(
-              color: AppTheme.accent.withOpacity(_borderOpacity.value),
+              color: c.accent.withOpacity(_borderOpacity.value),
               width: 2,
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.accent.withOpacity(_borderOpacity.value * 0.18),
+                color: c.accent.withOpacity(_borderOpacity.value * 0.18),
                 blurRadius: 20,
                 spreadRadius: 2,
               ),
@@ -767,27 +773,27 @@ class _PhotoDropState extends State<_PhotoDrop>
                     width: 76,
                     height: 76,
                     decoration: BoxDecoration(
-                      color: AppTheme.accent.withAlpha(20),
+                      color: c.accent.withAlpha(20),
                       borderRadius: BorderRadius.circular(22),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.add_photo_alternate_rounded,
                       size: 38,
-                      color: AppTheme.accent,
+                      color: c.accent,
                     ),
                   ),
                 ),
                 const SizedBox(height: 14),
                 Text(l10n.addPhoto,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
-                        color: AppTheme.text)),
+                        color: c.text)),
                 const SizedBox(height: 5),
                 Text(
                   l10n.photoHint,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppTheme.muted, fontSize: 13),
+                  style: TextStyle(color: c.muted, fontSize: 13),
                 ),
                 const SizedBox(height: 18),
                 // Boutons caméra / galerie inline
@@ -825,26 +831,27 @@ class _SourceBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: c.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: c.border),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: AppTheme.accent),
+            Icon(icon, size: 16, color: c.accent),
             const SizedBox(width: 7),
             Text(label,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.text)),
+                    color: c.text)),
           ],
         ),
       ),
@@ -900,6 +907,7 @@ class _PhotoTipsSectionState extends State<_PhotoTipsSection>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final tips = _tips(l10n);
     return FadeTransition(
       opacity: _fade,
@@ -912,15 +920,15 @@ class _PhotoTipsSectionState extends State<_PhotoTipsSection>
               padding: const EdgeInsets.only(left: 2, bottom: 10),
               child: Row(
                 children: [
-                  const Icon(Icons.tips_and_updates_rounded,
-                      size: 14, color: AppTheme.accent),
+                  Icon(Icons.tips_and_updates_rounded,
+                      size: 14, color: c.accent),
                   const SizedBox(width: 6),
                   Text(
                     l10n.photoTipsTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.muted,
+                      color: c.muted,
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -996,6 +1004,7 @@ class _TipCardState extends State<_TipCard>
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return FadeTransition(
       opacity: _fade,
       child: ScaleTransition(
@@ -1081,19 +1090,20 @@ class _AnalyzingOverlayState extends State<_AnalyzingOverlay>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
-      color: AppTheme.bg.withAlpha(210),
+      color: c.bg.withAlpha(210),
       child: Center(
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 36),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 36),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: c.surface,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: AppTheme.accent.withAlpha(90)),
+            border: Border.all(color: c.accent.withAlpha(90)),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.accent.withAlpha(40),
+                color: c.accent.withAlpha(40),
                 blurRadius: 48,
                 spreadRadius: 8,
               ),
@@ -1124,10 +1134,10 @@ class _AnalyzingOverlayState extends State<_AnalyzingOverlay>
                         width: 70,
                         height: 70,
                         decoration: BoxDecoration(
-                          color: AppTheme.accent.withAlpha(22),
+                          color: c.accent.withAlpha(22),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: AppTheme.accent.withAlpha(60),
+                            color: c.accent.withAlpha(60),
                             width: 1.5,
                           ),
                         ),
@@ -1145,19 +1155,19 @@ class _AnalyzingOverlayState extends State<_AnalyzingOverlay>
               // ── Titre ───────────────────────────────────────────────────
               Text(
                 l10n.analyzing,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Syne',
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.text,
+                  color: c.text,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 l10n.aiIdentification,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppTheme.muted,
+                style: TextStyle(
+                  color: c.muted,
                   fontSize: 13,
                   height: 1.4,
                 ),
@@ -1178,7 +1188,7 @@ class _AnalyzingOverlayState extends State<_AnalyzingOverlay>
                         width: 9,
                         height: 9,
                         decoration: BoxDecoration(
-                          color: AppTheme.accent.withOpacity(opacity),
+                          color: c.accent.withOpacity(opacity),
                           shape: BoxShape.circle,
                         ),
                       );
@@ -1271,6 +1281,7 @@ class _AnimatedResultCardState extends State<_AnimatedResultCard>
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return FadeTransition(
       opacity: _fade,
       child: SlideTransition(
@@ -1288,17 +1299,18 @@ class _ResultCard extends StatelessWidget {
   const _ResultCard({required this.result});
 
   Color _scoreColor(int s) =>
-      s >= 7 ? AppTheme.accent : s >= 4 ? const Color(0xFFffcc00) : AppTheme.accent3;
+      s >= 7 ? c.accent : s >= 4 ? Color(0xFFffcc00) : c.accent3;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.accent.withAlpha(64)),
+        border: Border.all(color: c.accent.withAlpha(64)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1311,34 +1323,34 @@ class _ResultCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(result.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontFamily: 'Syne',
                             fontSize: 20,
                             fontWeight: FontWeight.w800)),
                     const SizedBox(height: 4),
                     if (result.estimatedGrams != null)
                       Row(children: [
-                        const Icon(Icons.scale_rounded,
-                            size: 13, color: AppTheme.accent),
+                        Icon(Icons.scale_rounded,
+                            size: 13, color: c.accent),
                         const SizedBox(width: 4),
                         Text(l10n.portionEstimated(result.estimatedGrams!),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12,
-                                color: AppTheme.accent,
+                                color: c.accent,
                                 fontWeight: FontWeight.w600)),
                       ]),
                     const SizedBox(height: 4),
                     Row(children: [
                       Text('${result.calories}',
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontFamily: 'Syne',
                               fontSize: 32,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.accent)),
+                              color: c.accent)),
                       const SizedBox(width: 6),
                       const Text('kcal',
                           style: TextStyle(
-                              color: AppTheme.muted, fontSize: 14)),
+                              color: c.muted, fontSize: 14)),
                     ]),
                   ],
                 ),
@@ -1351,7 +1363,7 @@ class _ResultCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         color: _scoreColor(result.healthScore))),
                 Text(l10n.healthScore,
-                    style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                    style: TextStyle(fontSize: 11, color: c.muted)),
               ]),
             ],
           ),
@@ -1368,17 +1380,17 @@ class _ResultCard extends StatelessWidget {
                   label: l10n.proteins,
                   value: result.protein,
                   unit: 'g',
-                  color: AppTheme.accent2),
+                  color: c.accent2),
               _NutrientTile(
                   label: l10n.carbs,
                   value: result.carbs,
                   unit: 'g',
-                  color: AppTheme.accent),
+                  color: c.accent),
               _NutrientTile(
                   label: l10n.fats,
                   value: result.fat,
                   unit: 'g',
-                  color: AppTheme.accent3),
+                  color: c.accent3),
               _NutrientTile(
                   label: l10n.fibers,
                   value: result.fiber,
@@ -1391,19 +1403,19 @@ class _ResultCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                  color: AppTheme.surface2,
+                  color: c.surface2,
                   borderRadius: BorderRadius.circular(12)),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
-                      const Icon(Icons.science_rounded, size: 13, color: AppTheme.muted),
+                      Icon(Icons.science_rounded, size: 13, color: c.muted),
                       const SizedBox(width: 5),
-                      Text(l10n.micronutrients, style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                      Text(l10n.micronutrients, style: TextStyle(fontSize: 12, color: c.muted)),
                     ]),
                     const SizedBox(height: 4),
                     Text('${result.vitamins} · ${result.minerals}',
-                        style: const TextStyle(fontSize: 13)),
+                        style: TextStyle(fontSize: 13)),
                   ]),
             ),
           ],
@@ -1412,18 +1424,18 @@ class _ResultCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.accent.withAlpha(18),
+                color: c.accent.withAlpha(18),
                 borderRadius: BorderRadius.circular(12),
                 border:
-                    Border.all(color: AppTheme.accent.withAlpha(48)),
+                    Border.all(color: c.accent.withAlpha(48)),
               ),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
-                      const Icon(Icons.lightbulb_rounded, size: 13, color: AppTheme.accent),
+                      Icon(Icons.lightbulb_rounded, size: 13, color: c.accent),
                       const SizedBox(width: 5),
-                      Text(l10n.tip, style: const TextStyle(fontSize: 12, color: AppTheme.accent, fontWeight: FontWeight.w600)),
+                      Text(l10n.tip, style: TextStyle(fontSize: 12, color: c.accent, fontWeight: FontWeight.w600)),
                     ]),
                     const SizedBox(height: 2),
                     Text(result.tip,
@@ -1445,6 +1457,7 @@ class _ScanUpsellSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
       child: Column(
@@ -1455,7 +1468,7 @@ class _ScanUpsellSheet extends StatelessWidget {
             child: Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.border,
+                color: c.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1465,16 +1478,16 @@ class _ScanUpsellSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(20),
+              color: c.accent.withAlpha(20),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.bolt_rounded, color: AppTheme.accent, size: 36),
+            child: Icon(Icons.bolt_rounded, color: c.accent, size: 36),
           ),
           const SizedBox(height: 16),
           // Titre
           Text(
             l10n.scanUpsellTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Syne',
               color: Colors.white,
               fontSize: 20,
@@ -1486,7 +1499,7 @@ class _ScanUpsellSheet extends StatelessWidget {
           // Corps
           Text(
             l10n.scanUpsellBody,
-            style: const TextStyle(color: AppTheme.muted, fontSize: 14, height: 1.5),
+            style: TextStyle(color: c.muted, fontSize: 14, height: 1.5),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -1505,8 +1518,8 @@ class _ScanUpsellSheet extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accent,
-                foregroundColor: AppTheme.bg,
+                backgroundColor: c.accent,
+                foregroundColor: c.bg,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
@@ -1514,7 +1527,7 @@ class _ScanUpsellSheet extends StatelessWidget {
               icon: const Icon(Icons.workspace_premium_rounded, size: 18),
               label: Text(
                 l10n.upgradeNow,
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
               ),
             ),
           ),
@@ -1526,7 +1539,7 @@ class _ScanUpsellSheet extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 l10n.notNow,
-                style: const TextStyle(color: AppTheme.muted, fontSize: 14),
+                style: TextStyle(color: c.muted, fontSize: 14),
               ),
             ),
           ),
@@ -1549,10 +1562,11 @@ class _NutrientTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-          color: AppTheme.surface2,
+          color: c.surface2,
           borderRadius: BorderRadius.circular(14)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1566,12 +1580,12 @@ class _NutrientTile extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: color)),
             Text(' $unit',
-                style: const TextStyle(
-                    fontSize: 11, color: AppTheme.muted)),
+                style: TextStyle(
+                    fontSize: 11, color: c.muted)),
           ]),
           Text(label,
               style:
-                  const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                  TextStyle(fontSize: 12, color: c.muted)),
         ],
       ),
     );

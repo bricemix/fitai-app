@@ -162,7 +162,7 @@ class _PaywallScreenState extends State<PaywallScreen>
           backgroundColor: const Color(0xFF1E293B),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Row(children: [
-            const Icon(Icons.lock_rounded, color: AppTheme.accent, size: 20),
+            Icon(Icons.lock_rounded, color: c.accent, size: 20),
             const SizedBox(width: 8),
             Expanded(child: Text(l10n.accountRequired,
                 style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800))),
@@ -177,8 +177,8 @@ class _PaywallScreenState extends State<PaywallScreen>
             ElevatedButton(
               onPressed: () { Navigator.pop(context); widget.onContinue(); },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accent,
-                foregroundColor: AppTheme.bg,
+                backgroundColor: c.accent,
+                foregroundColor: c.bg,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 elevation: 0,
               ),
@@ -222,7 +222,7 @@ class _PaywallScreenState extends State<PaywallScreen>
 
       showModalBottomSheet(
         context: context,
-        backgroundColor: AppTheme.surface,
+        backgroundColor: c.surface,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
         isScrollControlled: true,
@@ -247,13 +247,14 @@ class _PaywallScreenState extends State<PaywallScreen>
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
 
     final monthlyPlans = _plans.where((p) => p.billingFrequency == 'monthly').take(3).toList();
     final displayPlans = monthlyPlans.isNotEmpty ? monthlyPlans : _plans.take(3).toList();
     final safeIdx      = _selectedIndex.clamp(0, displayPlans.isEmpty ? 0 : displayPlans.length - 1);
 
     return Scaffold(
-      backgroundColor: AppTheme.bg,
+      backgroundColor: c.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -273,8 +274,8 @@ class _PaywallScreenState extends State<PaywallScreen>
                       style: TextStyle(
                           fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w800),
                       children: [
-                        TextSpan(text: 'Diet',   style: TextStyle(color: AppTheme.text)),
-                        TextSpan(text: 'Vision', style: TextStyle(color: AppTheme.accent)),
+                        TextSpan(text: 'Diet',   style: TextStyle(color: c.text)),
+                        TextSpan(text: 'Vision', style: TextStyle(color: c.accent)),
                       ],
                     ),
                   ),
@@ -286,21 +287,21 @@ class _PaywallScreenState extends State<PaywallScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppTheme.surface,
+                      color: c.surface,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppTheme.border),
+                      border: Border.all(color: c.border),
                     ),
                     child: Text(
                       '${_currentPage + 1} / 3',
-                      style: const TextStyle(
-                          fontSize: 12, color: AppTheme.muted, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 12, color: c.muted, fontWeight: FontWeight.w600),
                     ),
                   ),
                   const SizedBox(width: 4),
                   TextButton(
                     onPressed: widget.onContinue,
                     style: TextButton.styleFrom(
-                        foregroundColor: AppTheme.muted,
+                        foregroundColor: c.muted,
                         padding: const EdgeInsets.symmetric(horizontal: 8)),
                     child: Text(l10n.skip, style: const TextStyle(fontSize: 13)),
                   ),
@@ -322,7 +323,7 @@ class _PaywallScreenState extends State<PaywallScreen>
                     width:  active ? 28 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: active ? AppTheme.accent : AppTheme.border,
+                      color: active ? c.accent : c.border,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   );
@@ -419,6 +420,7 @@ class _WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return FadeTransition(
       opacity: heroFade,
       child: SlideTransition(
@@ -438,19 +440,19 @@ class _WelcomePage extends StatelessWidget {
                     height: 140,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppTheme.accent.withAlpha(16),
+                      color: c.accent.withAlpha(16),
                       border: Border.all(
-                        color: AppTheme.accent.withAlpha((glowPulse.value * 80).round()),
+                        color: c.accent.withAlpha((glowPulse.value * 80).round()),
                         width: 1.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.accent.withAlpha((glowPulse.value * 100).round()),
+                          color: c.accent.withAlpha((glowPulse.value * 100).round()),
                           blurRadius: 55 * glowPulse.value,
                           spreadRadius: 8 * glowPulse.value,
                         ),
                         BoxShadow(
-                          color: AppTheme.accent.withAlpha((glowPulse.value * 35).round()),
+                          color: c.accent.withAlpha((glowPulse.value * 35).round()),
                           blurRadius: 90 * glowPulse.value,
                           spreadRadius: 18 * glowPulse.value,
                         ),
@@ -475,11 +477,11 @@ class _WelcomePage extends StatelessWidget {
                 Text(
                   l10n.welcomeTo,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Syne',
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.text,
+                    color: c.text,
                     height: 1.1,
                   ),
                 ),
@@ -491,7 +493,7 @@ class _WelcomePage extends StatelessWidget {
                     fontFamily: 'Syne',
                     fontSize: 40,
                     fontWeight: FontWeight.w900,
-                    color: AppTheme.accent,
+                    color: c.accent,
                     height: 1.1,
                     letterSpacing: -0.5,
                   ),
@@ -502,9 +504,9 @@ class _WelcomePage extends StatelessWidget {
                 Text(
                   l10n.welcomeSubtitle,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
-                    color: AppTheme.muted,
+                    color: c.muted,
                     height: 1.6,
                   ),
                 ),
@@ -528,20 +530,20 @@ class _WelcomePage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppTheme.accent.withAlpha(36), AppTheme.accent.withAlpha(18)],
+                      colors: [c.accent.withAlpha(36), c.accent.withAlpha(18)],
                     ),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppTheme.accent.withAlpha(80)),
+                    border: Border.all(color: c.accent.withAlpha(80)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.verified_rounded, size: 15, color: AppTheme.accent),
+                      Icon(Icons.verified_rounded, size: 15, color: c.accent),
                       const SizedBox(width: 6),
                       Text(
                         l10n.freeTrial,
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.accent),
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w700, color: c.accent),
                       ),
                     ],
                   ),
@@ -563,21 +565,22 @@ class _MiniChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppTheme.accent),
+          Icon(icon, size: 14, color: c.accent),
           const SizedBox(width: 6),
           Text(label,
-              style: const TextStyle(
-                  fontSize: 12, color: AppTheme.text, fontWeight: FontWeight.w600)),
+              style: TextStyle(
+                  fontSize: 12, color: c.text, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -607,6 +610,7 @@ class _FeaturesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
       child: Column(
@@ -616,19 +620,19 @@ class _FeaturesPage extends StatelessWidget {
           // ── En-tête ────────────────────────────────────────────────────────
           RichText(
             text: TextSpan(
-              style: const TextStyle(
+              style: TextStyle(
                   fontFamily: 'Syne', fontSize: 26, fontWeight: FontWeight.w800,
-                  color: AppTheme.text, height: 1.2),
+                  color: c.text, height: 1.2),
               children: [
                 TextSpan(text: l10n.paywallFeaturesPrefix),
-                TextSpan(text: l10n.paywallFeaturesHighlight, style: const TextStyle(color: AppTheme.accent)),
+                TextSpan(text: l10n.paywallFeaturesHighlight, style: TextStyle(color: c.accent)),
               ],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             l10n.paywallFeaturesSubtitle,
-            style: const TextStyle(fontSize: 14, color: AppTheme.muted, height: 1.5),
+            style: TextStyle(fontSize: 14, color: c.muted, height: 1.5),
           ),
           const SizedBox(height: 22),
 
@@ -692,12 +696,13 @@ class _FeatureTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -705,19 +710,19 @@ class _FeatureTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: AppTheme.accent.withAlpha(22),
+              color: c.accent.withAlpha(22),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: AppTheme.accent, size: 18),
+            child: Icon(icon, color: c.accent, size: 18),
           ),
           const SizedBox(height: 10),
           Text(label,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.text)),
+              style: TextStyle(
+                  fontWeight: FontWeight.w700, fontSize: 13, color: c.text)),
           const SizedBox(height: 3),
           Text(sub,
-              style: const TextStyle(
-                  fontSize: 11, color: AppTheme.muted, height: 1.35)),
+              style: TextStyle(
+                  fontSize: 11, color: c.muted, height: 1.35)),
         ],
       ),
     );
@@ -751,6 +756,7 @@ class _PlansPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
       child: Column(
@@ -760,20 +766,20 @@ class _PlansPage extends StatelessWidget {
           // ── En-tête ────────────────────────────────────────────────────────
           RichText(
             text: TextSpan(
-              style: const TextStyle(
+              style: TextStyle(
                   fontFamily: 'Syne', fontSize: 26, fontWeight: FontWeight.w800,
-                  color: AppTheme.text, height: 1.2),
+                  color: c.text, height: 1.2),
               children: [
                 TextSpan(text: l10n.paywallPlanPrefix),
                 TextSpan(text: l10n.paywallPlanHighlight,
-                    style: const TextStyle(color: AppTheme.accent)),
+                    style: TextStyle(color: c.accent)),
               ],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             l10n.paywallPlanSubtitle,
-            style: const TextStyle(fontSize: 14, color: AppTheme.muted, height: 1.5),
+            style: TextStyle(fontSize: 14, color: c.muted, height: 1.5),
           ),
           const SizedBox(height: 22),
 
@@ -782,7 +788,7 @@ class _PlansPage extends StatelessWidget {
             const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
-                child: CircularProgressIndicator(color: AppTheme.accent),
+                child: CircularProgressIndicator(color: c.accent),
               ),
             )
           else if (plans.isEmpty)
@@ -839,6 +845,7 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final isLastPage   = currentPage == 2;
     final selectedPlan = plans.isNotEmpty ? plans[selectedIndex] : null;
 
@@ -880,10 +887,10 @@ class _BottomBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       decoration: BoxDecoration(
-        color: AppTheme.bg,
-        border: const Border(top: BorderSide(color: AppTheme.border)),
+        color: c.bg,
+        border: Border(top: BorderSide(color: c.border)),
         boxShadow: [
-          BoxShadow(color: AppTheme.bg, blurRadius: 20, offset: const Offset(0, -10)),
+          BoxShadow(color: c.bg, blurRadius: 20, offset: Offset(0, -10)),
         ],
       ),
       child: Column(
@@ -917,8 +924,8 @@ class _BottomBar extends StatelessWidget {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: loading
-                                  ? [AppTheme.accent.withAlpha(80), AppTheme.accent.withAlpha(60)]
-                                  : const [Color(0xFF5EE87A), AppTheme.accent, Color(0xFF3CB86E)],
+                                  ? [c.accent.withAlpha(80), c.accent.withAlpha(60)]
+                                  : [Color(0xFF5EE87A), c.accent, Color(0xFF3CB86E)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -972,10 +979,10 @@ class _BottomBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Text(
                 l10n.continueFreePlanLabel,
-                style: const TextStyle(
-                  fontSize: 13, color: AppTheme.muted,
+                style: TextStyle(
+                  fontSize: 13, color: c.muted,
                   decoration: TextDecoration.underline,
-                  decorationColor: AppTheme.muted,
+                  decorationColor: c.muted,
                 ),
               ),
             ),
@@ -985,7 +992,7 @@ class _BottomBar extends StatelessWidget {
             const SizedBox(height: 3),
             Text(
               l10n.noCommitment,
-              style: TextStyle(fontSize: 10, color: AppTheme.muted.withAlpha(140)),
+              style: TextStyle(fontSize: 10, color: c.muted.withAlpha(140)),
             ),
           ],
         ],
@@ -1039,6 +1046,7 @@ class _AnimatedPlanList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final bestIdx = (() {
       int idx = 0, best = 0;
       for (int i = 0; i < plans.length; i++) {
@@ -1070,19 +1078,19 @@ class _AnimatedPlanList extends StatelessWidget {
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
               decoration: BoxDecoration(
-                color: selected ? AppTheme.accent.withAlpha(18) : AppTheme.surface,
+                color: selected ? c.accent.withAlpha(18) : c.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: selected
-                      ? AppTheme.accent
+                      ? c.accent
                       : isBest
                           ? const Color(0xFFFFD700).withAlpha(100)
-                          : AppTheme.border,
+                          : c.border,
                   width: selected ? 1.8 : 1,
                 ),
                 boxShadow: selected ? [
                   BoxShadow(
-                    color: AppTheme.accent.withAlpha(35),
+                    color: c.accent.withAlpha(35),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -1096,7 +1104,7 @@ class _AnimatedPlanList extends StatelessWidget {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
                         ),
@@ -1109,7 +1117,7 @@ class _AnimatedPlanList extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             l10n.bestOffer.toUpperCase(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.black, fontSize: 10,
                               fontWeight: FontWeight.w900, letterSpacing: 0.8,
                             ),
@@ -1130,16 +1138,16 @@ class _AnimatedPlanList extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: selected ? AppTheme.accent : AppTheme.muted,
+                              color: selected ? c.accent : c.muted,
                               width: 2,
                             ),
-                            color: selected ? AppTheme.accent : Colors.transparent,
+                            color: selected ? c.accent : Colors.transparent,
                             boxShadow: selected ? [
-                              BoxShadow(color: AppTheme.accent.withAlpha(80), blurRadius: 6),
+                              BoxShadow(color: c.accent.withAlpha(80), blurRadius: 6),
                             ] : null,
                           ),
                           child: selected
-                              ? const Icon(Icons.check, size: 13, color: AppTheme.bg)
+                              ? Icon(Icons.check, size: 13, color: c.bg)
                               : null,
                         ),
                         const SizedBox(width: 14),
@@ -1151,8 +1159,8 @@ class _AnimatedPlanList extends StatelessWidget {
                             children: [
                               Row(children: [
                                 Text(plan.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.text)),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w800, fontSize: 15, color: c.text)),
                                 if (savings != null) ...[
                                   const SizedBox(width: 6),
                                   Container(
@@ -1162,7 +1170,7 @@ class _AnimatedPlanList extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: Text('-$savings%',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             color: Colors.greenAccent, fontSize: 10,
                                             fontWeight: FontWeight.w800)),
                                   ),
@@ -1172,7 +1180,7 @@ class _AnimatedPlanList extends StatelessWidget {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 2),
                                   child: Text(plan.description,
-                                      style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                                      style: TextStyle(fontSize: 12, color: c.muted)),
                                 ),
                               if (dailyStr != null)
                                 Padding(
@@ -1180,7 +1188,7 @@ class _AnimatedPlanList extends StatelessWidget {
                                   child: Text(l10n.perDay('≈ $dailyStr'),
                                       style: TextStyle(
                                           fontSize: 11,
-                                          color: selected ? AppTheme.accent : AppTheme.muted,
+                                          color: selected ? c.accent : c.muted,
                                           fontWeight: FontWeight.w600)),
                                 ),
                             ],
@@ -1194,10 +1202,10 @@ class _AnimatedPlanList extends StatelessWidget {
                             Text(plan.displayPrice(currency),
                                 style: TextStyle(
                                     fontFamily: 'Syne', fontSize: 20, fontWeight: FontWeight.w900,
-                                    color: selected ? AppTheme.accent : AppTheme.text, height: 1)),
+                                    color: selected ? c.accent : c.text, height: 1)),
                             const SizedBox(height: 2),
                             Text(_freqBadge(plan),
-                                style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                                style: TextStyle(fontSize: 11, color: c.muted)),
                           ],
                         ),
                       ],
@@ -1214,16 +1222,16 @@ class _AnimatedPlanList extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Divider(color: AppTheme.border, height: 1),
+                                Divider(color: c.border, height: 1),
                                 const SizedBox(height: 12),
                                 ...plan.features.take(4).map((f) => Padding(
                                   padding: const EdgeInsets.only(bottom: 6),
                                   child: Row(children: [
-                                    const Icon(Icons.check_circle_rounded,
-                                        color: AppTheme.accent, size: 14),
+                                    Icon(Icons.check_circle_rounded,
+                                        color: c.accent, size: 14),
                                     const SizedBox(width: 8),
                                     Expanded(child: Text(f,
-                                        style: const TextStyle(color: AppTheme.text, fontSize: 12))),
+                                        style: TextStyle(color: c.text, fontSize: 12))),
                                   ]),
                                 )),
                               ],
@@ -1254,6 +1262,7 @@ class _StaticPlans extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     return Column(
       children: [
         _StaticPlanCard(
@@ -1292,14 +1301,15 @@ class _StaticPlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final highlighted = badge != null;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: highlighted ? AppTheme.accent.withAlpha(14) : AppTheme.surface,
+        color: highlighted ? c.accent.withAlpha(14) : c.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: highlighted ? AppTheme.accent : AppTheme.border,
+          color: highlighted ? c.accent : c.border,
           width: highlighted ? 1.5 : 1,
         ),
       ),
@@ -1311,16 +1321,16 @@ class _StaticPlanCard extends StatelessWidget {
               children: [
                 Row(children: [
                   Text(name,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                   if (badge != null) ...[
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
-                          color: AppTheme.accent, borderRadius: BorderRadius.circular(5)),
+                          color: c.accent, borderRadius: BorderRadius.circular(5)),
                       child: Text(badge!,
-                          style: const TextStyle(
-                              fontSize: 9, fontWeight: FontWeight.w800, color: AppTheme.bg)),
+                          style: TextStyle(
+                              fontSize: 9, fontWeight: FontWeight.w800, color: c.bg)),
                     ),
                   ],
                 ]),
@@ -1328,9 +1338,9 @@ class _StaticPlanCard extends StatelessWidget {
                 ...features.map((f) => Padding(
                   padding: const EdgeInsets.only(top: 3),
                   child: Row(children: [
-                    const Icon(Icons.check_circle_rounded, size: 12, color: AppTheme.accent),
+                    Icon(Icons.check_circle_rounded, size: 12, color: c.accent),
                     const SizedBox(width: 5),
-                    Text(f, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                    Text(f, style: TextStyle(fontSize: 11, color: c.muted)),
                   ]),
                 )),
               ],
@@ -1340,10 +1350,10 @@ class _StaticPlanCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(CurrencyService.format(priceUsdCents, currency),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontFamily: 'Syne', fontSize: 20, fontWeight: FontWeight.w800,
-                      color: AppTheme.accent)),
-              Text(period, style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                      color: c.accent)),
+              Text(period, style: TextStyle(fontSize: 11, color: c.muted)),
             ],
           ),
         ],
@@ -1363,7 +1373,7 @@ class _LangButton extends StatelessWidget {
     final localeProvider = context.read<LocaleProvider>();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => Padding(
@@ -1376,7 +1386,7 @@ class _LangButton extends StatelessWidget {
               child: Container(
                 width: 36, height: 4,
                 decoration: BoxDecoration(
-                    color: AppTheme.border,
+                    color: c.border,
                     borderRadius: BorderRadius.circular(2)),
               ),
             ),
@@ -1392,13 +1402,13 @@ class _LangButton extends StatelessWidget {
               final isSelected = localeProvider.locale.languageCode == lang.$1;
               return ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Text(lang.$3, style: const TextStyle(fontSize: 26)),
+                leading: Text(lang.$3, style: TextStyle(fontSize: 26)),
                 title: Text(lang.$2,
                     style: TextStyle(
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
-                        color: isSelected ? AppTheme.accent : AppTheme.text)),
+                        color: isSelected ? c.accent : c.text)),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle, color: AppTheme.accent, size: 20)
+                    ? Icon(Icons.check_circle, color: c.accent, size: 20)
                     : null,
                 onTap: () {
                   localeProvider.setLocale(Locale(lang.$1));
@@ -1415,6 +1425,7 @@ class _LangButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final c = AppTheme.of(context);
     final currentLang = LocaleProvider.supportedLanguages.firstWhere(
       (l) => l.$1 == localeProvider.locale.languageCode,
       orElse: () => LocaleProvider.supportedLanguages.first,
@@ -1424,20 +1435,20 @@ class _LangButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: c.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: c.border),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(currentLang.$3, style: const TextStyle(fontSize: 15)),
+            Text(currentLang.$3, style: TextStyle(fontSize: 15)),
             const SizedBox(width: 4),
             Text(currentLang.$1.toUpperCase(),
-                style: const TextStyle(
-                    fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.muted)),
+                style: TextStyle(
+                    fontSize: 11, fontWeight: FontWeight.w700, color: c.muted)),
             const SizedBox(width: 2),
-            const Icon(Icons.expand_more, size: 13, color: AppTheme.muted),
+            Icon(Icons.expand_more, size: 13, color: c.muted),
           ],
         ),
       ),
@@ -1455,12 +1466,13 @@ class _TestimonialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: c.border),
       ),
       child: Row(
         children: [
@@ -1476,8 +1488,8 @@ class _TestimonialCard extends StatelessWidget {
               ]),
               const SizedBox(height: 4),
               Text(l10n.rating,
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.text)),
+                  style: TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w600, color: c.text)),
             ],
           ),
           const Spacer(),
@@ -1485,19 +1497,19 @@ class _TestimonialCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppTheme.accent.withAlpha(40), AppTheme.accent.withAlpha(20)],
+                colors: [c.accent.withAlpha(40), c.accent.withAlpha(20)],
               ),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.accent.withAlpha(80)),
+              border: Border.all(color: c.accent.withAlpha(80)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.verified_rounded, size: 13, color: AppTheme.accent),
+                Icon(Icons.verified_rounded, size: 13, color: c.accent),
                 const SizedBox(width: 5),
                 Text(l10n.freeTrial,
-                    style: const TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent)),
+                    style: TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.w700, color: c.accent)),
               ],
             ),
           ),

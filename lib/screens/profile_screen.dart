@@ -119,6 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     final bmi = widget.profile.bmi;
     final bmiStr = bmi == 0 ? '—' : bmi.toStringAsFixed(1);
     final bmiLabel = bmi == 0
@@ -155,13 +156,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.surface, Color(0xFF1a1a30)],
+                  gradient: LinearGradient(
+                    colors: [c.surface, Color(0xFF1a1a30)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: c.border),
                 ),
                 child: Row(
                   children: [
@@ -169,16 +170,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(l10n.bmi, style: const TextStyle(fontSize: 12, color: AppTheme.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
-                          Text(bmiStr, style: const TextStyle(fontFamily: 'Syne', fontSize: 48, fontWeight: FontWeight.w800, color: AppTheme.accent, height: 1)),
-                          Text(bmiLabel, style: const TextStyle(fontSize: 13, color: AppTheme.muted)),
+                          Text(l10n.bmi, style: TextStyle(fontSize: 12, color: c.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+                          Text(bmiStr, style: TextStyle(fontFamily: 'Syne', fontSize: 48, fontWeight: FontWeight.w800, color: c.accent, height: 1)),
+                          Text(bmiLabel, style: TextStyle(fontSize: 13, color: c.muted)),
                         ],
                       ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(l10n.objective, style: const TextStyle(fontSize: 13, color: AppTheme.muted)),
+                        Text(l10n.objective, style: TextStyle(fontSize: 13, color: c.muted)),
                         const SizedBox(height: 2),
                         Text(
                           _goal.isEmpty ? '—' : _goal,
@@ -186,9 +187,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           textAlign: TextAlign.right,
                         ),
                         const SizedBox(height: 4),
-                        Text('${widget.profile.tdee.round()} kcal/j', style: const TextStyle(fontSize: 12, color: AppTheme.accent)),
+                        Text('${widget.profile.tdee.round()} kcal/j', style: TextStyle(fontSize: 12, color: c.accent)),
                         const SizedBox(height: 2),
-                        Text(_activity, style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                        Text(_activity, style: TextStyle(fontSize: 12, color: c.muted)),
                       ],
                     ),
                   ],
@@ -201,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 10),
 
               // Gender buttons
-              Text(l10n.gender.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+              Text(l10n.gender.toUpperCase(), style: TextStyle(fontSize: 11, color: c.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -232,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // ── Section: Mesures corporelles ──────────────────────────────
               _sectionTitle(l10n.bodyMeasurementsLabel.toUpperCase()),
               const SizedBox(height: 4),
-              Text(l10n.bodyMeasurementsHintProfile, style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+              Text(l10n.bodyMeasurementsHintProfile, style: TextStyle(fontSize: 12, color: c.muted)),
               const SizedBox(height: 10),
               Row(
                 children: [
@@ -260,7 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 14),
                 Text(
                   _goal == l10n.loseWeight ? l10n.lossRhythm : l10n.gainRhythm,
-                  style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                  style: TextStyle(fontSize: 11, color: c.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5),
                 ),
                 const SizedBox(height: 8),
                 Wrap(
@@ -275,24 +276,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         duration: const Duration(milliseconds: 180),
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: sel ? AppTheme.accent : AppTheme.surface2,
+                          color: sel ? c.accent : c.surface2,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: sel ? AppTheme.accent : AppTheme.border),
+                          border: Border.all(color: sel ? c.accent : c.border),
                         ),
                         child: Column(
                           children: [
                             Text(
                               _kgLabel(v, l10n),
-                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: sel ? AppTheme.bg : AppTheme.text),
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: sel ? c.bg : c.text),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               '${v.abs()} kg/sem',
-                              style: TextStyle(fontSize: 11, color: sel ? AppTheme.bg.withAlpha(180) : AppTheme.muted),
+                              style: TextStyle(fontSize: 11, color: sel ? c.bg.withAlpha(180) : c.muted),
                             ),
                             Text(
                               '${_goal == l10n.loseWeight ? "-" : "+"}$kcalDelta kcal/j',
-                              style: TextStyle(fontSize: 10, color: sel ? AppTheme.bg.withAlpha(150) : AppTheme.muted),
+                              style: TextStyle(fontSize: 10, color: sel ? c.bg.withAlpha(150) : c.muted),
                             ),
                           ],
                         ),
@@ -316,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Expanded(
                           child: Text(
                             l10n.aggressiveWarning,
-                            style: const TextStyle(fontSize: 12, color: Colors.orange),
+                            style: TextStyle(fontSize: 12, color: Colors.orange),
                           ),
                         ),
                       ],
@@ -349,18 +350,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 24),
 
               // App info
-              Text(l10n.appInfo.toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.muted, letterSpacing: 0.5)),
+              Text(l10n.appInfo.toUpperCase(), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: c.muted, letterSpacing: 0.5)),
               const SizedBox(height: 10),
               ...[
                 (l10n.version, '1.0.0'),
               ].map((r) => Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppTheme.border))),
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.border))),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(r.$1, style: const TextStyle(color: AppTheme.muted, fontSize: 14)),
-                        Text(r.$2, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                        Text(r.$1, style: TextStyle(color: c.muted, fontSize: 14)),
+                        Text(r.$2, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                       ],
                     ),
                   )),
@@ -376,8 +377,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(color: AppTheme.accent, borderRadius: BorderRadius.circular(100)),
-                child: Text(_toast!, style: const TextStyle(color: AppTheme.bg, fontWeight: FontWeight.w700, fontSize: 13)),
+                decoration: BoxDecoration(color: c.accent, borderRadius: BorderRadius.circular(100)),
+                child: Text(_toast!, style: TextStyle(color: c.bg, fontWeight: FontWeight.w700, fontSize: 13)),
               ),
             ),
           ),
@@ -385,19 +386,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _sectionTitle(String t) => Text(t, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.muted, letterSpacing: 0.5));
+  Widget _sectionTitle(String t) => Text(t, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: c.muted, letterSpacing: 0.5));
 
   Widget _field(String label, String initial, void Function(String) onChanged, {bool numeric = false, String? hint}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+        Text(label.toUpperCase(), style: TextStyle(fontSize: 11, color: c.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
         const SizedBox(height: 6),
         TextFormField(
           initialValue: initial,
           keyboardType: numeric ? TextInputType.number : TextInputType.text,
           decoration: InputDecoration(hintText: hint),
-          style: const TextStyle(color: AppTheme.text),
+          style: TextStyle(color: c.text),
           onChanged: onChanged,
         ),
       ],
@@ -409,11 +410,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+        Text(label.toUpperCase(), style: TextStyle(fontSize: 11, color: c.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           value: safeValue,
-          dropdownColor: AppTheme.surface,
+          dropdownColor: c.surface,
           decoration: const InputDecoration(),
           items: options.map((o) => DropdownMenuItem(value: o, child: Text(o))).toList(),
           onChanged: onChanged,
@@ -432,6 +433,7 @@ class _GenderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -439,16 +441,16 @@ class _GenderButton extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: selected ? AppTheme.accent : AppTheme.surface2,
+            color: selected ? c.accent : c.surface2,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: selected ? AppTheme.accent : AppTheme.border, width: 1.5),
+            border: Border.all(color: selected ? c.accent : c.border, width: 1.5),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 20, color: selected ? AppTheme.bg : AppTheme.muted),
+              Icon(icon, size: 20, color: selected ? c.bg : c.muted),
               const SizedBox(width: 8),
-              Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: selected ? AppTheme.bg : AppTheme.muted)),
+              Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: selected ? c.bg : c.muted)),
             ],
           ),
         ),
