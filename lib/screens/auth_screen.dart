@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/social_auth_service.dart';
 import '../services/currency_service.dart';
 import '../theme.dart';
 import '../l10n/app_localizations.dart';
@@ -388,6 +389,10 @@ class _AuthScreenState extends State<AuthScreen>
                   _RegisterForm(onSuccess: () => widget.onAuthenticated(true)),
                 ],
               ),
+              const SizedBox(height: 16),
+
+              // ── Social auth buttons ────────────────────────────────────────
+              _SocialButtons(onSuccess: () => widget.onAuthenticated(false)),
               const SizedBox(height: 32),
             ],
           ),
@@ -596,18 +601,19 @@ class _RegisterFormState extends State<_RegisterForm> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
-  final _ageCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
+
+  DateTime? _birthDate;
 
   // Default: États-Unis
   String _countryCode = 'US';
   String _countryFlag = '🇺🇸';
   String _countryName = 'États-Unis';
 
-  // Default: Dollar US
-  AppCurrency _currency = CurrencyService.currencies.firstWhere((c) => c.code == 'USD');
+  // Devise détectée depuis la locale de l'appareil (pas de défaut USD)
+  AppCurrency _currency = CurrencyService.detectFromLocale();
 
   bool _obscurePass = true;
   bool _obscureConfirm = true;
@@ -619,11 +625,103 @@ class _RegisterFormState extends State<_RegisterForm> {
   void dispose() {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
-    _ageCtrl.dispose();
     _phoneCtrl.dispose();
     _passCtrl.dispose();
     _confirmCtrl.dispose();
     super.dispose();
+  }
+
+  // ── Date de naissance ────────────────────────────────────────────────────
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate ?? DateTime(now.year - 20, now.month, now.day),
+      firstDate: DateTime(now.year - 100),
+      lastDate: now,
+      locale: Localizations.localeOf(context),
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      helpText: '',
+      builder: (ctx, child) => Theme(
+        data: Theme.of(ctx).copyWith(
+          colorScheme: const ColorScheme.dark(
+            primary: AppTheme.accent,
+            onPrimary: Colors.black,
+            surface: Color(0xFF1C1C1E),
+            onSurface: Colors.white,
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(foregroundColor: AppTheme.accent),
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked == null || !mounted) return;
+
+    final age = now.year - picked.year -
+        (now.month < picked.month ||
+                (now.month == picked.month && now.day < picked.day)
+            ? 1
+            : 0);
+
+    if (age < 15) {
+      _showUnderageDialog(context);
+      return;
+    }
+
+    setState(() => _birthDate = picked);
+  }
+
+  void _showUnderageDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Column(
+          children: [
+            const Text('🔒', style: TextStyle(fontSize: 40)),
+            const SizedBox(height: 8),
+            Text(
+              l10n.underageTitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          l10n.underageBody,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Color(0xFFAAAAAA), fontSize: 14, height: 1.6),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              style: TextButton.styleFrom(
+                backgroundColor: AppTheme.accent,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: Text(
+                l10n.underageButton,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _openCountryPicker() {
@@ -676,13 +774,25 @@ class _RegisterFormState extends State<_RegisterForm> {
     setState(() { _loading = true; _error = null; });
 
     final email = _emailCtrl.text.trim();
+    // Calcul de l'âge depuis la date de naissance
+    String? ageStr;
+    if (_birthDate != null) {
+      final now = DateTime.now();
+      int age = now.year - _birthDate!.year;
+      if (now.month < _birthDate!.month ||
+          (now.month == _birthDate!.month && now.day < _birthDate!.day)) {
+        age--;
+      }
+      ageStr = age.toString();
+    }
+
     final result = await AuthService.register(
       name: _nameCtrl.text,
       email: email,
       password: _passCtrl.text,
       phone: _phoneCtrl.text,
       country: _countryCode,
-      age: _ageCtrl.text.trim().isNotEmpty ? _ageCtrl.text.trim() : null,
+      age: ageStr,
     );
 
     if (!mounted) return;
@@ -725,24 +835,43 @@ class _RegisterFormState extends State<_RegisterForm> {
           ),
           const SizedBox(height: 14),
 
-          // Age
-          _Label(l10n.age.toUpperCase()),
+          // Date de naissance
+          _Label(l10n.birthDate.toUpperCase()),
           const SizedBox(height: 6),
-          TextFormField(
-            controller: _ageCtrl,
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.next,
-            style: const TextStyle(color: AppTheme.text),
-            decoration: InputDecoration(
-              hintText: '25',
-              prefixIcon: const Icon(Icons.cake_outlined, color: AppTheme.muted, size: 18),
+          GestureDetector(
+            onTap: _pickBirthDate,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _birthDate != null
+                      ? AppTheme.accent.withValues(alpha: 0.5)
+                      : Colors.transparent,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.cake_outlined, color: AppTheme.muted, size: 18),
+                  const SizedBox(width: 10),
+                  Text(
+                    _birthDate != null
+                        ? '${_birthDate!.day.toString().padLeft(2, '0')}/'
+                          '${_birthDate!.month.toString().padLeft(2, '0')}/'
+                          '${_birthDate!.year}'
+                        : l10n.birthDateHint,
+                    style: TextStyle(
+                      color: _birthDate != null ? AppTheme.text : AppTheme.muted,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.calendar_today_outlined,
+                      color: AppTheme.muted, size: 16),
+                ],
+              ),
             ),
-            validator: (v) {
-              if (v == null || v.trim().isEmpty) return null; // facultatif
-              final n = int.tryParse(v.trim());
-              if (n == null || n < 10 || n > 120) return l10n.error;
-              return null;
-            },
           ),
           const SizedBox(height: 14),
 
@@ -875,8 +1004,9 @@ class _RegisterFormState extends State<_RegisterForm> {
             validator: (v) {
               if (v == null || v.length < 8) return l10n.passwordMin8;
               if (!v.contains(RegExp(r'[A-Z]'))) return l10n.passwordNeedsUppercase;
-              if (!v.contains(RegExp(r'[\d!@#$%^&*()\-_=+\[\]{};:,.<>/?\\|~]')))
+              if (!v.contains(RegExp(r'[\d!@#$%^&*()\-_=+\[\]{};:,.<>/?\\|~]'))) {
                 return l10n.passwordNeedsNumberOrSymbol;
+              }
               return null;
             },
           ),
@@ -1024,6 +1154,199 @@ class _PasswordStrengthHint extends StatelessWidget {
       ),
     );
   }
+}
+
+// ── Social Buttons ────────────────────────────────────────────────────────────
+
+class _SocialButtons extends StatefulWidget {
+  final VoidCallback onSuccess;
+  const _SocialButtons({required this.onSuccess});
+
+  @override
+  State<_SocialButtons> createState() => _SocialButtonsState();
+}
+
+class _SocialButtonsState extends State<_SocialButtons> {
+  bool _loading = false;
+
+  Future<void> _handleSocial(String provider) async {
+    setState(() => _loading = true);
+    try {
+      // 1. Authentifier avec le fournisseur social
+      final SocialAuthResult socialResult;
+      switch (provider) {
+        case 'google':
+          socialResult = await SocialAuthService.signInWithGoogle();
+          break;
+        case 'facebook':
+          socialResult = await SocialAuthService.signInWithFacebook();
+          break;
+        case 'apple':
+          socialResult = await SocialAuthService.signInWithApple();
+          break;
+        default:
+          return;
+      }
+
+      if (!mounted) return;
+
+      if (!socialResult.success) {
+        if (socialResult.error != 'cancelled') {
+          _showError(socialResult.error ?? AppLocalizations.of(context).socialAuthError);
+        }
+        return;
+      }
+
+      // 2. Envoyer le token au backend
+      final authResult = await AuthService.socialLogin(
+        provider: socialResult.provider!,
+        token: socialResult.token!,
+      );
+
+      if (!mounted) return;
+
+      if (authResult.success) {
+        widget.onSuccess();
+      } else {
+        _showError(authResult.error ?? AppLocalizations.of(context).socialAuthError);
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: Colors.red.shade800,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    // Sur Android, Apple n'est pas disponible → on masque toute la section
+    if (!SocialAuthService.isAppleAvailable) return const SizedBox.shrink();
+
+    return Column(
+      children: [
+        // ── Séparateur "Ou continuer avec" ────────────────────────────────
+        Row(
+          children: [
+            const Expanded(child: Divider(color: AppTheme.border)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                l10n.orContinueWith,
+                style: const TextStyle(fontSize: 12, color: AppTheme.muted),
+              ),
+            ),
+            const Expanded(child: Divider(color: AppTheme.border)),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        // ── Bouton Apple uniquement ───────────────────────────────────────
+        if (SocialAuthService.isAppleAvailable)
+          _loading
+              ? const SizedBox(
+                  height: 48,
+                  child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : _SocialIconButton(
+                  label: 'Apple',
+                  icon: _appleIcon(),
+                  onTap: () => _handleSocial('apple'),
+                ),
+      ],
+    );
+  }
+
+  Widget _googleIcon() => SizedBox(
+        width: 22,
+        height: 22,
+        child: CustomPaint(painter: _GoogleLogoPainter()),
+      );
+
+  Widget _facebookIcon() => const Icon(Icons.facebook, color: Color(0xFF1877F2), size: 22);
+
+  Widget _appleIcon() => const Icon(Icons.apple, color: AppTheme.text, size: 22);
+}
+
+class _SocialIconButton extends StatelessWidget {
+  final String label;
+  final Widget icon;
+  final VoidCallback onTap;
+
+  const _SocialIconButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: 56,
+          height: 52,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppTheme.border),
+          ),
+          child: Center(child: icon),
+        ),
+      ),
+    );
+  }
+}
+
+/// Peint le logo Google en couleurs (G multicolore) via canvas.
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r  = size.width / 2;
+
+    // Arc rouge (top-right + bottom-right)
+    final red    = Paint()..color = const Color(0xFFEA4335)..style = PaintingStyle.stroke..strokeWidth = r * 0.38;
+    final blue   = Paint()..color = const Color(0xFF4285F4)..style = PaintingStyle.stroke..strokeWidth = r * 0.38;
+    final yellow = Paint()..color = const Color(0xFFFBBC05)..style = PaintingStyle.stroke..strokeWidth = r * 0.38;
+    final green  = Paint()..color = const Color(0xFF34A853)..style = PaintingStyle.stroke..strokeWidth = r * 0.38;
+
+    final rArc = r * 0.62;
+    final rect = Rect.fromCircle(center: Offset(cx, cy), radius: rArc);
+    canvas.drawArc(rect, -0.35, 1.3,  false, red);
+    canvas.drawArc(rect,  0.95, 0.7,  false, yellow);
+    canvas.drawArc(rect,  1.65, 1.2,  false, green);
+    canvas.drawArc(rect,  2.85, 0.85, false, blue);
+
+    // Barre horizontale bleue du G
+    final barPaint = Paint()
+      ..color = const Color(0xFF4285F4)
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - 0.1, cy - r * 0.19, r * 1.05, r * 0.38),
+        const Radius.circular(2),
+      ),
+      barPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_GoogleLogoPainter old) => false;
 }
 
 // ── Country Picker Sheet ───────────────────────────────────────────────────────

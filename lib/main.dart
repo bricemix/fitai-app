@@ -188,6 +188,9 @@ class _AppLoaderState extends State<_AppLoader> {
       } else {
         // Profil local présent → sync serveur en arrière-plan pour rester à jour
         SyncService.downloadAll().ignore();
+        // Upload silencieux de tout ce qui est local → garantit que rien n'est perdu
+        // si l'upload avait échoué lors d'une session précédente.
+        _uploadAllLocal(profile!).ignore();
       }
 
       subscriptionStatus = await PaymentService.fetchSubscriptionStatus();
@@ -325,8 +328,33 @@ class _AppLoaderState extends State<_AppLoader> {
     }
   }
 
+  /// Upload silencieux de toutes les données locales vers le serveur.
+  /// Appelé au démarrage quand un profil local existe — corrige les comptes
+  /// dont les données n'avaient jamais été synchronisées.
+  Future<void> _uploadAllLocal(UserProfile profile) async {
+    try {
+      await SyncService.uploadProfile(profile);
+      final bodyEntries = await StorageService.loadBodyEntries();
+      if (bodyEntries.isNotEmpty) {
+        await SyncService.uploadBodyEntries(bodyEntries);
+      }
+      final meals = await StorageService.loadMeals();
+      if (meals.isNotEmpty) {
+        await SyncService.uploadMeals(meals);
+      }
+      final planning = await StorageService.loadPlanning();
+      if (planning.isNotEmpty) {
+        await SyncService.uploadPlanning(planning);
+      }
+    } catch (_) {
+      // Silencieux — ne bloque jamais le démarrage
+    }
+  }
+
   void _onOnboardingDone(UserProfile p) {
     setState(() => _profile = p);
+    // Upload vers le serveur pour persistance cross-appareils
+    SyncService.uploadProfile(p);
     // Schedule daily motivation notification after onboarding
     _scheduleNotification();
   }
@@ -767,6 +795,10 @@ class _HomeShellState extends State<HomeShell> {
   String _userPlan = 'free'; // 'free' | 'starter' | 'pro' | 'premium'
   DateTime? _trialEndsAt;
 
+  // Triggers for deep navigation from Dashboard
+  final _bodyEntryTrigger   = ValueNotifier<int>(0);
+  final _coachPlanningTrigger = ValueNotifier<int>(0);
+
   @override
   void initState() {
     super.initState();
@@ -810,9 +842,24 @@ class _HomeShellState extends State<HomeShell> {
     final updated = [..._meals, meal];
     await StorageService.saveMeals(updated);
     setState(() { _meals = updated; _tab = 0; });
+    // Sync silencieux : envoie les repas au serveur (récupérables sur autre appareil)
+    SyncService.uploadMeals(updated);
   }
 
-  void _goToBodyLog() => setState(() => _tab = 3);
+  void _goToBodyLog() {
+    setState(() => _tab = 3);
+    // Tiny delay so IndexedStack has time to show ProgressScreen before opening sheet
+    Future.delayed(const Duration(milliseconds: 120), () {
+      _bodyEntryTrigger.value++;
+    });
+  }
+
+  void _goToCoachPlanning() {
+    setState(() => _tab = 2);
+    Future.delayed(const Duration(milliseconds: 120), () {
+      _coachPlanningTrigger.value++;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -830,14 +877,23 @@ class _HomeShellState extends State<HomeShell> {
               todayBodyEntry: _todayBodyEntry,
               todayPlan: _todayPlan,
               onLogBody: _goToBodyLog,
+              onGoToScan:  () => setState(() => _tab = 1),
+              onGoToCoach: _goToCoachPlanning,
               userPlan: _userPlan,
               trialEndsAt: _trialEndsAt,
             ),
             ScanScreen(onMealAdded: _addMeal),
-            CoachScreen(profile: _profile, meals: _meals, userPlan: _userPlan, onPlanChanged: _loadUserPlan),
+            CoachScreen(
+              profile: _profile,
+              meals: _meals,
+              userPlan: _userPlan,
+              onPlanChanged: _loadUserPlan,
+              openPlanningTrigger: _coachPlanningTrigger,
+            ),
             ProgressScreen(
               meals: _meals,
               profile: _profile,
+              openBodyEntryTrigger: _bodyEntryTrigger,
               onBodyEntrySaved: () async {
                 final today = await StorageService.todayBodyEntry();
                 if (mounted) setState(() => _todayBodyEntry = today);

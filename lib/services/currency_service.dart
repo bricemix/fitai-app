@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppCurrency {
@@ -75,15 +76,50 @@ class CurrencyService {
     AppCurrency(code: 'NZD', symbol: 'NZ\$',  flag: '🇳🇿', name: 'Dollar néo-zélandais',  rateFromUsd: 1.65),
   ];
 
-  static AppCurrency get defaultCurrency => currencies.firstWhere((c) => c.code == 'USD');
+  /// Devise par défaut détectée depuis le pays de l'appareil.
+  /// Retourne XOF pour l'Afrique francophone, la devise locale sinon.
+  static AppCurrency detectFromLocale() {
+    final country = WidgetsBinding.instance.platformDispatcher
+        .locale.countryCode?.toUpperCase() ?? '';
+    const xofCountries = {'CI','SN','ML','BF','TG','BJ','GN','NE','GW','CV','KM','ST'};
+    const xafCountries = {'CM','CF','TD','CG','GQ','GA'};
+    const eurCountries = {'FR','DE','ES','IT','PT','NL','BE','AT','FI','IE','LU','SK','SI','EE','LV','LT','MT','CY','GR'};
+    const _countryToCurrency = {
+      'MG': 'MGA', 'NG': 'NGN', 'GH': 'GHS', 'KE': 'KES', 'ZA': 'ZAR',
+      'TZ': 'TZS', 'UG': 'UGX', 'RW': 'RWF', 'ET': 'ETB', 'EG': 'EGP',
+      'MA': 'MAD', 'DZ': 'DZD', 'TN': 'TND', 'GN': 'GNF',
+      'GB': 'GBP', 'CH': 'CHF', 'SE': 'SEK', 'NO': 'NOK', 'DK': 'DKK',
+      'PL': 'PLN', 'TR': 'TRY', 'RU': 'RUB',
+      'US': 'USD', 'CA': 'CAD', 'MX': 'MXN', 'BR': 'BRL',
+      'AU': 'AUD', 'NZ': 'NZD', 'SG': 'SGD', 'JP': 'JPY', 'CN': 'CNY',
+      'KR': 'KRW', 'IN': 'INR', 'ID': 'IDR', 'TH': 'THB',
+      'AE': 'AED', 'SA': 'SAR', 'QA': 'QAR', 'PK': 'PKR', 'BD': 'BDT',
+    };
+
+    String code;
+    if (xofCountries.contains(country)) {
+      code = 'XOF';
+    } else if (xafCountries.contains(country)) {
+      code = 'XAF';
+    } else if (eurCountries.contains(country)) {
+      code = 'EUR';
+    } else {
+      code = _countryToCurrency[country] ?? 'XOF'; // XOF par défaut
+    }
+    return currencies.firstWhere((c) => c.code == code,
+        orElse: () => currencies.first);
+  }
+
+  static AppCurrency get defaultCurrency => detectFromLocale();
 
   // ── Persistance ────────────────────────────────────────────────────────────
 
   static Future<AppCurrency> load() async {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString(_key);
-    if (code == null) return defaultCurrency;
-    return currencies.firstWhere((c) => c.code == code, orElse: () => defaultCurrency);
+    if (code == null) return detectFromLocale();
+    return currencies.firstWhere((c) => c.code == code,
+        orElse: () => detectFromLocale());
   }
 
   static Future<void> save(AppCurrency currency) async {

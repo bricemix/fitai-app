@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/profile.dart';
+import '../providers/locale_provider.dart';
 import '../services/storage_service.dart';
 import '../services/sync_service.dart';
 import '../theme.dart';
@@ -115,6 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
     final bmi = widget.profile.bmi;
     final bmiStr = bmi == 0 ? '—' : bmi.toStringAsFixed(1);

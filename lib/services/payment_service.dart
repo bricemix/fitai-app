@@ -326,10 +326,13 @@ class PaymentService {
 
   // ── Fetch plans ──────────────────────────────────────────────────────────────
 
-  static Future<List<Plan>> fetchPlans() async {
+  static Future<List<Plan>> fetchPlans({String locale = 'en'}) async {
     try {
       final res = await http
-          .get(Uri.parse('$_base/plans'))
+          .get(
+            Uri.parse('$_base/plans'),
+            headers: {'Accept-Language': locale},
+          )
           .timeout(const Duration(seconds: 15));
       if (res.statusCode != 200) throw Exception('Failed to load plans');
       final List data = jsonDecode(res.body) as List;
@@ -342,7 +345,7 @@ class PaymentService {
   // ── Créer session Stripe Checkout ────────────────────────────────────────────
 
   /// Retourne l'URL Stripe Checkout à ouvrir dans le navigateur.
-  static Future<SubscribeResult> createCheckout(Plan plan) async {
+  static Future<SubscribeResult> createCheckout(Plan plan, {String locale = 'en'}) async {
     final token = await AuthService.getToken();
     if (token == null) throw Exception('Non authentifié');
 
@@ -351,8 +354,9 @@ class PaymentService {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
+        'Accept-Language': locale,
       },
-      body: jsonEncode({'plan_id': plan.id}),
+      body: jsonEncode({'plan_id': plan.id, 'locale': locale}),
     );
 
     if (res.statusCode == 401) {

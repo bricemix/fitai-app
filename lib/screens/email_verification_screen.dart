@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../providers/locale_provider.dart';
 import '../theme.dart';
 import '../l10n/app_localizations.dart';
 
@@ -181,6 +183,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import '../models/profile.dart';
 import '../services/storage_service.dart';
+import '../services/sync_service.dart';
 import '../services/currency_service.dart';
 import '../theme.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/locale_provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final void Function(UserProfile) onDone;
@@ -35,8 +38,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _activity     = '';  // set lazily in build() from l10n
   List<String> _restrictions = [];
 
-  static const _restrictionsList = [
-    'Végétarien', 'Vegan', 'Sans gluten', 'Sans lactose', 'Halal', 'Keto',
+  // Clés canoniques (stockées dans le profil, indépendantes de la langue)
+  static const _restrictionKeys = [
+    'vegetarian', 'vegan', 'gluten_free', 'lactose_free', 'halal', 'keto',
+  ];
+
+  List<String> _restrictionLabels(AppLocalizations l) => [
+    l.restrictionVegetarian, l.restrictionVegan, l.restrictionGlutenFree,
+    l.restrictionLactoseFree, l.restrictionHalal, l.restrictionKeto,
   ];
 
   // Options kg/semaine selon le goal (computed in build via l10n)
@@ -88,6 +97,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         currencyCode:   currency.code,
       );
       await StorageService.saveProfile(profile);
+      // Sync immédiat vers le serveur — indispensable pour retrouver
+      // le profil après déconnexion/réinstallation.
+      SyncService.uploadProfile(profile);
       widget.onDone(profile);
     } else {
       setState(() => _step++);
@@ -96,6 +108,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Force rebuild quand la locale change (nécessaire pour mettre à jour
+    // tous les textes du screen, pas seulement les widgets enfants qui
+    // regardent LocaleProvider indépendamment)
+    context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
     // Initialize default activity lazily from l10n
     if (_activity.isEmpty) _activity = l10n.activityModerate;
@@ -159,60 +175,166 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // ── Step 0: Welcome ──────────────────────────────────────────────────────────
 
   Widget _buildWelcome(AppLocalizations l10n) {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: const Alignment(0, -0.8),
-              radius: 1.2,
-              colors: [AppTheme.accent.withAlpha(51), Colors.transparent],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        children: [
+
+          // ── Bouton langue (haut à droite) ──────────────────────────────────
+          Align(
+            alignment: Alignment.centerRight,
+            child: _OnboardingLangButton(),
+          ),
+          const SizedBox(height: 16),
+
+          // ── Logo avec glow ─────────────────────────────────────────────────
+          Container(
+            width: 110,
+            height: 110,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppTheme.accent.withAlpha(16),
+              border: Border.all(color: AppTheme.accent.withAlpha(60), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.accent.withAlpha(70),
+                  blurRadius: 40,
+                  spreadRadius: 6,
+                ),
+              ],
+            ),
+            child: Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: SvgPicture.asset(
+                  'assets/logo/dietvision-icon.svg',
+                  width: 66,
+                  height: 66,
+                ),
+              ),
             ),
           ),
-          child: Column(
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                padding: const EdgeInsets.all(27),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppTheme.accent.withAlpha(18),
-                  border: Border.all(color: AppTheme.accent.withAlpha(50), width: 1),
+          const SizedBox(height: 28),
+
+          // ── Titre ──────────────────────────────────────────────────────────
+          Text(
+            l10n.welcomeTo,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Syne',
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.text,
+              height: 1.1,
+            ),
+          ),
+          const SizedBox(height: 2),
+          const Text(
+            'DietVision',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Syne',
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
+              color: AppTheme.accent,
+              height: 1.1,
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // ── Sous-titre ─────────────────────────────────────────────────────
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 14, color: AppTheme.muted, height: 1.55),
+              children: [
+                TextSpan(text: l10n.onboardingIntro),
+                TextSpan(
+                  text: l10n.onboardingPersonalize,
+                  style: const TextStyle(color: AppTheme.accent, fontWeight: FontWeight.w600),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(21),
-                  child: SvgPicture.asset(
-                    'assets/logo/dietvision-icon.svg',
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+
+          // ── 3 cartes d'info ────────────────────────────────────────────────
+          _WelcomeInfoCard(
+            icon: Icons.person_rounded,
+            title: l10n.infoCardTitle,
+            subtitle: l10n.infoCardSubtitle,
+          ),
+          const SizedBox(height: 10),
+          _WelcomeInfoCard(
+            icon: Icons.straighten_rounded,
+            title: l10n.measuresCardTitle,
+            subtitle: l10n.measuresCardSubtitle,
+          ),
+          const SizedBox(height: 10),
+          _WelcomeInfoCard(
+            icon: Icons.track_changes_rounded,
+            title: l10n.objectivesCardTitle,
+            subtitle: l10n.objectivesCardSubtitle,
+          ),
+          const SizedBox(height: 14),
+
+          // ── Note IA ────────────────────────────────────────────────────────
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppTheme.accent.withAlpha(12),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppTheme.accent.withAlpha(40)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.verified_rounded, size: 16, color: AppTheme.accent),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 12, color: AppTheme.muted, height: 1.5),
+                      children: [
+                        TextSpan(text: l10n.aiNoteText),
+                        TextSpan(
+                          text: l10n.aiNoteHighlight,
+                          style: const TextStyle(color: AppTheme.accent, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 32),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+
+          // ── Bouton CTA ─────────────────────────────────────────────────────
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => setState(() => _step = 1),
+              child: Text(l10n.configureProfile),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // ── Footer ─────────────────────────────────────────────────────────
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               Text(
-                l10n.welcome,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineLarge,
+                l10n.nextStepLabel,
+                style: const TextStyle(fontSize: 12, color: AppTheme.muted),
               ),
-              const SizedBox(height: 12),
-              Text(
-                l10n.welcomeSubtitle,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.muted, height: 1.5),
-              ),
-              const SizedBox(height: 40),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => setState(() => _step = 1),
-                  child: Text(l10n.configureProfile),
-                ),
-              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.chevron_right_rounded, size: 16, color: AppTheme.muted),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -406,17 +528,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: _restrictionsList.map((r) => _Chip(
-            label: r,
-            selected: _restrictions.contains(r),
-            onTap: () => setState(() {
-              if (_restrictions.contains(r)) {
-                _restrictions = List.from(_restrictions)..remove(r);
-              } else {
-                _restrictions = List.from(_restrictions)..add(r);
-              }
-            }),
-          )).toList(),
+          children: List.generate(_restrictionKeys.length, (i) {
+            final key   = _restrictionKeys[i];
+            final label = _restrictionLabels(l10n)[i];
+            return _Chip(
+              label: label,
+              selected: _restrictions.contains(key),
+              onTap: () => setState(() {
+                if (_restrictions.contains(key)) {
+                  _restrictions = List.from(_restrictions)..remove(key);
+                } else {
+                  _restrictions = List.from(_restrictions)..add(key);
+                }
+              }),
+            );
+          }),
         ),
         const SizedBox(height: 20),
       ],
@@ -461,6 +587,145 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     child: Text(text.toUpperCase(),
         style: const TextStyle(fontSize: 11, color: AppTheme.muted, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
   );
+}
+
+// ── Bouton langue onboarding ──────────────────────────────────────────────────
+class _OnboardingLangButton extends StatelessWidget {
+  const _OnboardingLangButton();
+
+  void _showPicker(BuildContext context) {
+    final localeProvider = context.read<LocaleProvider>();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 36, height: 4,
+                decoration: BoxDecoration(
+                    color: AppTheme.border,
+                    borderRadius: BorderRadius.circular(2)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Builder(builder: (ctx) {
+              final l10n = AppLocalizations.of(ctx);
+              return Text(l10n.chooseLanguage,
+                  style: const TextStyle(
+                      fontFamily: 'Syne', fontSize: 17, fontWeight: FontWeight.w700));
+            }),
+            const SizedBox(height: 14),
+            ...LocaleProvider.supportedLanguages.map((lang) {
+              final isSelected = localeProvider.locale.languageCode == lang.$1;
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Text(lang.$3, style: const TextStyle(fontSize: 26)),
+                title: Text(lang.$2,
+                    style: TextStyle(
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
+                        color: isSelected ? AppTheme.accent : AppTheme.text)),
+                trailing: isSelected
+                    ? const Icon(Icons.check_circle, color: AppTheme.accent, size: 20)
+                    : null,
+                onTap: () {
+                  localeProvider.setLocale(Locale(lang.$1));
+                  Navigator.pop(context);
+                },
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localeProvider = context.watch<LocaleProvider>();
+    final currentLang = LocaleProvider.supportedLanguages.firstWhere(
+      (l) => l.$1 == localeProvider.locale.languageCode,
+      orElse: () => LocaleProvider.supportedLanguages.first,
+    );
+    return GestureDetector(
+      onTap: () => _showPicker(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppTheme.border),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(currentLang.$3, style: const TextStyle(fontSize: 15)),
+            const SizedBox(width: 4),
+            Text(currentLang.$1.toUpperCase(),
+                style: const TextStyle(
+                    fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.muted)),
+            const SizedBox(width: 2),
+            const Icon(Icons.expand_more, size: 13, color: AppTheme.muted),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Welcome info card ─────────────────────────────────────────────────────────
+class _WelcomeInfoCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  const _WelcomeInfoCard({required this.icon, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppTheme.accent.withAlpha(20),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: AppTheme.accent, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 14, color: AppTheme.text)),
+                const SizedBox(height: 2),
+                Text(subtitle,
+                    style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded, size: 18, color: AppTheme.muted),
+        ],
+      ),
+    );
+  }
 }
 
 // ── Gender button ─────────────────────────────────────────────────────────────

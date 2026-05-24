@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DietVision</string>
+    <!-- Facebook SDK — remplacer ces valeurs depuis https://developers.facebook.com -->
+    <string name="facebook_app_id">VOTRE_FACEBOOK_APP_ID</string>
+    <string name="facebook_client_token">VOTRE_FACEBOOK_CLIENT_TOKEN</string>
+    <string name="fb_login_protocol_scheme">fbVOTRE_FACEBOOK_APP_ID</string>
+</resources>

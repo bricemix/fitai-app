@@ -1,0 +1,51 @@
+🥗 DietVision — Your AI-powered Nutrition & Fitness Coach
+
+Take a photo of your meal and let the AI do the rest. DietVision instantly identifies foods, calculates calories and macronutrients, and guides you toward your health goals.
+
+━━━━━━━━━━━━━━━━━━━━━━
+🔍 AI MEAL SCANNING
+━━━━━━━━━━━━━━━━━━━━━━
+• Photograph any dish — AI identifies it in seconds
+• Calories, proteins, carbs, fats and fibre calculated automatically
+• Health score out of 10 + detected micronutrients
+• Easily adjust your portion size
+
+━━━━━━━━━━━━━━━━━━━━━━
+🤖 AI NUTRITION COACH
+━━━━━━━━━━━━━━━━━━━━━━
+• Chat with your AI coach 24/7 for personalised advice
+• AI-generated dishes tailored to your diet (omnivore, halal, vegetarian, keto…)
+• 7-day nutrition plan adapted to your goals
+• Smart suggestions based on your history
+
+━━━━━━━━━━━━━━━━━━━━━━
+📊 TRACKING & PROGRESS
+━━━━━━━━━━━━━━━━━━━━━━
+• Daily dashboard with calorie goal
+• 7-day progress charts
+• Body measurement tracking (weight, waist, biceps…)
+• AI projection of your future progress
+
+━━━━━━━━━━━━━━━━━━━━━━
+🎯 PERSONALISED FOR YOU
+━━━━━━━━━━━━━━━━━━━━━━
+• Full profile: age, weight, height, goal, activity level
+• Automatic TDEE calculation
+• Diets available: Omnivore, Halal, Vegetarian, Vegan, Keto, Mediterranean, Gluten-free, Paleo, High-protein, Low-calorie
+• Interface available in 5 languages: Français, English, Deutsch, Español, Português
+
+━━━━━━━━━━━━━━━━━━━━━━
+💎 AVAILABLE PLANS
+━━━━━━━━━━━━━━━━━━━━━━
+• Starter (free) — AI scan, basic tracking, chat coach
+• Pro — Personalised AI dishes, 9 diets, detailed ingredients
+• Premium — 7-day AI planning, all features
+
+7-day free trial included — No commitment — Cancel anytime.
+
+━━━━━━━━━━━━━━━━━━━━━━
+🔒 PRIVACY & SECURITY
+━━━━━━━━━━━━━━━━━━━━━━
+Your data is encrypted and never sold. Full GDPR compliance.
+
+Start your transformation today. Download DietVision for free!

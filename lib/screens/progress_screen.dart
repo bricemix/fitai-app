@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/profile.dart';
+import '../providers/locale_provider.dart';
 import '../models/meal.dart';
 import '../models/body_entry.dart';
 import '../services/storage_service.dart';
@@ -12,7 +15,14 @@ class ProgressScreen extends StatefulWidget {
   final List<Meal> meals;
   final UserProfile profile;
   final VoidCallback? onBodyEntrySaved;
-  const ProgressScreen({super.key, required this.meals, required this.profile, this.onBodyEntrySaved});
+  final ValueNotifier<int>? openBodyEntryTrigger;
+  const ProgressScreen({
+    super.key,
+    required this.meals,
+    required this.profile,
+    this.onBodyEntrySaved,
+    this.openBodyEntryTrigger,
+  });
 
   @override
   State<ProgressScreen> createState() => _ProgressScreenState();
@@ -28,6 +38,15 @@ class _ProgressScreenState extends State<ProgressScreen> with SingleTickerProvid
     super.initState();
     _tabs = TabController(length: 2, vsync: this);
     _load();
+    widget.openBodyEntryTrigger?.addListener(_onBodyEntryTrigger);
+  }
+
+  void _onBodyEntryTrigger() {
+    // Switch to body tab (index 0) and open the entry sheet
+    _tabs.animateTo(0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _openEntrySheet();
+    });
   }
 
   Future<void> _load() async {
@@ -72,12 +91,14 @@ class _ProgressScreenState extends State<ProgressScreen> with SingleTickerProvid
 
   @override
   void dispose() {
+    widget.openBodyEntryTrigger?.removeListener(_onBodyEntryTrigger);
     _tabs.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
     final todayEntry = _entries.where((e) => e.isToday).firstOrNull;
 
@@ -1066,6 +1087,31 @@ class _HistoryTab extends StatelessWidget {
   }
 }
 
+/// Affiche la miniature d'un repas — fichier local OU base64 synchronisé (nouveau téléphone).
+Widget _buildProgressMealThumb(Meal meal) {
+  // 1. Fichier local présent sur cet appareil
+  if (meal.imagePath != null) {
+    final file = File(meal.imagePath!);
+    if (file.existsSync()) {
+      return Image.file(file, fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _progressMealIcon());
+    }
+  }
+  // 2. Miniature base64 synchronisée depuis le serveur (nouveau téléphone / réinstallation)
+  if (meal.thumbnailBase64 != null && meal.thumbnailBase64!.isNotEmpty) {
+    try {
+      final bytes = base64Decode(meal.thumbnailBase64!);
+      return Image.memory(bytes, fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _progressMealIcon());
+    } catch (_) {}
+  }
+  // 3. Fallback icône
+  return _progressMealIcon();
+}
+
+Widget _progressMealIcon() =>
+    const Center(child: Icon(Icons.restaurant_rounded, size: 22, color: AppTheme.muted));
+
 class _MealTile extends StatelessWidget {
   final Meal meal;
   final bool isLast;
@@ -1088,10 +1134,7 @@ class _MealTile extends StatelessWidget {
             width: 46, height: 46,
             decoration: BoxDecoration(color: AppTheme.surface2, borderRadius: BorderRadius.circular(12)),
             clipBehavior: Clip.antiAlias,
-            child: meal.imagePath != null
-                ? Image.file(File(meal.imagePath!), fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.restaurant_rounded, size: 22, color: AppTheme.muted)))
-                : const Center(child: Icon(Icons.restaurant_rounded, size: 22, color: AppTheme.muted)),
+            child: _buildProgressMealThumb(meal),
           ),
           const SizedBox(width: 12),
           Expanded(

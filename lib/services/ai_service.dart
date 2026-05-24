@@ -81,24 +81,57 @@ class AiService {
 
   static Future<String> askCoach(
     List<Map<String, String>> messages,
-    UserProfile profile,
-  ) async {
+    UserProfile profile, {
+    List<Meal>? todayMeals,
+  }) async {
     try {
       final headers = await AuthService.authHeaders();
-      final locale = await _appLocale();
-      final model  = await SettingsService.getModel();
+      final locale  = await _appLocale();
+      final model   = await SettingsService.getModel();
+
+      // Calcule le contexte nutritionnel du jour
+      final kcalConsumed  = todayMeals?.fold(0, (s, m) => s + m.result.calories) ?? 0;
+      final kcalTarget    = profile.tdee.round();
+      final kcalRemaining = (kcalTarget - kcalConsumed).clamp(0, 9999);
+      final proteinToday  = todayMeals?.fold(0.0, (s, m) => s + m.result.protein) ?? 0.0;
+      final carbsToday    = todayMeals?.fold(0.0, (s, m) => s + m.result.carbs) ?? 0.0;
+      final fatToday      = todayMeals?.fold(0.0, (s, m) => s + m.result.fat) ?? 0.0;
+      final proteinTarget = (double.tryParse(profile.weight) ?? 70.0) * 1.6;
+
+      final todayContext = {
+        'date': DateTime.now().toIso8601String().substring(0, 10),
+        'kcal_consumed':  kcalConsumed,
+        'kcal_target':    kcalTarget,
+        'kcal_remaining': kcalRemaining,
+        'protein_g':      proteinToday.round(),
+        'protein_target_g': proteinTarget.round(),
+        'carbs_g':        carbsToday.round(),
+        'carbs_target_g': profile.targetCarbs,
+        'fat_g':          fatToday.round(),
+        'fat_target_g':   profile.targetFat,
+        'meals': todayMeals?.map((m) => {
+          'name':     m.result.name,
+          'calories': m.result.calories,
+          'protein':  m.result.protein.round(),
+          'carbs':    m.result.carbs.round(),
+          'fat':      m.result.fat.round(),
+        }).toList() ?? [],
+      };
+
       final response = await http
           .post(
             Uri.parse('$_baseUrl/ai/coach'),
             headers: headers,
             body: jsonEncode({
-              'messages': messages,
-              'profile': profile.toJson(),
-              'locale': locale,
-              'model': model,
+              'messages':      messages,
+              'profile':       profile.toJson(),
+              'locale':        locale,
+              'model':         model,
+              'today_context': todayContext,
+              'max_tokens':    1500,
             }),
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -124,21 +157,37 @@ class AiService {
     final locale = await _appLocale();
     final lang = _languageName(locale);
     final todayKcal = todayMeals.fold(0, (s, m) => s + m.result.calories);
-    final remaining = (profile.tdee.round() - todayKcal).clamp(0, 9999);
+    final rawRemaining = profile.tdee.round() - todayKcal;
+    final inSurplus   = rawRemaining < 0;
+    final surplus     = inSurplus ? -rawRemaining : 0;
+    final remaining   = rawRemaining.clamp(0, 9999);
     final restrictions = profile.restrictions.isEmpty ? 'none' : profile.restrictions.join(', ');
 
     // Instructions spécifiques selon le régime sélectionné (clés internes)
     final dietInstructions = _dietInstructions(dietType);
+
+    // Contexte calorique selon la situation (normal vs surplus)
+    final caloricContext = inSurplus
+        ? 'Kcal consumed today: $todayKcal — EXCEEDED daily target by +$surplus kcal (caloric surplus)'
+        : 'Kcal consumed today: $todayKcal — remaining: $remaining kcal';
+
+    // Instruction supplémentaire si en surplus
+    final surplusInstruction = inSurplus ? '''
+IMPORTANT: The user has already exceeded their daily caloric goal by $surplus kcal.
+You MUST still return 3 dish suggestions in JSON format — do NOT refuse or explain.
+Recommend very light dishes under 350 kcal each: salads, soups, steamed vegetables, lean proteins.
+Focus on micronutrients, fibre and hydration rather than calories.
+''' : '';
 
     final prompt = '''
 IMPORTANT: Respond ENTIRELY in $lang. All dish names, descriptions and ingredient names must be in $lang.
 
 Recommend 3 detailed dishes adapted for this user today.
 Goal: ${profile.goal} (${profile.tdee.round()} kcal/day)
-Kcal consumed today: $todayKcal — remaining: $remaining kcal
+$caloricContext
 User weight: ${profile.weight} kg
 Dietary restrictions: $restrictions
-
+$surplusInstruction
 SELECTED DIET: $dietType
 $dietInstructions
 
@@ -188,7 +237,7 @@ The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always
 
   // ── Weekly planning generation ─────────────────────────────────────────────
 
-  static Future<List<DayPlan>> generateWeeklyPlan(UserProfile profile) async {
+  static Future<List<DayPlan>> generateWeeklyPlan(UserProfile profile, {String? preference}) async {
     final locale = await _appLocale();
     final lang = _languageName(locale);
     final now = DateTime.now();
@@ -204,6 +253,9 @@ The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always
     final rhythm = profile.goalKgPerWeek != 0
         ? 'Rhythm: ${profile.goalKgPerWeek > 0 ? '+' : ''}${profile.goalKgPerWeek} kg/week → $deltaStr/day'
         : '';
+    final preferenceNote = preference != null
+        ? '\nUSER PREFERENCE TO APPLY: $preference\nAdapt the plan accordingly.\n'
+        : '';
 
     final prompt = '''
 IMPORTANT: Write the "note" field in $lang only. All advice must be in $lang.
@@ -214,7 +266,7 @@ Caloric maintenance: $maintenance kcal/day
 MANDATORY daily target: $dailyKcal kcal/day (${rhythm.isNotEmpty ? rhythm : 'maintenance'})
 Target protein: ${profile.targetProtein}g/day | Carbs: ${profile.targetCarbs}g/day | Fat: ${profile.targetFat}g/day
 Restrictions: ${profile.restrictions.isEmpty ? 'none' : profile.restrictions.join(', ')}
-
+$preferenceNote
 IMPORTANT: Each day must have target_kcal = $dailyKcal (± 50 kcal max).
 Macros may vary slightly per day for variety.
 The "note" field must contain a short motivating tip for that day, written in $lang.

@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb, compute;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import '../providers/locale_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import '../models/meal.dart';
@@ -13,7 +15,7 @@ import '../theme.dart';
 import '../l10n/app_localizations.dart';
 import 'subscription_screen.dart';
 
-/// Fonction top-level pour compute() — doit être en dehors de toute classe.
+/// Compresse en JPEG ≤ 1024px (pour l'analyse IA). Top-level pour compute().
 String _compressImage(Uint8List rawBytes) {
   var decoded = img.decodeImage(rawBytes);
   if (decoded == null) throw Exception('Unsupported image format');
@@ -25,6 +27,16 @@ String _compressImage(Uint8List rawBytes) {
     );
   }
   final jpeg = img.encodeJpg(decoded, quality: 85);
+  return base64Encode(jpeg);
+}
+
+/// Génère une miniature 200px JPEG qualité 55 (~8–15 Ko). Top-level pour compute().
+String _makeThumbnail(Uint8List rawBytes) {
+  var decoded = img.decodeImage(rawBytes);
+  if (decoded == null) return '';
+  // Redimensionner à 200px de large (hauteur proportionnelle)
+  final thumb = img.copyResize(decoded, width: 200);
+  final jpeg  = img.encodeJpg(thumb, quality: 55);
   return base64Encode(jpeg);
 }
 
@@ -151,10 +163,22 @@ class _ScanScreenState extends State<ScanScreen> {
             ? _result!.scaledTo(_portionGrams)
             : _result!;
 
+    // Générer une miniature pour la sync cross-appareils (200px, ~10 Ko)
+    String? thumbnailBase64;
+    if (_imageBytes != null) {
+      try {
+        final thumb = await compute(_makeThumbnail, _imageBytes!);
+        if (thumb.isNotEmpty) thumbnailBase64 = thumb;
+      } catch (_) {
+        // Non bloquant — le repas est sauvé même sans miniature
+      }
+    }
+
     final meal = Meal(
       date: DateTime.now().toIso8601String(),
       imagePath: path,
       result: adjustedResult,
+      thumbnailBase64: thumbnailBase64,
     );
     widget.onMealAdded(meal);
     if (mounted) {
@@ -230,6 +254,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
     return Stack(
       children: [
@@ -688,13 +713,13 @@ class _PhotoDropState extends State<_PhotoDrop>
                     borderRadius: BorderRadius.circular(100),
                     border: Border.all(color: AppTheme.border),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.refresh_rounded, size: 14, color: AppTheme.accent),
-                      SizedBox(width: 5),
-                      Text('Changer',
-                          style: TextStyle(
+                      const Icon(Icons.refresh_rounded, size: 14, color: AppTheme.accent),
+                      const SizedBox(width: 5),
+                      Text(l10n.change,
+                          style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.text)),
@@ -771,13 +796,13 @@ class _PhotoDropState extends State<_PhotoDrop>
                   children: [
                     _SourceBtn(
                       icon: Icons.camera_alt_rounded,
-                      label: 'Caméra',
+                      label: l10n.camera,
                       onTap: widget.onTap,
                     ),
                     const SizedBox(width: 12),
                     _SourceBtn(
                       icon: Icons.photo_library_rounded,
-                      label: 'Galerie',
+                      label: l10n.gallery,
                       onTap: widget.onTap,
                     ),
                   ],
@@ -863,17 +888,19 @@ class _PhotoTipsSectionState extends State<_PhotoTipsSection>
     super.dispose();
   }
 
-  static const _tips = [
-    (icon: Icons.dinner_dining_rounded,     label: 'Cadrer l\'assiette',   color: Color(0xFF6BCB77)),
-    (icon: Icons.wb_sunny_rounded,          label: 'Bonne lumière',        color: Color(0xFFFFD166)),
-    (icon: Icons.straighten_rounded,        label: 'Vue du dessus',        color: Color(0xFF4DA1FF)),
-    (icon: Icons.visibility_rounded,        label: 'Aliment visible',      color: Color(0xFFFF9F1C)),
-    (icon: Icons.photo_size_select_large_rounded, label: 'Tout le plat',   color: Color(0xFFEF476F)),
-    (icon: Icons.no_flash_rounded,          label: 'Éviter le flash',      color: Color(0xFFa5b4fc)),
+  List<({IconData icon, String label, Color color})> _tips(AppLocalizations l) => [
+    (icon: Icons.dinner_dining_rounded,           label: l.tipFramePlate,    color: const Color(0xFF6BCB77)),
+    (icon: Icons.wb_sunny_rounded,                label: l.tipGoodLight,     color: const Color(0xFFFFD166)),
+    (icon: Icons.straighten_rounded,              label: l.tipTopView,       color: const Color(0xFF4DA1FF)),
+    (icon: Icons.visibility_rounded,              label: l.tipVisibleFood,   color: const Color(0xFFFF9F1C)),
+    (icon: Icons.photo_size_select_large_rounded, label: l.tipFullPlate,     color: const Color(0xFFEF476F)),
+    (icon: Icons.no_flash_rounded,                label: l.tipNoFlash,       color: const Color(0xFFa5b4fc)),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final tips = _tips(l10n);
     return FadeTransition(
       opacity: _fade,
       child: SlideTransition(
@@ -881,16 +908,16 @@ class _PhotoTipsSectionState extends State<_PhotoTipsSection>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 2, bottom: 10),
+            Padding(
+              padding: const EdgeInsets.only(left: 2, bottom: 10),
               child: Row(
                 children: [
-                  Icon(Icons.tips_and_updates_rounded,
+                  const Icon(Icons.tips_and_updates_rounded,
                       size: 14, color: AppTheme.accent),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
-                    'CONSEILS PHOTO',
-                    style: TextStyle(
+                    l10n.photoTipsTitle,
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.muted,
@@ -905,10 +932,10 @@ class _PhotoTipsSectionState extends State<_PhotoTipsSection>
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.only(right: 4),
-                itemCount: _tips.length,
+                itemCount: tips.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 10),
                 itemBuilder: (_, i) {
-                  final tip = _tips[i];
+                  final tip = tips[i];
                   return _TipCard(
                     icon:  tip.icon,
                     label: tip.label,

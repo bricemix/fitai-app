@@ -35,6 +35,7 @@ abstract class AppLocalizations {
   String get cancel;
   String get confirm;
   String get save;
+  String get change;
   String get retry;
   String get loading;
   String get error;
@@ -95,6 +96,11 @@ abstract class AppLocalizations {
   String get mustAcceptPrivacy;
   String get iAcceptThe;
   String get privacyPolicyLink;
+  String get birthDate;
+  String get birthDateHint;
+  String get underageTitle;
+  String get underageBody;
+  String get underageButton;
 
   // ── Email verification ───────────────────────────────────────────────────────
   String get verifyEmailTitle;
@@ -117,6 +123,10 @@ abstract class AppLocalizations {
   String get missingMeasurements;
   String get bodyMeasurementsHint;
   String get measurementsDoneToday;
+  String get bodyMeasurementsSubtitle;
+  String get syncedLabel;
+  String get stayFocused;
+  String get dailyProgress;
   String get proteins;
   String get carbs;
   String get fats;
@@ -130,6 +140,15 @@ abstract class AppLocalizations {
   String get chooseGallery;
   String get addPhoto;
   String get photoHint;
+  String get camera;
+  String get gallery;
+  String get photoTipsTitle;
+  String get tipFramePlate;
+  String get tipGoodLight;
+  String get tipTopView;
+  String get tipVisibleFood;
+  String get tipFullPlate;
+  String get tipNoFlash;
   String get adjustPortion;
   String get precisions;
   String get precisionsHint;
@@ -261,15 +280,48 @@ abstract class AppLocalizations {
   String get activityDiet;
   String get activityLevelLabel;
   String get dietLabel;
+  // Dietary restrictions (canonical keys, translated labels)
+  String get restrictionVegetarian;
+  String get restrictionVegan;
+  String get restrictionGlutenFree;
+  String get restrictionLactoseFree;
+  String get restrictionHalal;
+  String get restrictionKeto;
   String get welcome;
   String get welcomeSubtitle;
   String get createProfile;
   String get continueButton;
 
+  // ── Onboarding welcome step ───────────────────────────────────────────────
+  String get welcomeTo;
+  String get onboardingIntro;
+  String get onboardingPersonalize;
+  String get infoCardTitle;
+  String get infoCardSubtitle;
+  String get measuresCardTitle;
+  String get measuresCardSubtitle;
+  String get objectivesCardTitle;
+  String get objectivesCardSubtitle;
+  String get aiNoteText;
+  String get aiNoteHighlight;
+  String get nextStepLabel;
+
   // ── Paywall ─────────────────────────────────────────────────────────────────
   String get paywallTitle;
   String get paywallSubtitle;
+  // Page 1 chips
+  String get chipMealScan;
+  String get chipMacroTracking;
+  String get chipAiCoach;
+  // Page 2 features
+  String get paywallFeaturesPrefix;
+  String get paywallFeaturesHighlight;
+  String get paywallFeaturesSubtitle;
+  // Page 3 plans
   String get choosePlan;
+  String get paywallPlanPrefix;
+  String get paywallPlanHighlight;
+  String get paywallPlanSubtitle;
   String get unlimitedScan;
   String get featureSubScan;
   String get personalizedCoach;
@@ -441,6 +493,102 @@ abstract class AppLocalizations {
   // ── Dashboard extras ─────────────────────────────────────────────────────────
   String get kcalRemaining;
   String get kcalExceeded;
+  String get kcalOver;
+
+  // ── Context Day Card ─────────────────────────────────────────────────────────
+  String get protLow;
+  String get protModerate;
+  String get protGood;
+  String get goalWeightLoss;
+  String get goalMassGain;
+  String get goalMaintain;
+  String get labelProteins;
+  String get labelGoal;
+  String get labelDiet;
+  String ctxDescSurplus(int surplus);
+  String get ctxDescLowProt;
+  String get ctxDescDefault;
+
+  // ── Smart Actions labels ──────────────────────────────────────────────────────
+  String get smartBuildDay;
+  String smartBuildDaySub(int kcal);
+  String smartSurplusTitle(int kcal);
+  String get smartSurplusSub;
+  String get smart3Dishes;
+  String get smart3DishesSub;
+  String get smartAnalyzeBilan;
+  String get smartAnalyzeBilanSub;
+  String get smartPrepareDinner;
+  String get smartPrepareDinnerSub;
+
+  // ── Pro gate benefits & table ─────────────────────────────────────────────────
+  String get gateDishesAdaptedRecipes;
+  String get gateDishes9Diets;
+  String get gateDishesWeighedIngredients;
+  String get gateDishesUpdatedDaily;
+  String get tableHeaderFeatures;
+  String get tableRowPersonalizedDishes;
+  String get tableRowAdaptedRecipes;
+  String get tableRowWeighedIngredients;
+  String get tableRowUpdatedDaily;
+
+  // ── Premium gate benefits & plan cards ───────────────────────────────────────
+  String get gatePlanningWeekPlan;
+  String get gatePlanningCaloricGoal;
+  String get gatePlanningAdapted;
+  String get gatePlanningDailyTips;
+  String get planStarterSubtitle;
+  String get planProSubtitle;
+  String get planPremiumSubtitle;
+  String get planIncluded;
+  String get planNotIncluded;
+
+  // ── Quick tips (chat) ─────────────────────────────────────────────────────────
+  String get tipScanFirstMeal;
+  String get tipIncreaseProtein;
+  String tipCaloriesAvailable(int pct);
+  String get tipCaloriesExceeded;
+  String get tipKeepGoing;
+
+  // ── Chat history ─────────────────────────────────────────────────────────────
+  String get newChat;
+  String get clearChatTitle;
+  String get clearChatConfirm;
+  String get clearChatConfirmBtn;
+
+  // ── AI prompt strings (sent to Anthropic) ────────────────────────────────────
+  String promptCreatePlanSurplus(int surplus, String diet);
+  String promptCreatePlanNormal(int remaining, String diet);
+  String get promptFixMacros;
+  String get promptAnalyzeProgress;
+  String promptSurplusBalance(int surplus, int tdee);
+  String promptBuildDay(int remaining, String diet);
+  String prompt3Dishes(String diet);
+  String get promptAnalyzeBilan;
+  String promptDinnerSurplus(int surplus, int tdee, String diet);
+  String promptDinnerNormal(int remaining, String diet);
+
+  // ── Dashboard — Today Mission & AI Reco ──────────────────────────────────────
+  String get readyToCrush;
+  String get notifications;
+  String get todayMission;
+  String get seeDailyPlan;
+  String get completeDailyMeasures;
+  String get dailyCheckIn;
+  String get toComplete;
+  String get completeNow;
+  String get checkInDone;
+  String get dataUpToDate;
+  String get aiRecommendation;
+  String get viewMore;
+  String get viewDishes;
+  String get scanMeal;
+  String get adjustToday;
+  String get aiRecNoScan;
+  String get aiRecProteinLow;
+  String get aiRecCaloriesHigh;
+  String get aiRecOnTrack;
+  String get objectifQuotidien;
 
   // ── Subscription gate ─────────────────────────────────────────────────────────
   String get trialExpiredTitle;
@@ -454,6 +602,10 @@ abstract class AppLocalizations {
   String get trialExpiredToday;
   String trialExpiredDaysAgo(int days);
   String trialDaysRemaining(int days);
+  String get statusActive;
+  String get statusInactive;
+  String get verifiedFromServer;
+  String get localCache;
 
   // ── Billing frequency labels ──────────────────────────────────────────────────
   String get billingMonthly;
@@ -481,6 +633,126 @@ abstract class AppLocalizations {
   String get trialNotifJ1;
   String get trialNotifJ1Body;
 
+  // ── Weekly details sheet ─────────────────────────────────────────────────────
+  String get weeklyDetails;
+  String get weeklySummaryTitle;
+  String get avgKcalPerDay;
+  String get targetKcalDay2;
+  String get differenceKcal;
+  String proteinTargetReached(int done, int total);
+  String get statusOnTrack;
+  String get statusAttention;
+  String get statusOffTrack;
+  String get statusNotStarted;
+  String get editThisDay;
+  String get replaceMeals;
+  String get copyThisDay;
+  String get balanceWeek;
+
+  // ── AI Insight sheet ──────────────────────────────────────────────────────────
+  String get insightAnalysisTitle;
+  String get insightWhyTitle;
+  String get insightActionsTitle;
+  String insightProteinAnalysis(int current, int target, int gap);
+  String insightCaloriesAnalysis(int current, int target);
+  String get insightWhyProtein;
+  String get insightWhyCalories;
+  String get insightWhyWater;
+  String get insightWhyCarbs;
+  String get insightWhyNoScan;
+  String get insightAction1Protein;
+  String get insightAction1ProteinDetail;
+  String get insightAction2Protein;
+  String get insightAction2ProteinDetail;
+  String get insightIgnoreToday;
+  String get applySuggestion;
+  String get showAlternatives;
+  String get remindMeLater;
+
+  // ── Progress forecast sheet ───────────────────────────────────────────────────
+  String get progressForecast;
+  String get projectionBasis;
+  String get conservativeScenario;
+  String get balancedScenario;
+  String get aggressiveScenario;
+  String get scenarioEasyToKeep;
+  String get scenarioRecommended;
+  String get scenarioHarder;
+  String get useBalancedPlan;
+  String get makeItEasierPlan;
+  String get makeItFasterPlan;
+  String get weekLabel;
+  String get estimatedWeight;
+  String get weightEvolution;
+  String get todayWeightLabel;
+
+  // ── Planning tab ─────────────────────────────────────────────────────────────
+  String get weeklyBalanceScore;
+  String get onTrackThisWeek;
+  String get greatConsistency;
+  String get goodProgressPlan;
+  String get aFewMoreEfforts;
+  String get stayConsistentPlan;
+  String get tryHitTargets;
+  String get buildYourRoutine;
+  String get everyStepCounts;
+  String todayKcalRemainingLabel(int n);
+  String get viewDetails;
+  String get todayChecklist;
+  String completedOfTotal(int done, int total);
+  String get checkHitCalorie;
+  String get checkScan2Meals;
+  String get checkProteinGoal;
+  String get checkWalk30;
+  String get checkDrinkWater;
+  String get checkNoSugarAfter8pm;
+  String get aiInsightTitle;
+  String get insightProteinLow;
+  String get insightCaloriesHigh;
+  String get insightLackWater;
+  String get insightTooManyCarbs;
+  String get insightNoScan;
+  String get insightOnTrack;
+  String get weekProjectionTitle;
+  String get projectionSubtitle;
+  String get weightChangeLbl;
+  String get musclePreservedLbl;
+  String get muscleGrowingLbl;
+  String get muscleMaintainedLbl;
+  String get energyStableLbl;
+  String get adjustWeekBtn;
+  String get adjustWeekSheetTitle;
+  String get adjustLoseFaster;
+  String get adjustEasierPlan;
+  String get adjustMoreProtein;
+  String get adjustFewerCarbs;
+  String get adjustCheaper;
+  String get adjustLocal;
+  String get adjustFlexibleWeekend;
+  String get notificationsTooltip;
+
+  // ── Dishes tab extras ────────────────────────────────────────────────────────
+  String get suggestionDuMoment;
+  String get personalizeLabel;
+  String get mealObjectiveLabel;
+  String get chooseThisDish;
+  String get filterQuick;
+  String get filterBudget;
+  String get filterLowKcal;
+  String get filterLowCarb;
+  String get filterSnack;
+  String get dishSelectedMsg;
+  String get preparationBtn;
+
+  // ── Chat tab — smart context ──────────────────────────────────────────────────
+  String get contextDayTitle;
+  String get smartActionsTitle;
+  String get viewAll;
+  String get quickTipLabel;
+  String get actionCreatePlan;
+  String get actionFixMacros;
+  String get actionAnalyzeProgress;
+
   // ── Payment verification ───────────────────────────────────────────────────────
   String get verifyingPayment;
   String get stepPaymentConfirmed;
@@ -493,6 +765,38 @@ abstract class AppLocalizations {
   String webhookPolling(int attempt, int max);   // "Tentative X/Y…"
   String get webhookNotReceived;                 // après N tentatives échouées
   String get webhookReceived;                    // quand webhook confirmé
+
+  // ── Gate PRO (Plats IA) ───────────────────────────────────────────────────────
+  String get proGateBannerTitle;
+  String get proGateBannerSub;
+  String get proGateChip;
+  String get proGateHeroTitle;
+  String get proGateHeroAvail;
+  String get proGateHeroDesc;
+  String get proGateCta;
+  String get cancelAnytime;
+  String get freeTrialDays;
+
+  // ── Gate PREMIUM (Planning) ───────────────────────────────────────────────────
+  String get premiumGateBannerTitle;
+  String get premiumGateBannerSub;
+  String get premiumGateHeroAvail;
+  String get premiumGateHeroDesc;
+  String get premiumGatePreviewTitle;
+  String get premiumGatePreviewLock;
+  String get premiumGateCta;
+
+  // ── Dishes tab ────────────────────────────────────────────────────────────────
+  String dishesResultCount(int n);
+  String get seeDetails;
+  String get dayBilan;
+  String get dayMeals;
+  String get previewHint;
+  String stepLabel(int n);
+
+  // ── Social auth ───────────────────────────────────────────────────────────────
+  String get orContinueWith;
+  String get socialAuthError;
 }
 
 class _AppLocalizationsDelegate

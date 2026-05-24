@@ -465,7 +465,7 @@ class _PlanCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      isActive ? 'Actif' : 'Inactif',
+                      isActive ? l10n.statusActive : l10n.statusInactive,
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -500,10 +500,8 @@ class _PlanCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     trialDays == 0
-                        ? 'Essai Starter expiré'
-                        : trialDays == 1
-                            ? 'Essai Starter : 1 jour restant'
-                            : 'Essai Starter : $trialDays jours restants',
+                        ? l10n.trialExpiredToday
+                        : l10n.trialDaysRemaining(trialDays),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -528,7 +526,7 @@ class _PlanCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                serverRefreshed ? 'Vérifié depuis le serveur' : 'Cache local',
+                serverRefreshed ? l10n.verifiedFromServer : l10n.localCache,
                 style: TextStyle(
                   fontSize: 11,
                   color: serverRefreshed

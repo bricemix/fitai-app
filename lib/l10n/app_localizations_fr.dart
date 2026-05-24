@@ -10,7 +10,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override String get navScan => 'Scanner';
 
-  @override String get navCoach => 'Coach IA';
+  @override String get navCoach => 'Diet Coach';
 
   @override String get navProgress => 'Progrès';
 
@@ -32,7 +32,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override String get confirm => 'Confirmer';
 
-  @override String get save => 'Enregistrer';
+  @override String get save   => 'Enregistrer';
+  @override String get change => 'Changer';
 
   @override String get retry => 'Réessayer';
 
@@ -128,6 +129,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override String get privacyPolicyLink => 'politique de confidentialité et les CGU';
 
+  @override String get birthDate         => 'Date de naissance';
+  @override String get birthDateHint     => 'JJ/MM/AAAA';
+  @override String get underageTitle     => 'Accès limité';
+  @override String get underageBody      => 'DietVision est réservé aux personnes âgées de 15 ans et plus.\n\nSi tu as moins de 15 ans, l\'utilisation de cette application nécessite le consentement d\'un parent ou tuteur légal.\n\nDemande à un adulte de créer un compte et de t\'accompagner dans ton suivi nutritionnel.';
+  @override String get underageButton    => 'J\'ai compris';
+
 
 
   // ── Dashboard ───────────────────────────────────────────────────────────────
@@ -154,7 +161,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override String get bodyMeasurementsHint => 'Poids, tour de taille, biceps…';
 
-  @override String get measurementsDoneToday => "Mesures enregistrées aujourd'hui";
+  @override String get measurementsDoneToday        => "Mesures enregistrées aujourd'hui";
+  @override String get bodyMeasurementsSubtitle     => 'Poids · Tour de taille · Biceps';
+  @override String get syncedLabel                  => 'Données à jour';
+  @override String get stayFocused                  => 'Reste focus, chaque action compte !';
+  @override String get dailyProgress                => 'Progression\ndu jour';
 
   @override String get proteins => 'Protéines';
 
@@ -181,6 +192,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String get addPhoto => 'Ajouter une photo';
 
   @override String get photoHint => 'Prenez ou importez une photo de votre repas';
+
+  @override String get camera => 'Caméra';
+  @override String get gallery => 'Galerie';
+  @override String get photoTipsTitle => 'CONSEILS PHOTO';
+  @override String get tipFramePlate => 'Cadrer l\'assiette';
+  @override String get tipGoodLight => 'Bonne lumière';
+  @override String get tipTopView => 'Vue du dessus';
+  @override String get tipVisibleFood => 'Aliment visible';
+  @override String get tipFullPlate => 'Tout le plat';
+  @override String get tipNoFlash => 'Éviter le flash';
 
   @override String get adjustPortion => 'Ajuster la portion';
 
@@ -222,7 +243,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   // ── Coach ───────────────────────────────────────────────────────────────────
 
-  @override String get coachTitle => 'Coach IA';
+  @override String get coachTitle => 'Diet Coach';
 
   @override String get coachSubtitle => 'Votre assistant nutrition personnel';
 
@@ -443,6 +464,12 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String get activityLevelLabel => "Niveau d'activité";
 
   @override String get dietLabel => 'Régimes alimentaires (optionnel)';
+  @override String get restrictionVegetarian => 'Végétarien';
+  @override String get restrictionVegan      => 'Vegan';
+  @override String get restrictionGlutenFree => 'Sans gluten';
+  @override String get restrictionLactoseFree=> 'Sans lactose';
+  @override String get restrictionHalal      => 'Halal';
+  @override String get restrictionKeto       => 'Keto';
 
   @override String get welcome => 'Bienvenue sur DietVision';
 
@@ -459,6 +486,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String get paywallTitle => 'Atteignez vos objectifs\nplus vite avec Premium';
 
   @override String get paywallSubtitle => "Tout ce dont vous avez besoin, dans une seule app.";
+
+  @override String get chipMealScan       => 'Scan repas';
+  @override String get chipMacroTracking  => 'Suivi macros';
+  @override String get chipAiCoach        => 'Coach IA';
+  @override String get paywallFeaturesPrefix    => 'Tout ce dont\nvous avez besoin\npour ';
+  @override String get paywallFeaturesHighlight => 'réussir';
+  @override String get paywallFeaturesSubtitle  => 'Des outils intelligents pour atteindre vos objectifs nutritionnels.';
+  @override String get paywallPlanPrefix    => 'Choisissez\nvotre ';
+  @override String get paywallPlanHighlight => 'plan';
+  @override String get paywallPlanSubtitle  => 'Commencez votre essai gratuit. Annulable à tout moment.';
 
   @override String get choosePlan => 'Choisissez votre plan';
 
@@ -798,10 +835,77 @@ class AppLocalizationsFr extends AppLocalizations {
   // ── Dashboard extras ─────────────────────────────────────────────────────────
 
   @override String get kcalRemaining => 'kcal restantes';
+  @override String get kcalExceeded  => 'kcal en excès';
+  @override String get kcalOver      => 'kcal de trop';
 
-  @override String get kcalExceeded => 'kcal en excès';
+  // ── Context Day Card ─────────────────────────────────────────────────────────
+  @override String get protLow       => 'faibles';
+  @override String get protModerate  => 'modérées';
+  @override String get protGood      => 'bonnes';
+  @override String get goalWeightLoss => 'perte de poids';
+  @override String get goalMassGain  => 'prise de masse';
+  @override String get goalMaintain  => 'maintien';
+  @override String get labelProteins => 'Protéines';
+  @override String get labelGoal     => 'Objectif :';
+  @override String get labelDiet     => 'Régime :';
+  @override String ctxDescSurplus(int surplus) => 'Vous êtes en surplus de +$surplus kcal. Je peux vous proposer des plats légers pour équilibrer votre journée.';
+  @override String get ctxDescLowProt => 'Votre apport en protéines est faible. Je peux vous aider à rééquilibrer vos macros.';
+  @override String get ctxDescDefault => 'Je peux vous aider à construire votre journée selon vos calories restantes et votre objectif.';
 
+  // ── Smart Actions labels ──────────────────────────────────────────────────────
+  @override String get smartBuildDay        => 'Construis ma journée';
+  @override String smartBuildDaySub(int k)  => 'avec $k kcal restantes';
+  @override String smartSurplusTitle(int k)  => 'Surplus +$k kcal';
+  @override String get smartSurplusSub      => 'Comment équilibrer ?';
+  @override String get smart3Dishes         => 'Donne-moi 3 plats';
+  @override String get smart3DishesSub      => 'riches en protéines';
+  @override String get smartAnalyzeBilan    => 'Analyse mon bilan';
+  @override String get smartAnalyzeBilanSub => 'nutritionnel de la semaine';
+  @override String get smartPrepareDinner   => 'Prépare mon dîner';
+  @override String get smartPrepareDinnerSub => 'de ce soir';
 
+  // ── Pro gate ─────────────────────────────────────────────────────────────────
+  @override String get gateDishesAdaptedRecipes    => 'Recettes adaptées\nà votre profil\net régime';
+  @override String get gateDishes9Diets            => '9 régimes\nalimentaires\ndisponibles';
+  @override String get gateDishesWeighedIngredients => 'Ingrédients pesés\n& macros\ncalculés';
+  @override String get gateDishesUpdatedDaily      => 'Mis à jour\nchaque jour';
+  @override String get tableHeaderFeatures         => 'Fonctionnalités';
+  @override String get tableRowPersonalizedDishes  => 'Plats IA personnalisés';
+  @override String get tableRowAdaptedRecipes      => 'Recettes adaptées à votre profil';
+  @override String get tableRowWeighedIngredients  => 'Ingrédients pesés & macros calculés';
+  @override String get tableRowUpdatedDaily        => 'Mis à jour chaque jour';
+
+  // ── Premium gate ─────────────────────────────────────────────────────────────
+  @override String get gatePlanningWeekPlan    => 'Un plan sur 7 jours\ngénéré par l\'IA\nselon votre objectif';
+  @override String get gatePlanningCaloricGoal => 'Objectif calorique\net macros\ncalculés';
+  @override String get gatePlanningAdapted     => 'Adapté à\nvotre objectif';
+  @override String get gatePlanningDailyTips   => 'Conseils quotidiens\n& suivi intelligent';
+  @override String get planStarterSubtitle     => 'Fonctions de base';
+  @override String get planProSubtitle         => 'Recettes & régimes IA';
+  @override String get planPremiumSubtitle     => 'Planning nutritionnel IA';
+  @override String get planIncluded            => 'Inclus';
+  @override String get planNotIncluded         => 'Planning non inclus';
+
+  // ── Quick tips ────────────────────────────────────────────────────────────────
+  @override String get tipScanFirstMeal  => 'Commencez par scanner votre premier repas pour que je puisse analyser vos macros du jour.';
+  @override String get tipIncreaseProtein => 'Priorité aujourd\'hui : augmenter vos protéines au prochain repas.';
+  @override String tipCaloriesAvailable(int pct) => 'Vous avez encore $pct% de vos calories disponibles. Pensez à votre prochain repas !';
+  @override String get tipCaloriesExceeded => 'Objectif calorique dépassé. Misez sur des aliments légers et riches en fibres ce soir.';
+  @override String get tipKeepGoing       => 'Continuez sur cette lancée ! Votre journée est bien équilibrée — gardez le cap.';
+  @override String get newChat => 'Nouvelle conversation';
+  @override String get clearChatTitle => 'Effacer la conversation ?';
+  @override String get clearChatConfirm => 'L\'historique du chat sera supprimé définitivement.';
+  @override String get clearChatConfirmBtn => 'Effacer';
+  @override String promptCreatePlanSurplus(int surplus, String diet) => "Je suis en surplus de +$surplus kcal aujourd'hui. Aide-moi à équilibrer le reste de ma journée avec mon régime $diet.";
+  @override String promptCreatePlanNormal(int remaining, String diet) => "Crée mon plan alimentaire pour aujourd'hui avec $remaining kcal restantes et mon régime $diet.";
+  @override String get promptFixMacros => "Analyse et corrige mes macros d'aujourd'hui. Donne-moi des conseils concrets pour équilibrer protéines, glucides et lipides.";
+  @override String get promptAnalyzeProgress => "Analyse mes progrès nutritionnels de la semaine et donne-moi 3 conseils personnalisés pour m'améliorer.";
+  @override String promptSurplusBalance(int surplus, int tdee) => "Je suis en surplus de +$surplus kcal aujourd'hui (objectif $tdee kcal/jour). Donne-moi des conseils pour équilibrer ma journée et limiter les effets du surplus.";
+  @override String promptBuildDay(int remaining, String diet) => "Construis-moi un plan de repas complet pour aujourd'hui avec $remaining kcal restantes, adapté à mon régime $diet et à mes objectifs.";
+  @override String prompt3Dishes(String diet) => "Propose-moi 3 plats riches en protéines (minimum 30g par plat) adaptés à mon régime $diet.";
+  @override String get promptAnalyzeBilan => "Analyse mon bilan nutritionnel de la semaine et donne-moi des conseils concrets pour m'améliorer.";
+  @override String promptDinnerSurplus(int surplus, int tdee, String diet) => "Je suis en surplus de +$surplus kcal aujourd'hui (objectif $tdee kcal/jour). Propose-moi un repas léger pour ce soir adapté à mon régime $diet.";
+  @override String promptDinnerNormal(int remaining, String diet) => "Propose-moi un repas pour ce soir qui correspond à mes $remaining kcal restantes et à mon régime $diet.";
 
   // ── Subscription gate ─────────────────────────────────────────────────────────
 
@@ -826,6 +930,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String trialExpiredDaysAgo(int days) => 'Essai expiré il y a $days j.';
 
   @override String trialDaysRemaining(int days) => days == 1 ? 'Essai : encore 1 jour ' : 'Essai : encore $days jours ';
+  @override String get statusActive => 'Actif';
+  @override String get statusInactive => 'Inactif';
+  @override String get verifiedFromServer => 'Vérifié depuis le serveur';
+  @override String get localCache => 'Cache local';
 
 
 
@@ -881,6 +989,110 @@ class AppLocalizationsFr extends AppLocalizations {
 
 
 
+  // ── Weekly details sheet ─────────────────────────────────────────────────────
+
+  @override String get weeklyDetails => 'Détails de la semaine';
+  @override String get weeklySummaryTitle => 'Résumé hebdomadaire';
+  @override String get avgKcalPerDay => 'Moyenne';
+  @override String get targetKcalDay2 => 'Objectif';
+  @override String get differenceKcal => 'Écart';
+  @override String proteinTargetReached(int done, int total) => 'Objectif protéines atteint : $done/$total jours';
+  @override String get statusOnTrack => 'En bonne voie';
+  @override String get statusAttention => 'Attention';
+  @override String get statusOffTrack => 'Hors objectif';
+  @override String get statusNotStarted => 'Pas encore commencé';
+  @override String get editThisDay => 'Modifier ce jour';
+  @override String get replaceMeals => 'Remplacer les repas';
+  @override String get copyThisDay => 'Copier ce jour';
+  @override String get balanceWeek => 'Équilibrer la semaine';
+
+  // ── AI Insight sheet ──────────────────────────────────────────────────────────
+
+  @override String get insightAnalysisTitle => 'Analyse';
+  @override String get insightWhyTitle => 'Pourquoi c\'est important';
+  @override String get insightActionsTitle => 'Actions suggérées';
+  @override String insightProteinAnalysis(int current, int target, int gap) =>
+      'Votre objectif protéines aujourd\'hui est de $target g.\nVous êtes actuellement à $current g.\nIl vous manque environ $gap g de protéines.';
+  @override String insightCaloriesAnalysis(int current, int target) =>
+      'Vous avez consommé $current kcal sur votre objectif de $target kcal.';
+  @override String get insightWhyProtein => 'Atteindre votre objectif protéines aide à préserver la masse musculaire, surtout pendant une perte de poids. Cela vous aide aussi à rester rassasié plus longtemps.';
+  @override String get insightWhyCalories => 'Rester proche de votre objectif calorique est le facteur le plus important pour atteindre votre objectif de poids de manière régulière.';
+  @override String get insightWhyWater => 'Une bonne hydratation soutient votre métabolisme, réduit la faim et aide votre corps à traiter les nutriments plus efficacement.';
+  @override String get insightWhyCarbs => 'Gérer l\'apport en glucides aide à stabiliser la glycémie et à optimiser les niveaux d\'énergie tout au long de la journée.';
+  @override String get insightWhyNoScan => 'Suivre vos repas vous aide à rester conscient de votre apport et facilite l\'atteinte de vos objectifs quotidiens.';
+  @override String get insightAction1Protein => 'Yaourt grec + 2 œufs';
+  @override String get insightAction1ProteinDetail => '280 kcal · 32 g protéines';
+  @override String get insightAction2Protein => 'Ajouter 150 g de poulet au dîner';
+  @override String get insightAction2ProteinDetail => '+240 kcal · +45 g protéines';
+  @override String get insightIgnoreToday => 'Ignorer pour aujourd\'hui';
+  @override String get applySuggestion => 'Appliquer la suggestion';
+  @override String get showAlternatives => 'Voir les alternatives';
+  @override String get remindMeLater => 'Me rappeler plus tard';
+
+  // ── Progress forecast sheet ───────────────────────────────────────────────────
+
+  @override String get progressForecast => 'Prévision de progression';
+  @override String get projectionBasis => 'Cette projection est basée sur votre objectif calorique, votre activité estimée, votre apport en protéines et votre régularité actuelle.';
+  @override String get conservativeScenario => 'Conservateur';
+  @override String get balancedScenario => 'Équilibré';
+  @override String get aggressiveScenario => 'Intensif';
+  @override String get scenarioEasyToKeep => 'Plus facile à tenir';
+  @override String get scenarioRecommended => 'Recommandé';
+  @override String get scenarioHarder => 'Plus difficile — risque de faim élevé';
+  @override String get useBalancedPlan => 'Utiliser le plan équilibré';
+  @override String get makeItEasierPlan => 'Rendre plus facile';
+  @override String get makeItFasterPlan => 'Accélérer';
+  @override String get weekLabel => 'Semaine';
+  @override String get estimatedWeight => 'Poids estimé';
+  @override String get weightEvolution => 'Évolution';
+  @override String get todayWeightLabel => 'Aujourd\'hui';
+
+  // ── Planning tab ─────────────────────────────────────────────────────────────
+
+  @override String get weeklyBalanceScore => 'SCORE HEBDOMADAIRE';
+  @override String get onTrackThisWeek => 'Vous êtes sur la bonne voie !';
+  @override String get greatConsistency => 'Excellente régularité. Continuez !';
+  @override String get goodProgressPlan => 'Bonne progression, continuez !';
+  @override String get aFewMoreEfforts => 'Encore quelques efforts et vous y serez.';
+  @override String get stayConsistentPlan => 'Restez régulier cette semaine.';
+  @override String get tryHitTargets => 'Essayez d\'atteindre vos objectifs quotidiens.';
+  @override String get buildYourRoutine => 'Commencez à construire votre routine !';
+  @override String get everyStepCounts => 'Chaque effort compte. Vous pouvez le faire !';
+  @override String todayKcalRemainingLabel(int n) => 'Aujourd\'hui : $n kcal restantes';
+  @override String get viewDetails => 'Voir les détails';
+  @override String get todayChecklist => 'Checklist du jour';
+  @override String completedOfTotal(int done, int total) => '$done/$total complétés';
+  @override String get checkHitCalorie => 'Atteindre l\'objectif calorique';
+  @override String get checkScan2Meals => 'Scanner 2 repas';
+  @override String get checkProteinGoal => 'Objectif protéines atteint';
+  @override String get checkWalk30 => 'Marcher 30 min';
+  @override String get checkDrinkWater => 'Boire 2,5 L d\'eau';
+  @override String get checkNoSugarAfter8pm => 'Pas de sucre après 20h';
+  @override String get aiInsightTitle => 'Conseil IA';
+  @override String get insightProteinLow => 'Les protéines sont légèrement insuffisantes aujourd\'hui. Ajoutez une collation riche en protéines ce soir.';
+  @override String get insightCaloriesHigh => 'Vous approchez de votre limite calorique. Choisissez un dîner léger ce soir.';
+  @override String get insightLackWater => 'N\'oubliez pas de boire de l\'eau. Visez 2,5 L aujourd\'hui.';
+  @override String get insightTooManyCarbs => 'Apport en glucides élevé aujourd\'hui. Équilibrez avec plus de protéines et légumes.';
+  @override String get insightNoScan => 'Aucun repas scanné aujourd\'hui. Commencez à tracker pour rester dans votre plan.';
+  @override String get insightOnTrack => 'Tout va bien aujourd\'hui. Continuez ainsi et restez régulier !';
+  @override String get weekProjectionTitle => 'Projection 4 semaines';
+  @override String get projectionSubtitle => 'Résultat estimé si vous suivez ce plan';
+  @override String get weightChangeLbl => 'Variation de poids';
+  @override String get musclePreservedLbl => 'Préservé';
+  @override String get muscleGrowingLbl => 'En croissance';
+  @override String get muscleMaintainedLbl => 'Maintenu';
+  @override String get energyStableLbl => 'Stable';
+  @override String get adjustWeekBtn => 'Ajuster la semaine';
+  @override String get adjustWeekSheetTitle => 'Comment souhaitez-vous ajuster ?';
+  @override String get adjustLoseFaster => 'Je veux perdre du poids plus vite';
+  @override String get adjustEasierPlan => 'Je veux un plan plus simple';
+  @override String get adjustMoreProtein => 'Je veux plus de protéines';
+  @override String get adjustFewerCarbs => 'Je veux moins de glucides';
+  @override String get adjustCheaper => 'Je veux un plan moins cher';
+  @override String get adjustLocal => 'Je veux des repas locaux';
+  @override String get adjustFlexibleWeekend => 'Je veux un week-end plus flexible';
+  @override String get notificationsTooltip => 'Notifications';
+
   // ── Payment verification ───────────────────────────────────────────────────────
 
   @override String get verifyingPayment => 'Vérification du paiement…';
@@ -904,6 +1116,26 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String get webhookNotReceived => 'Le serveur n\'a pas reçu le webhook Stripe après plusieurs tentatives.';
 
   @override String get webhookReceived => 'Webhook Stripe reçu et traité ✓';
+
+  // ── Dishes tab extras ────────────────────────────────────────────────────────
+  @override String get suggestionDuMoment  => 'Suggestion du moment';
+  @override String get personalizeLabel    => 'Personnaliser vos suggestions';
+  @override String get mealObjectiveLabel  => 'Objectif du repas';
+  @override String get chooseThisDish      => 'Choisir ce plat';
+  @override String get filterQuick         => 'Rapide';
+  @override String get filterBudget        => 'Petit budget';
+  @override String get filterLowKcal       => '< 600 kcal';
+  @override String get filterLowCarb       => 'Faible en glucides';
+  @override String get filterSnack         => 'Collation';
+  @override String get dishSelectedMsg     => 'Plat sélectionné !';
+  @override String get preparationBtn        => 'Préparation';
+  @override String get contextDayTitle       => 'Contexte du jour';
+  @override String get smartActionsTitle     => 'Actions intelligentes';
+  @override String get viewAll               => 'Tout voir';
+  @override String get quickTipLabel         => 'Conseil rapide';
+  @override String get actionCreatePlan      => 'Créer mon plan';
+  @override String get actionFixMacros       => 'Corriger mes macros';
+  @override String get actionAnalyzeProgress => 'Analyser mes progrès';
 
 
 
@@ -935,6 +1167,72 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String get resetPassword => 'Réinitialiser le mot de passe';
   @override String get passwordResetSuccess => 'Mot de passe réinitialisé !';
   @override String get passwordResetSuccessDesc => 'Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous connecter.';
+
+  // ── Dashboard — Today Mission & AI Reco ──────────────────────────────────────
+  @override String get readyToCrush => 'Prêt à crush tes objectifs ?';
+  @override String get notifications => 'Notifications';
+  @override String get todayMission => 'Mission du jour';
+  @override String get seeDailyPlan => 'Voir mon plan du jour';
+  @override String get completeDailyMeasures => 'Compléter les mesures du jour';
+  @override String get dailyCheckIn => 'Check-in quotidien';
+  @override String get toComplete => 'À compléter';
+  @override String get completeNow => 'Compléter maintenant';
+  @override String get checkInDone => 'Check-in complété !';
+  @override String get dataUpToDate => 'Données à jour. La projection IA est plus précise.';
+  @override String get aiRecommendation => 'Recommandation IA';
+  @override String get viewMore => 'Voir plus';
+  @override String get viewDishes => 'Voir plats';
+  @override String get scanMeal => 'Scanner repas';
+  @override String get adjustToday => "Ajuster aujourd'hui";
+  @override String get aiRecNoScan => "Aucun repas scanné aujourd'hui. Commence le tracking pour rester dans ton plan.";
+  @override String get aiRecProteinLow => 'Tes protéines sont basses. Ajoute un aliment riche en protéines à ton prochain repas.';
+  @override String get aiRecCaloriesHigh => 'Tu approches ta limite calorique. Prévois un dîner léger ce soir.';
+  @override String get aiRecOnTrack => "Tu es dans les clous ! Tout est parfait aujourd'hui. Continue comme ça.";
+  @override String get objectifQuotidien => 'Objectif quotidien';
+
+  // ── Gate PRO ─────────────────────────────────────────────────────────────────
+  @override String get proGateBannerTitle  => 'Plan Pro requis';
+  @override String get proGateBannerSub    => 'Débloquez des plats IA personnalisés';
+  @override String get proGateChip         => 'Pro requis';
+  @override String get proGateHeroTitle    => 'Plats IA personnalisés';
+  @override String get proGateHeroAvail    => 'Disponible avec le plan Pro ou Premium';
+  @override String get proGateHeroDesc     => 'Recevez chaque jour des repas pensés pour vous, adaptés à vos objectifs.';
+  @override String get proGateCta         => 'Débloquer mes plats IA';
+  @override String get cancelAnytime       => 'Annulation à tout moment';
+  @override String get freeTrialDays       => 'Essai gratuit 7 jours';
+
+  // ── Gate PREMIUM ──────────────────────────────────────────────────────────────
+  @override String get premiumGateBannerTitle  => 'Plan Premium requis';
+  @override String get premiumGateBannerSub    => 'Débloquez le planning nutritionnel personnalisé';
+  @override String get premiumGateHeroAvail    => 'Disponible avec le plan Premium';
+  @override String get premiumGateHeroDesc     => 'Un plan sur 7 jours généré par l\'IA, adapté à vos objectifs et à votre quotidien.';
+  @override String get premiumGatePreviewTitle => 'Aperçu de votre futur planning';
+  @override String get premiumGatePreviewLock  => 'Débloquez le planning complet et personnalisé';
+  @override String get premiumGateCta         => 'Activer mon planning Premium';
+
+  // ── Dishes tab ────────────────────────────────────────────────────────────────
+  @override String dishesResultCount(int n) => '$n résultats';
+  @override String get seeDetails   => 'Voir détails';
+  @override String get dayBilan     => 'Bilan du jour';
+  @override String get dayMeals     => 'Repas du jour';
+  @override String get previewHint  => 'Aperçu — Génère pour voir tes plats personnalisés';
+  @override String stepLabel(int n) => 'Étape $n';
+  @override String get orContinueWith => 'Ou continuer avec';
+  @override String get socialAuthError => 'Erreur d\'authentification sociale';
+
+  // ── Onboarding welcome step ───────────────────────────────────────────────
+  @override String get welcomeTo => 'Bienvenue sur';
+  @override String get onboardingIntro => 'Avant de commencer, nous allons configurer\nvotre profil pour ';
+  @override String get onboardingPersonalize => 'personnaliser votre expérience.';
+  @override String get infoCardTitle => 'Vos informations';
+  @override String get infoCardSubtitle => 'Âge, sexe, taille, poids';
+  @override String get measuresCardTitle => 'Vos mesures';
+  @override String get measuresCardSubtitle => 'Tour de taille, hanches, biceps…';
+  @override String get objectivesCardTitle => 'Vos objectifs';
+  @override String get objectivesCardSubtitle => 'Perte de poids, prise de masse ou maintien';
+  @override String get aiNoteText => 'Cela ne prend que quelques instants et permet à l\'IA de vous proposer des ';
+  @override String get aiNoteHighlight => 'recommandations adaptées.';
+  @override String get nextStepLabel => 'Étape suivante : saisie de vos données';
 }
 
 

@@ -79,11 +79,16 @@ class Meal {
   final String date;
   final String? imagePath;
   final FoodResult result;
+  /// Miniature JPEG encodée en base64 (~200px, ~8–15 Ko).
+  /// Sauvegardée avec le repas et synchronisée sur le serveur.
+  /// Permet d'afficher une image même après déconnexion/réinstallation.
+  final String? thumbnailBase64;
 
   const Meal({
     required this.date,
     this.imagePath,
     required this.result,
+    this.thumbnailBase64,
   });
 
   bool get isToday {
@@ -96,11 +101,13 @@ class Meal {
         'date': date,
         'imagePath': imagePath,
         'result': result.toJson(),
+        if (thumbnailBase64 != null) 'thumbnailBase64': thumbnailBase64,
       };
 
   factory Meal.fromJson(Map<String, dynamic> json) => Meal(
         date: json['date'],
         imagePath: json['imagePath'],
         result: FoodResult.fromJson(json['result']),
+        thumbnailBase64: json['thumbnailBase64'] as String?,
       );
 }

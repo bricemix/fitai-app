@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/profile.dart';
 import '../models/body_entry.dart';
+import '../models/meal.dart';
 import '../models/planning.dart';
 import 'auth_service.dart';
 import 'currency_service.dart';
@@ -31,6 +32,12 @@ class SyncService {
     });
   }
 
+  static Future<void> uploadMeals(List<Meal> meals) async {
+    await _put('/user/meals', {
+      'meals': meals.map((m) => m.toJson()).toList(),
+    });
+  }
+
   // ── Download (au login) ───────────────────────────────────────────────────
 
   /// Récupère toutes les données utilisateur depuis le serveur et les stocke
@@ -41,6 +48,7 @@ class SyncService {
       _downloadProfile().then((ok) { if (ok) gotProfile = true; }),
       _downloadBodyEntries(),
       _downloadPlanning(),
+      _downloadMeals(),
     ]);
     return gotProfile;
   }
@@ -122,6 +130,29 @@ class SyncService {
     } catch (_) {}
   }
 
+  static Future<void> _downloadMeals() async {
+    try {
+      final headers = await AuthService.authHeaders();
+      final res = await http
+          .get(Uri.parse('$_base/user/meals'), headers: headers)
+          .timeout(const Duration(seconds: 15));
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        final raw = data['meals'];
+        if (raw is List && raw.isNotEmpty) {
+          final serverMeals = raw
+              .map((e) => Meal.fromJson(Map<String, dynamic>.from(e as Map)))
+              .toList();
+          // Merge : union par date+heure, les locales priment (plus récentes)
+          final localMeals = await StorageService.loadMeals();
+          final merged = _mergeMeals(serverMeals: serverMeals, localMeals: localMeals);
+          await StorageService.saveMeals(merged);
+        }
+      }
+    } catch (_) {}
+  }
+
   // ── Merge logique ─────────────────────────────────────────────────────────
 
   /// Fusionne entrées serveur + locales : pour un même jour, on garde
@@ -143,6 +174,28 @@ class SyncService {
         // Garde la locale si elle a un poids défini (c'est la plus récente sur l'appareil)
         if (e.weight != null) map[e.date] = e;
       }
+    }
+    final result = map.values.toList();
+    result.sort((a, b) => a.date.compareTo(b.date));
+    return result;
+  }
+
+  /// Fusionne repas serveur + locaux : union par (date ISO + nom du plat).
+  /// Les repas locaux priment sur les serveur en cas de doublon exact.
+  static List<Meal> _mergeMeals({
+    required List<Meal> serverMeals,
+    required List<Meal> localMeals,
+  }) {
+    // Clé = date ISO complète + nom normalisé
+    String key(Meal m) => '${m.date}|${m.result.name.toLowerCase().trim()}';
+
+    final map = <String, Meal>{};
+    for (final m in serverMeals) {
+      map[key(m)] = m;
+    }
+    // Local écrase serveur (appareil courant = vérité)
+    for (final m in localMeals) {
+      map[key(m)] = m;
     }
     final result = map.values.toList();
     result.sort((a, b) => a.date.compareTo(b.date));

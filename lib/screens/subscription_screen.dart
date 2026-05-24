@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../providers/locale_provider.dart';
 import '../theme.dart';
 import '../services/auth_service.dart';
 import '../services/payment_service.dart';
@@ -22,13 +24,23 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   int? _processingPlanId;
   AppCurrency _currency = CurrencyService.defaultCurrency;
   String? _currentPlan; // plan actuellement souscrit ('free'|'starter'|'pro'|'premium')
+  String? _lastLocale;
 
   @override
   void initState() {
     super.initState();
-    _loadPlans();
     _loadCurrency();
     _loadCurrentPlan();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = Localizations.localeOf(context).languageCode;
+    if (_lastLocale != locale) {
+      _lastLocale = locale;
+      _loadPlans(locale);
+    }
   }
 
   /// Charge le plan depuis le cache local puis rafraîchit depuis le serveur.
@@ -47,10 +59,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     }
   }
 
-  Future<void> _loadPlans() async {
+  Future<void> _loadPlans([String locale = 'en']) async {
     setState(() { _loading = true; _error = null; });
     try {
-      final plans = await PaymentService.fetchPlans();
+      final plans = await PaymentService.fetchPlans(locale: locale);
       if (mounted) setState(() { _plans = plans; _loading = false; });
     } catch (e) {
       if (mounted) setState(() { _error = e.toString(); _loading = false; });
@@ -72,7 +84,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     }
     setState(() => _processingPlanId = plan.id);
     try {
-      final result = await PaymentService.createCheckout(plan);
+      final result = await PaymentService.createCheckout(
+        plan,
+        locale: Localizations.localeOf(context).languageCode,
+      );
       if (!mounted) return;
       setState(() => _processingPlanId = null);
       _showCheckoutSheet(plan, result);
@@ -117,6 +132,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppTheme.bg,

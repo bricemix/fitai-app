@@ -267,6 +267,41 @@ class AuthService {
     }
   }
 
+  // ── Social login ───────────────────────────────────────────────────────────
+
+  /// Authentification via fournisseur social (google | facebook | apple).
+  /// [provider] : "google" | "facebook" | "apple"
+  /// [token]    : idToken (Google/Apple) ou accessToken (Facebook)
+  static Future<AuthResult> socialLogin({
+    required String provider,
+    required String token,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/auth/social'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'provider': provider, 'token': token}),
+          )
+          .timeout(const Duration(seconds: 20));
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        final jwtToken = data['token'] as String;
+        final user     = data['user'] as Map<String, dynamic>;
+        await saveToken(jwtToken);
+        await _saveUser(user);
+        return AuthResult(success: true, token: jwtToken, user: user);
+      } else {
+        final error = data['error'] ?? data['message'] ?? 'Social auth failed';
+        return AuthResult(success: false, error: error.toString());
+      }
+    } catch (_) {
+      return const AuthResult(success: false, error: 'Unable to reach the server');
+    }
+  }
+
   /// Appel API de logout : invalide le session_token côté serveur.
   static Future<void> logout() async {
     try {
