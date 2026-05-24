@@ -60,3 +60,4 @@ key.properties
 android/key.properties
 **/*.keystore
 **/*.jks
+googleplay/release/*.aab
