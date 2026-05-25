@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 import '../services/chat_sync_service.dart';
 import 'dart:ui';
@@ -22,12 +22,13 @@ import 'progress_forecast_sheet.dart';
 // free / starter → Chat uniquement
 // pro            → Chat + Plats
 // premium        → Chat + Plats + Planning
+// vip            → Chat + Plats + Planning (illimité)
 
 bool _canAccessDishes(String plan) =>
-    plan == 'pro' || plan == 'premium';
+    plan == 'pro' || plan == 'premium' || plan == 'vip';
 
 bool _canAccessPlanning(String plan) =>
-    plan == 'premium';
+    plan == 'premium' || plan == 'vip';
 
 class CoachScreen extends StatefulWidget {
   final UserProfile profile;
@@ -74,9 +75,9 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
-    final c = AppTheme.of(context);
     return Column(
       children: [
         Padding(
@@ -181,8 +182,8 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
                             const SizedBox(width: 4),
                             Text(l10n.planningTab),
                             if (!_canAccessPlanning(widget.userPlan))
-                              const Padding(
-                                padding: EdgeInsets.only(left: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
                                 child: Icon(Icons.workspace_premium_rounded,
                                     size: 11, color: c.accent),
                               ),
@@ -272,8 +273,8 @@ class _PlanGateState extends State<_PlanGate> {
     super.dispose();
   }
 
-  Color get _color =>
-      widget.requiredPlan == 'Premium' ? c.accent : Colors.orangeAccent;
+  Color _color(BuildContext context) =>
+      widget.requiredPlan == 'Premium' ? AppTheme.of(context).accent : Colors.orangeAccent;
 
   String get _currentPlanLabel =>
       widget.currentPlan.isEmpty || widget.currentPlan == 'free'
@@ -300,6 +301,7 @@ class _PlanGateState extends State<_PlanGate> {
   // PAGE PRO — Plats IA personnalisés (orange)
   // ══════════════════════════════════════════════════════════════════
   Widget _buildProGate(BuildContext context) {
+    final c = AppTheme.of(context);
     final color = Colors.orangeAccent;
     final l10n  = AppLocalizations.of(context);
 
@@ -596,6 +598,7 @@ class _PlanGateState extends State<_PlanGate> {
   // PAGE PREMIUM — Planning nutritionnel (vert)
   // ══════════════════════════════════════════════════════════════════
   Widget _buildPremiumGate(BuildContext context) {
+    final c = AppTheme.of(context);
     final color = c.accent;
     final l10n  = AppLocalizations.of(context);
 
@@ -677,7 +680,7 @@ class _PlanGateState extends State<_PlanGate> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Planning nutritionnel',
+                            Text('Planning nutritionnel',
                                 style: TextStyle(fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w900, color: c.text, height: 1.2)),
                             const SizedBox(height: 4),
                             Text(l10n.premiumGateHeroAvail,
@@ -1427,6 +1430,7 @@ class _ChatTabState extends State<_ChatTab> {
 
   // ── Voir détails : bottom sheet bilan du jour ──────────────────────────────
   void _showDayDetailSheet(BuildContext context) {
+    final c = AppTheme.of(context);
     final todayMeals   = widget.meals.where((m) => m.isToday).toList();
     final todayKcal    = todayMeals.fold(0, (s, m) => s + m.result.calories);
     final todayProtein = todayMeals.fold(0.0, (s, m) => s + m.result.protein);
@@ -1544,10 +1548,10 @@ class _ChatTabState extends State<_ChatTab> {
                           color: c.surface2,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
                             Icon(Icons.no_food_rounded, size: 18, color: c.muted),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Text('Aucun repas enregistré aujourd\'hui',
                                 style: TextStyle(fontSize: 13, color: c.muted)),
                           ],
@@ -1567,8 +1571,8 @@ class _ChatTabState extends State<_ChatTab> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     // ── Compute context data ────────────────────────────────────────────────
     final todayMeals    = widget.meals.where((m) => m.isToday).toList();
@@ -1841,12 +1845,24 @@ class _DishesTabState extends State<_DishesTab> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() { _loading = false; _loaded = true; _error = e.toString(); });
+        final msg = e.toString();
+        String friendlyError;
+        if (msg.contains('DISHES_PLAN_REQUIRED')) {
+          friendlyError = AppLocalizations.of(context).dishesPlanRequired;
+        } else if (msg.contains('DISHES_LIMIT_REACHED')) {
+          friendlyError = AppLocalizations.of(context).dishesLimitReached;
+        } else if (msg.contains('SESSION_INVALIDATED')) {
+          friendlyError = AppLocalizations.of(context).sessionExpired;
+        } else {
+          friendlyError = msg;
+        }
+        setState(() { _loading = false; _loaded = true; _error = friendlyError; });
       }
     }
   }
 
   void _selectDiet(String diet) {
+    final c = AppTheme.of(context);
     if (_selectedDiet == diet) return;
     setState(() {
       _selectedDiet = diet;
@@ -1858,20 +1874,23 @@ class _DishesTabState extends State<_DishesTab> {
     _fetch();
   }
 
-  List<_QuickFilterData> _buildQuickFilters(AppLocalizations l10n) => [
-    _QuickFilterData('high-protein', l10n.dietHighProtein, Icons.fitness_center_rounded, const Color(0xFFE879F9)),
-    _QuickFilterData('quick',        l10n.filterQuick,    Icons.bolt_rounded,            const Color(0xFFFFB347)),
-    _QuickFilterData('budget',       l10n.filterBudget,   Icons.attach_money_rounded,    const Color(0xFF6BCB77)),
-    _QuickFilterData('local',        'Local',             Icons.place_rounded,           const Color(0xFF4DA1FF)),
-    _QuickFilterData('low-carb',     l10n.filterLowCarb,  Icons.trending_down_rounded,   const Color(0xFF38BDF8)),
-    _QuickFilterData('gluten-free',  l10n.dietGlutenFree, Icons.no_food_rounded,         const Color(0xFFFF8A65)),
-    _QuickFilterData('low-kcal',     l10n.filterLowKcal,  Icons.water_drop_rounded,      c.muted),
-  ];
+  List<_QuickFilterData> _buildQuickFilters(AppLocalizations l10n) {
+    final c = AppTheme.of(context);
+    return [
+      _QuickFilterData('high-protein', l10n.dietHighProtein, Icons.fitness_center_rounded, const Color(0xFFE879F9)),
+      _QuickFilterData('quick',        l10n.filterQuick,    Icons.bolt_rounded,            const Color(0xFFFFB347)),
+      _QuickFilterData('budget',       l10n.filterBudget,   Icons.attach_money_rounded,    const Color(0xFF6BCB77)),
+      _QuickFilterData('local',        'Local',             Icons.place_rounded,           const Color(0xFF4DA1FF)),
+      _QuickFilterData('low-carb',     l10n.filterLowCarb,  Icons.trending_down_rounded,   const Color(0xFF38BDF8)),
+      _QuickFilterData('gluten-free',  l10n.dietGlutenFree, Icons.no_food_rounded,         const Color(0xFFFF8A65)),
+      _QuickFilterData('low-kcal',     l10n.filterLowKcal,  Icons.water_drop_rounded,      c.muted),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final dietOptions = _buildDietOptions(l10n);
     final todayKcal   = widget.meals.where((m) => m.isToday).fold(0, (s, m) => s + m.result.calories);
     final rawRemaining = widget.profile.tdee.round() - todayKcal;
@@ -2119,8 +2138,8 @@ class _DishesTabState extends State<_DishesTab> {
                             children: [
                               ..._dishes.map((d) => _DishCard(dish: d)),
                               if (_loading)
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
                                   child: Center(child: CircularProgressIndicator(color: c.accent, strokeWidth: 2)),
                                 ),
                             ],
@@ -2145,7 +2164,7 @@ class _DishCard extends StatefulWidget {
 class _DishCardState extends State<_DishCard> {
   bool _expanded = false;
 
-  Color get _typeColor {
+  Color _typeColor(AppColors c) {
     final t = widget.dish.type.toLowerCase();
     if (t == 'breakfast' || t.contains('petit-déj')) return const Color(0xFFFFB347);
     if (t == 'lunch'     || t == 'déjeuner')         return const Color(0xFF6BCB77);
@@ -2171,8 +2190,8 @@ class _DishCardState extends State<_DishCard> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final dish = widget.dish;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -2197,10 +2216,10 @@ class _DishCardState extends State<_DishCard> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: _typeColor.withAlpha(25),
+                        color: _typeColor(c).withAlpha(25),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(_typeIcon, color: _typeColor, size: 18),
+                      child: Icon(_typeIcon, color: _typeColor(c), size: 18),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -2210,7 +2229,7 @@ class _DishCardState extends State<_DishCard> {
                           Text(dish.name,
                               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                           Text(_localizedType(l10n),
-                              style: TextStyle(fontSize: 12, color: _typeColor)),
+                              style: TextStyle(fontSize: 12, color: _typeColor(c))),
                         ],
                       ),
                     ),
@@ -2456,6 +2475,7 @@ class _PlanningTabState extends State<_PlanningTab> {
       SyncService.uploadPlanning(plans);
 
   void _showAdjustSheet(BuildContext context, AppLocalizations l10n) {
+    final c = AppTheme.of(context);
     final options = [
       (Icons.trending_down_rounded,  l10n.adjustLoseFaster),
       (Icons.sentiment_satisfied_rounded, l10n.adjustEasierPlan),
@@ -2529,8 +2549,8 @@ class _PlanningTabState extends State<_PlanningTab> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final dayNamesShort = [l10n.dayMon, l10n.dayTue, l10n.dayWed, l10n.dayThu, l10n.dayFri, l10n.daySat, l10n.daySun];
     final today = DayPlan.todayKey();
 
@@ -2878,8 +2898,8 @@ class _WeeklyStripCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (loading && plans.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Center(child: CircularProgressIndicator(color: c.accent, strokeWidth: 2)),
             )
           else
@@ -3399,8 +3419,8 @@ class _BubbleRow extends StatelessWidget {
 class _TypingBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -3746,7 +3766,7 @@ Widget _buildMealThumb(Meal meal) {
       return Image.memory(base64Decode(meal.thumbnailBase64!), fit: BoxFit.cover);
     } catch (_) {}
   }
-  return Icon(Icons.restaurant_rounded, size: 18, color: c.accent);
+  return const Icon(Icons.restaurant_rounded, size: 18, color: Color(0xFFc8ff5a));
 }
 
 class _MealDetailTile extends StatelessWidget {
@@ -3975,8 +3995,8 @@ class _LoadingDishes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(32),
@@ -4084,6 +4104,7 @@ List<String> _generateSteps(DishRecommendation dish) {
 }
 
 void showPreparationSheet(BuildContext context, {required DishRecommendation dish}) {
+  final c       = AppTheme.of(context);
   final steps   = _generateSteps(dish);
   final minutes = _prepMinutes(dish);
 
@@ -4134,7 +4155,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                                 color: c.accent.withAlpha(20),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Text('RECETTE',
+                              child: Text('RECETTE',
                                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
                                       color: c.accent, letterSpacing: 1.4)),
                             ),
@@ -4159,7 +4180,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                             Text('${dish.calories}',
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900,
                                     color: c.accent)),
-                            const Text('kcal',
+                            Text('kcal',
                                 style: TextStyle(fontSize: 10, color: c.muted)),
                           ],
                         ),
@@ -4328,21 +4349,23 @@ class _PrepChip extends StatelessWidget {
   const _PrepChip({required this.icon, required this.label, required this.color});
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-    decoration: BoxDecoration(
-      color: color.withAlpha(18),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 12, color: color),
-        const SizedBox(width: 4),
-        Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withAlpha(18),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+        ],
+      ),
+    );
+  }
 }
 
 class _PrepSectionTitle extends StatelessWidget {
@@ -4351,15 +4374,18 @@ class _PrepSectionTitle extends StatelessWidget {
   const _PrepSectionTitle({required this.icon, required this.label});
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Icon(icon, size: 15, color: c.accent),
-      const SizedBox(width: 7),
-      Text(label,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,
-              color: c.text, letterSpacing: 0.3)),
-    ],
-  );
+  Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 15, color: c.accent),
+        const SizedBox(width: 7),
+        Text(label,
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,
+                color: c.text, letterSpacing: 0.3)),
+      ],
+    );
+  }
 }
 
 // ── Quick filter data ─────────────────────────────────────────────────────────
@@ -4654,8 +4680,8 @@ class _ErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(20),
@@ -4695,8 +4721,8 @@ class _InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Container(
       color: c.bg,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),

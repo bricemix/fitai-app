@@ -262,6 +262,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get chatTab => 'Chat';
 
   @override String get dishesTab => 'Dishes';
+  @override String get dishesPlanRequired => 'AI dish recommendations are available from the Pro plan.';
+  @override String get dishesLimitReached => 'Daily dish recommendation limit reached. Come back tomorrow or upgrade your plan.';
 
   @override String get planningTab => 'Planning';
 

@@ -250,6 +250,8 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String get chatTab => 'Chat';
 
   @override String get dishesTab => 'Plats';
+  @override String get dishesPlanRequired => 'Les plats recommandés sont disponibles à partir du plan Pro.';
+  @override String get dishesLimitReached => 'Limite de plats atteinte pour aujourd\'hui. Revenez demain ou passez au plan supérieur.';
 
   @override String get planningTab => 'Planning';
 

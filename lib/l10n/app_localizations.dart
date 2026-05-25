@@ -173,6 +173,8 @@ abstract class AppLocalizations {
   String get coachSubtitle;
   String get chatTab;
   String get dishesTab;
+  String get dishesPlanRequired;
+  String get dishesLimitReached;
   String get planningTab;
   String planningRequired(String plan);
   String get whatYouGet;

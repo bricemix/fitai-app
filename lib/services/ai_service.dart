@@ -200,7 +200,7 @@ The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always
     final headers = await AuthService.authHeaders();
     final response = await http
         .post(
-          Uri.parse('$_baseUrl/ai/coach'),
+          Uri.parse('$_baseUrl/ai/dishes'),
           headers: headers,
           body: jsonEncode({
             'messages': [{'role': 'user', 'content': prompt}],
@@ -216,7 +216,8 @@ The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always
       if (invalidated) throw AiException('SESSION_INVALIDATED');
       throw AiException('Session expirée — veuillez vous reconnecter.');
     }
-    if (response.statusCode == 429) throw AiException('AI quota reached. Come back tomorrow or upgrade to Premium.');
+    if (response.statusCode == 403) throw AiException('DISHES_PLAN_REQUIRED');
+    if (response.statusCode == 429) throw AiException('DISHES_LIMIT_REACHED');
     if (response.statusCode != 200) throw AiException('Server error (${response.statusCode})');
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;

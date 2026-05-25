@@ -262,6 +262,8 @@ class AppLocalizationsDe extends AppLocalizations {
   @override String get chatTab => 'Chat';
 
   @override String get dishesTab => 'Gerichte';
+  @override String get dishesPlanRequired => 'KI-Gerichtempfehlungen sind ab dem Pro-Plan verfügbar.';
+  @override String get dishesLimitReached => 'Tageslimit für Gerichtempfehlungen erreicht. Komm morgen wieder oder upgrade deinen Plan.';
 
   @override String get planningTab => 'Planung';
 
