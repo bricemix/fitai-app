@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -111,6 +111,7 @@ class _ConsentScreenState extends State<ConsentScreen> {
   }
 
   void _refuse() {
+    final c = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
@@ -145,9 +146,9 @@ class _ConsentScreenState extends State<ConsentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
-    final c = AppTheme.of(context);
     final canAccept = _scrolledToBottom && _checked;
 
     return Scaffold(
@@ -405,7 +406,7 @@ class _ConsentScreenState extends State<ConsentScreen> {
                                   borderRadius: BorderRadius.circular(12)),
                             ),
                             child: _saving
-                                ? const SizedBox(
+                                ? SizedBox(
                                     width: 18,
                                     height: 18,
                                     child: CircularProgressIndicator(
@@ -501,8 +502,8 @@ class _ScrollEndMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(

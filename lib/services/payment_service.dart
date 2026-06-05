@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'auth_service.dart';
 import 'currency_service.dart';
+import '../widgets/error_dialog.dart';
 
 class Plan {
   final int id;
@@ -102,7 +104,7 @@ class Plan {
     // 3. Fallback : price_usd_cents (ancien champ)
     if (priceUsdCents > 0) return CurrencyService.format(priceUsdCents, currency);
 
-    return 'Gratuit';
+    return 'Free';
   }
 
   String get priceUsdFormatted {
@@ -229,6 +231,7 @@ class SubscriptionStatus {
   static String normalizePlan(String raw) {
     final p = raw.toLowerCase().trim();
     if (p.isEmpty || p == 'free') return 'free';
+    if (p.startsWith('vip')) return 'vip';
     if (p.contains('premium')) return 'premium';
     if (p.startsWith('pro'))    return 'pro';
     if (p.startsWith('starter')) return 'starter';
@@ -338,7 +341,7 @@ class PaymentService {
       final List data = jsonDecode(res.body) as List;
       return data.map((j) => Plan.fromJson(j as Map<String, dynamic>)).toList();
     } catch (e) {
-      throw Exception('Unable to reach the server');
+      throw classifyError(e);
     }
   }
 
@@ -347,32 +350,43 @@ class PaymentService {
   /// Retourne l'URL Stripe Checkout à ouvrir dans le navigateur.
   static Future<SubscribeResult> createCheckout(Plan plan, {String locale = 'en'}) async {
     final token = await AuthService.getToken();
-    if (token == null) throw Exception('Non authentifié');
+    if (token == null) throw const SessionExpiredException();
 
-    final res = await http.post(
-      Uri.parse('$_base/payments/subscribe'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-        'Accept-Language': locale,
-      },
-      body: jsonEncode({'plan_id': plan.id, 'locale': locale}),
-    );
+    try {
+      final res = await http.post(
+        Uri.parse('$_base/payments/subscribe'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Accept-Language': locale,
+        },
+        body: jsonEncode({'plan_id': plan.id, 'locale': locale}),
+      ).timeout(const Duration(seconds: 20));
 
-    if (res.statusCode == 401) {
-      await AuthService.handleUnauthorized(res);
-      throw Exception('Session expirée — veuillez vous reconnecter.');
+      if (res.statusCode == 401) {
+        await AuthService.handleUnauthorized(res);
+        throw const SessionExpiredException();
+      }
+      if (res.statusCode != 201) {
+        final body = jsonDecode(res.body) as Map<String, dynamic>;
+        throw ApiException(
+          body['error'] as String? ?? 'Erreur serveur (${res.statusCode})',
+          statusCode: res.statusCode,
+        );
+      }
+
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      return SubscribeResult(
+        checkoutUrl: data['checkout_url'] as String,
+        sessionId:   data['session_id']   as String,
+      );
+    } on SessionExpiredException {
+      rethrow;
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw classifyError(e);
     }
-    if (res.statusCode != 201) {
-      final body = jsonDecode(res.body) as Map<String, dynamic>;
-      throw Exception(body['error'] ?? 'Erreur serveur (${res.statusCode})');
-    }
-
-    final data = jsonDecode(res.body) as Map<String, dynamic>;
-    return SubscribeResult(
-      checkoutUrl: data['checkout_url'] as String,
-      sessionId:   data['session_id']   as String,
-    );
   }
 
   // ── Vérifier l'abonnement actuel ─────────────────────────────────────────────
@@ -490,6 +504,48 @@ class PaymentService {
       return VerifyResult.fromJson(data);
     } catch (_) {
       return null;
+    }
+  }
+
+  // ── Customer Portal Stripe ───────────────────────────────────────────────────
+  // Retourne l'URL du portail Stripe pour gérer l'abonnement (annuler, changer
+  // de carte, voir les factures). Ouvre dans le navigateur externe.
+
+  static Future<String> fetchPortalUrl({String locale = 'fr'}) async {
+    final token = await AuthService.getToken();
+    if (token == null) throw const SessionExpiredException();
+
+    try {
+      final res = await http.post(
+        Uri.parse('$_base/payments/portal'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Accept-Language': locale,
+        },
+        body: jsonEncode({'locale': locale}),
+      ).timeout(const Duration(seconds: 15));
+
+      if (res.statusCode == 401) {
+        await AuthService.handleUnauthorized(res);
+        throw const SessionExpiredException();
+      }
+      if (res.statusCode != 200) {
+        final body = jsonDecode(res.body) as Map<String, dynamic>;
+        throw ApiException(
+          body['error'] as String? ?? 'Erreur serveur (${res.statusCode})',
+          statusCode: res.statusCode,
+        );
+      }
+
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      return data['portal_url'] as String;
+    } on SessionExpiredException {
+      rethrow;
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw classifyError(e);
     }
   }
 

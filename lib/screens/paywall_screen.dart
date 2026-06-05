@@ -19,6 +19,8 @@ class PaywallScreen extends StatefulWidget {
 
 class _PaywallScreenState extends State<PaywallScreen>
     with TickerProviderStateMixin {
+  AppColors get c => AppTheme.of(context);
+
   // ── PageView ───────────────────────────────────────────────────────────────
   final _pageCtrl  = PageController();
   int _currentPage = 0;
@@ -40,6 +42,7 @@ class _PaywallScreenState extends State<PaywallScreen>
   List<Plan> _plans        = [];
   int _selectedIndex       = 0;
   bool _loadingPlans       = false;
+  String? _plansError;
   bool _checkoutLoading    = false;
   AppCurrency _currency    = CurrencyService.defaultCurrency;
   String? _lastLocale;
@@ -114,12 +117,12 @@ class _PaywallScreenState extends State<PaywallScreen>
   }
 
   Future<void> _fetchPlans([String locale = 'en']) async {
-    setState(() => _loadingPlans = true);
+    setState(() { _loadingPlans = true; _plansError = null; });
     try {
       final plans = await PaymentService.fetchPlans(locale: locale);
       if (mounted) setState(() { _plans = plans; _loadingPlans = false; });
-    } catch (_) {
-      if (mounted) setState(() => _loadingPlans = false);
+    } catch (e) {
+      if (mounted) setState(() { _loadingPlans = false; _plansError = e.toString(); });
     }
   }
 
@@ -270,8 +273,8 @@ class _PaywallScreenState extends State<PaywallScreen>
                   ),
                   const SizedBox(width: 8),
                   RichText(
-                    text: const TextSpan(
-                      style: TextStyle(
+                    text: TextSpan(
+                      style: const TextStyle(
                           fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w800),
                       children: [
                         TextSpan(text: 'Diet',   style: TextStyle(color: c.text)),
@@ -360,12 +363,14 @@ class _PaywallScreenState extends State<PaywallScreen>
                   // Page 3 — Plans
                   _PlansPage(
                     loadingPlans:  _loadingPlans,
+                    plansError:    _plansError,
                     plans:         displayPlans,
                     selectedIndex: safeIdx,
                     currency:      _currency,
                     onSelect:      (i) => setState(() => _selectedIndex = i),
                     onContinue:    widget.onContinue,
                     onSeePlans:    _goToSubscription,
+                    onRetry:       _fetchPlans,
                     l10n: l10n,
                   ),
                 ],
@@ -486,7 +491,7 @@ class _WelcomePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'DietVision',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -735,22 +740,26 @@ class _FeatureTile extends StatelessWidget {
 
 class _PlansPage extends StatelessWidget {
   final bool loadingPlans;
+  final String? plansError;
   final List<Plan> plans;
   final int selectedIndex;
   final AppCurrency currency;
   final ValueChanged<int> onSelect;
   final VoidCallback onContinue;
   final VoidCallback onSeePlans;
+  final VoidCallback onRetry;
   final AppLocalizations l10n;
 
   const _PlansPage({
     required this.loadingPlans,
+    this.plansError,
     required this.plans,
     required this.selectedIndex,
     required this.currency,
     required this.onSelect,
     required this.onContinue,
     required this.onSeePlans,
+    required this.onRetry,
     required this.l10n,
   });
 
@@ -788,7 +797,31 @@ class _PlansPage extends StatelessWidget {
             const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
-                child: CircularProgressIndicator(color: c.accent),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (plans.isEmpty && plansError != null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  children: [
+                    Icon(Icons.wifi_off_rounded, color: c.muted, size: 36),
+                    const SizedBox(height: 10),
+                    Text(l10n.cannotLoadPlans,
+                        style: TextStyle(color: c.muted, fontSize: 14)),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: onRetry,
+                      icon: const Icon(Icons.refresh_rounded, size: 16),
+                      label: Text(l10n.retry),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: c.accent,
+                        side: BorderSide(color: c.accent),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           else if (plans.isEmpty)
@@ -1271,7 +1304,7 @@ class _StaticPlans extends StatelessWidget {
           period: l10n.perMonth,
           badge: null,
           currency: currency,
-          features: [l10n.unlimitedScan, l10n.personalizedCoach, l10n.nutritionPlanning],
+          features: [l10n.proScanFeature, l10n.proChatFeature, l10n.nutritionPlanning],
         ),
         const SizedBox(height: 10),
         _StaticPlanCard(
@@ -1280,7 +1313,7 @@ class _StaticPlans extends StatelessWidget {
           period: l10n.perMonth,
           badge: l10n.save40,
           currency: currency,
-          features: [l10n.unlimitedScan, l10n.personalizedCoach, l10n.nutritionPlanning],
+          features: [l10n.premiumScanFeature, l10n.premiumChatFeature, l10n.nutritionPlanning],
         ),
       ],
     );
@@ -1370,6 +1403,7 @@ class _LangButton extends StatelessWidget {
   const _LangButton();
 
   void _showPicker(BuildContext context) {
+    final c = AppTheme.of(context);
     final localeProvider = context.read<LocaleProvider>();
     showModalBottomSheet<void>(
       context: context,

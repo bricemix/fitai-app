@@ -13,10 +13,14 @@ import '../services/storage_service.dart';
 import '../services/sync_service.dart';
 import '../theme.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/limit_dialog.dart';
 import 'subscription_screen.dart';
 import 'weekly_details_sheet.dart';
 import 'ai_insight_sheet.dart';
 import 'progress_forecast_sheet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import '../services/mission_sync_service.dart';
 
 // ── Hiérarchie des plans ─────────────────────────────────────────────────────
 // free / starter → Chat uniquement
@@ -86,8 +90,20 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Container(
+                    width: 48, height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: c.accent.withAlpha(60), blurRadius: 12, spreadRadius: 2),
+                      ],
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.asset('assets/images/visi.png', fit: BoxFit.cover),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,19 +111,6 @@ class _CoachScreenState extends State<CoachScreen> with SingleTickerProviderStat
                         Text(l10n.coachTitle, style: Theme.of(context).textTheme.headlineMedium),
                         Text(l10n.coachSubtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.muted)),
                       ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    tooltip: l10n.notificationsTooltip,
-                    icon: Container(
-                      width: 40, height: 40,
-                      decoration: BoxDecoration(
-                        color: c.surface2,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: c.border),
-                      ),
-                      child: Icon(Icons.notifications_outlined, color: c.text, size: 20),
                     ),
                   ),
                 ],
@@ -680,7 +683,7 @@ class _PlanGateState extends State<_PlanGate> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Planning nutritionnel',
+                            Text(l10n.planningNutritional,
                                 style: TextStyle(fontFamily: 'Syne', fontSize: 18, fontWeight: FontWeight.w900, color: c.text, height: 1.2)),
                             const SizedBox(height: 4),
                             Text(l10n.premiumGateHeroAvail,
@@ -792,11 +795,11 @@ class _PlanGateState extends State<_PlanGate> {
                               // Macros preview
                               Row(
                                 children: [
-                                  _GateMacroChip(label: 'Calories', value: '1 920 kcal/j', color: color),
+                                  _GateMacroChip(label: l10n.macroCalories, value: '1 920 kcal/j', color: color),
                                   const SizedBox(width: 6),
-                                  _GateMacroChip(label: 'Protéines', value: '142 g/j', color: color),
+                                  _GateMacroChip(label: l10n.macroProtein, value: '142 g/j', color: color),
                                   const SizedBox(width: 6),
-                                  _GateMacroChip(label: 'Glucides', value: '210 g/j', color: color),
+                                  _GateMacroChip(label: l10n.macroCarbs, value: '210 g/j', color: color),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -1400,19 +1403,35 @@ class _ChatTabState extends State<_ChatTab> {
     // Repas du jour pour enrichir le contexte IA
     final todayMeals = widget.meals.where((m) => m.isToday).toList();
 
-    final reply = await AiService.askCoach(
-      history,
-      widget.profile,
-      todayMeals: todayMeals,
-    );
+    try {
+      final reply = await AiService.askCoach(
+        history,
+        widget.profile,
+        todayMeals: todayMeals,
+      );
 
-    if (mounted) {
-      setState(() {
-        _messages.add(_Message(role: 'assistant', content: reply));
-        _loading = false;
-      });
-      ChatSyncService.saveExchange(text, reply).catchError((_) {});
-      _scrollToBottom();
+      if (mounted) {
+        setState(() {
+          _messages.add(_Message(role: 'assistant', content: reply));
+          _loading = false;
+        });
+        ChatSyncService.saveExchange(text, reply).catchError((_) {});
+        _scrollToBottom();
+      }
+    } on AiLimitException catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+        showLimitDialog(context, e);
+      }
+    } on AiException catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          if (e.message == 'SESSION_INVALIDATED') return;
+          _messages.add(_Message(role: 'assistant', content: e.message));
+        });
+        _scrollToBottom();
+      }
     }
   }
 
@@ -1430,7 +1449,8 @@ class _ChatTabState extends State<_ChatTab> {
 
   // ── Voir détails : bottom sheet bilan du jour ──────────────────────────────
   void _showDayDetailSheet(BuildContext context) {
-    final c = AppTheme.of(context);
+    final c    = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final todayMeals   = widget.meals.where((m) => m.isToday).toList();
     final todayKcal    = todayMeals.fold(0, (s, m) => s + m.result.calories);
     final todayProtein = todayMeals.fold(0.0, (s, m) => s + m.result.protein);
@@ -1501,7 +1521,7 @@ class _ChatTabState extends State<_ChatTab> {
                   children: [
                     // ── Calories ─────────────────────────────────────────
                     _DetailSection(
-                      label: 'Calories',
+                      label: l10n.macroCalories,
                       current: todayKcal.toDouble(),
                       target: targetKcal.toDouble(),
                       unit: 'kcal',
@@ -1511,7 +1531,7 @@ class _ChatTabState extends State<_ChatTab> {
                     const SizedBox(height: 14),
                     // ── Macros ────────────────────────────────────────────
                     _DetailSection(
-                      label: 'Protéines',
+                      label: l10n.macroProtein,
                       current: todayProtein,
                       target: targetProt,
                       unit: 'g',
@@ -1520,7 +1540,7 @@ class _ChatTabState extends State<_ChatTab> {
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'Glucides',
+                      label: l10n.macroCarbs,
                       current: todayCarbs,
                       target: targetCarbs,
                       unit: 'g',
@@ -1529,7 +1549,7 @@ class _ChatTabState extends State<_ChatTab> {
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'Lipides',
+                      label: l10n.macroFat,
                       current: todayFat,
                       target: targetFat,
                       unit: 'g',
@@ -1552,7 +1572,7 @@ class _ChatTabState extends State<_ChatTab> {
                           children: [
                             Icon(Icons.no_food_rounded, size: 18, color: c.muted),
                             const SizedBox(width: 10),
-                            Text('Aucun repas enregistré aujourd\'hui',
+                            Text(AppLocalizations.of(context)!.noMealsToday,
                                 style: TextStyle(fontSize: 13, color: c.muted)),
                           ],
                         ),
@@ -1809,6 +1829,9 @@ class _DishesTabState extends State<_DishesTab> {
   final Set<String> _activeFilters = {};
   int _dishCount = 3;
   String _mealType = ''; // '' = tous
+  String _cachedLocale = ''; // locale utilisée pour générer les plats en cache
+
+  static const _dishesLocaleKey = 'fitai_dishes_locale';
 
   @override
   void initState() {
@@ -1817,7 +1840,45 @@ class _DishesTabState extends State<_DishesTab> {
     _loadCached();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Détecter un changement de langue et invalider le cache si nécessaire
+    final currentLocale = Localizations.localeOf(context).languageCode;
+    if (_cachedLocale.isNotEmpty && _cachedLocale != currentLocale) {
+      // Langue changée → vider les plats en cache et recharger
+      setState(() {
+        _dishes = [];
+        _loaded  = false;
+        _error   = null;
+      });
+      _invalidateDishesCache(currentLocale);
+    }
+    _cachedLocale = currentLocale;
+  }
+
+  Future<void> _invalidateDishesCache(String newLocale) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_dishesLocaleKey, newLocale);
+    await StorageService.saveDishes([]);
+    if (mounted) setState(() => _loaded = true);
+  }
+
   Future<void> _loadCached() async {
+    final prefs     = await SharedPreferences.getInstance();
+    final savedLocale = prefs.getString(_dishesLocaleKey) ?? '';
+    final currentLocale = mounted
+        ? Localizations.localeOf(context).languageCode
+        : savedLocale;
+
+    // Cache invalide si la locale ne correspond pas
+    if (savedLocale.isNotEmpty && savedLocale != currentLocale) {
+      await prefs.setString(_dishesLocaleKey, currentLocale);
+      await StorageService.saveDishes([]);
+      if (mounted) setState(() => _loaded = true);
+      return;
+    }
+
     final cached = await StorageService.loadDishes();
     if (cached.isNotEmpty && mounted) {
       setState(() {
@@ -1840,6 +1901,10 @@ class _DishesTabState extends State<_DishesTab> {
       if (mounted) {
         setState(() { _dishes = result; _loading = false; _loaded = true; });
         if (result.isNotEmpty) {
+          // Sauvegarder la locale courante avec les plats pour invalidation future
+          final prefs = await SharedPreferences.getInstance();
+          final locale = Localizations.localeOf(context).languageCode;
+          await prefs.setString(_dishesLocaleKey, locale);
           await StorageService.saveDishes(result.map((d) => d.toJson()).toList());
         }
       }
@@ -2425,10 +2490,37 @@ class _PlanningTabState extends State<_PlanningTab> {
   List<bool> _checklistDone = List.filled(6, false);
   bool _checklistInit = false;
 
+  // Shared key with dashboard missions (same SharedPreferences namespace)
+  static String get _todayKey => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
   @override
   void initState() {
     super.initState();
     _loadCached();
+    _loadManualMissions(); // sync with home missions
+  }
+
+  /// Load manual mission states from SharedPreferences (shared with home screen)
+  /// Index mapping: [3]=walk, [4]=water, [5]=nosugar
+  Future<void> _loadManualMissions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _todayKey;
+    if (mounted) {
+      setState(() {
+        _checklistDone[3] = prefs.getBool('miss_walk_$key')    ?? false;
+        _checklistDone[4] = prefs.getBool('miss_water_$key')   ?? false;
+        _checklistDone[5] = prefs.getBool('miss_nosugar_$key') ?? false;
+      });
+    }
+  }
+
+  /// Persist a manual mission toggle (shared with home screen)
+  Future<void> _saveManualMission(int index, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _todayKey;
+    if (index == 3) await prefs.setBool('miss_walk_$key',    value);
+    if (index == 4) await prefs.setBool('miss_water_$key',   value);
+    if (index == 5) await prefs.setBool('miss_nosugar_$key', value);
   }
 
   void _initChecklist() {
@@ -2441,13 +2533,15 @@ class _PlanningTabState extends State<_PlanningTab> {
       (p) => p.isToday,
       orElse: () => _plans.isNotEmpty ? _plans.first : DayPlan(date: DayPlan.todayKey(), targetKcal: 2000, targetProtein: 120),
     );
+    // Only update auto-detected items [0,1,2]; manual items [3,4,5] are
+    // already loaded from SharedPreferences by _loadManualMissions()
     _checklistDone = [
-      todayKcal    >= todayPlan.targetKcal    * 0.9,  // Hit calorie target
-      todayMeals.length >= 2,                          // Scan 2 meals
-      todayProtein >= todayPlan.targetProtein * 0.9,  // Reach protein goal
-      false,  // Walk 30 min
-      false,  // Drink 2.5 L water
-      false,  // No sugary snack after 8 pm
+      todayKcal    >= todayPlan.targetKcal    * 0.9,  // [0] Hit calorie target (auto)
+      todayMeals.length >= 2,                          // [1] Scan 2 meals (auto)
+      todayProtein >= todayPlan.targetProtein * 0.9,  // [2] Reach protein goal (auto)
+      _checklistDone[3],  // [3] Walk 30 min (manual — preserved from SharedPrefs)
+      _checklistDone[4],  // [4] Drink water  (manual — preserved from SharedPrefs)
+      _checklistDone[5],  // [5] No sugar     (manual — preserved from SharedPrefs)
     ];
   }
 
@@ -2630,7 +2724,20 @@ class _PlanningTabState extends State<_PlanningTab> {
             items: checkItems, done: _checklistDone,
             completedCount: completedCount,
             l10n: l10n,
-            onToggle: (i) => setState(() => _checklistDone[i] = !_checklistDone[i]),
+            onToggle: (i) {
+              final newValue = !_checklistDone[i];
+              setState(() => _checklistDone[i] = newValue);
+              // Persist manual items — synced with home missions
+              _saveManualMission(i, newValue);
+              // Sync full snapshot to server
+              MissionSyncService.syncToday(
+                autoStates: {
+                  'calorie': _checklistDone[0],
+                  'scan':    _checklistDone[1],
+                  'protein': _checklistDone[2],
+                },
+              );
+            },
           ),
           const SizedBox(height: 16),
 
@@ -3350,12 +3457,12 @@ class _BubbleRow extends StatelessWidget {
                 Container(
                   width: 30, height: 30,
                   margin: const EdgeInsets.only(right: 8, bottom: 2),
-                  decoration: BoxDecoration(
-                    color: c.accent.withAlpha(20),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: c.accent.withAlpha(60)),
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    'assets/images/visi.png',
+                    fit: BoxFit.cover,
                   ),
-                  child: Icon(Icons.smart_toy_rounded, size: 15, color: c.accent),
                 ),
               Flexible(
                 child: Container(
@@ -3648,7 +3755,9 @@ class _ContextDayCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.smart_toy_rounded, size: 14, color: c.accent),
+                ClipOval(
+                  child: Image.asset('assets/images/visi.png', width: 18, height: 18, fit: BoxFit.cover),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(desc,
@@ -3688,7 +3797,8 @@ class _DetailSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.of(context);
+    final c    = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final pct = target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
     final over = current > target;
     return Container(
@@ -3740,13 +3850,13 @@ class _DetailSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${(pct * 100).round()}% atteint',
+              Text('${(pct * 100).round()}${l10n.percentReached}',
                   style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
               if (over)
-                Text('+${(current - target).round()} $unit dépassé',
+                Text('+${(current - target).round()} $unit ${l10n.exceeded}',
                     style: const TextStyle(fontSize: 11, color: Color(0xFFFF6B6B), fontWeight: FontWeight.w600))
               else
-                Text('${(target - current).round()} $unit restants',
+                Text('${(target - current).round()} $unit ${l10n.remaining}',
                     style: TextStyle(fontSize: 11, color: c.muted)),
             ],
           ),
@@ -4024,88 +4134,145 @@ class _LoadingDishes extends StatelessWidget {
 
 int _prepMinutes(DishRecommendation dish) {
   final d = dish.description.toLowerCase();
-  if (d.contains('mijoté') || d.contains('tajine') || d.contains('curry') || d.contains('dahl')) return 35;
-  if (d.contains('rôti') || d.contains('four') || d.contains('enfourner')) return 30;
-  if (d.contains('rapide') || d.contains('bowl') || d.contains('salade')) return 15;
+  final n = dish.name.toLowerCase();
+  if (d.contains('mijoté') || d.contains('tajine') || d.contains('curry') || d.contains('dahl') ||
+      d.contains('dhal') || d.contains('simmered') || d.contains('tagine')) return 35;
+  if (d.contains('rôti') || d.contains('four') || d.contains('enfourner') ||
+      d.contains('roast') || d.contains('baked') || d.contains('oven')) return 30;
+  if (d.contains('rapide') || n.contains('bowl') || n.contains('salade') ||
+      n.contains('salad') || d.contains('quick') || d.contains('raw')) return 15;
   if (dish.type.contains('breakfast') || dish.type.contains('petit-déj')) return 10;
   return 20;
 }
 
-List<String> _generateSteps(DishRecommendation dish) {
+List<String> _generateSteps(DishRecommendation dish, {String locale = 'fr'}) {
   final steps = <String>[];
   final d = dish.description.toLowerCase();
   final n = dish.name.toLowerCase();
   final hasIngr = dish.ingredients.isNotEmpty;
+  final isFr = locale == 'fr';
 
-  // ── Mise en place ──────────────────────────────────────────────────
+  // ── Mise en place / Prep ───────────────────────────────────────────
   if (hasIngr) {
     final list = dish.ingredients.take(5).map((i) => i.name).join(', ');
-    steps.add('🧾 Rassemblez et préparez tous les ingrédients : $list.');
+    steps.add(isFr
+        ? '🧾 Rassemblez et préparez tous les ingrédients : $list.'
+        : '🧾 Gather and prepare all ingredients: $list.');
   } else {
-    steps.add('🧾 Rassemblez et préparez tous les ingrédients nécessaires.');
+    steps.add(isFr
+        ? '🧾 Rassemblez et préparez tous les ingrédients nécessaires.'
+        : '🧾 Gather and prepare all necessary ingredients.');
   }
 
-  // ── Cuisson céréales/légumineuses ──────────────────────────────────
+  // ── Grains / legumes ───────────────────────────────────────────────
   if (d.contains('quinoa')) {
-    steps.add('🌾 Rincez le quinoa, puis faites-le cuire dans 2× son volume d\'eau bouillante salée pendant 12–15 min. Égouttez et réservez.');
-  } else if (d.contains('riz')) {
-    steps.add('🌾 Faites cuire le riz selon les instructions (environ 12 min dans l\'eau bouillante salée). Égouttez et réservez.');
-  } else if (d.contains('boulgour') || d.contains('couscous')) {
-    steps.add('🌾 Versez de l\'eau bouillante salée sur le boulgour/couscous, couvrez et laissez gonfler 10 min. Égrainez à la fourchette.');
-  } else if (d.contains('lentilles') || d.contains('pois chiches') || d.contains('pois cassés')) {
-    steps.add('🫘 Rincez les légumineuses. Faites-les cuire dans l\'eau bouillante 20–25 min jusqu\'à tendreté. Égouttez.');
+    steps.add(isFr
+        ? '🌾 Rincez le quinoa, puis faites-le cuire dans 2× son volume d\'eau bouillante salée pendant 12–15 min. Égouttez et réservez.'
+        : '🌾 Rinse the quinoa, then cook in 2× its volume of salted boiling water for 12–15 min. Drain and set aside.');
+  } else if (d.contains('riz') || d.contains('rice')) {
+    steps.add(isFr
+        ? '🌾 Faites cuire le riz selon les instructions (environ 12 min dans l\'eau bouillante salée). Égouttez et réservez.'
+        : '🌾 Cook the rice per package instructions (approx. 12 min in salted boiling water). Drain and set aside.');
+  } else if (d.contains('boulgour') || d.contains('couscous') || d.contains('bulgur')) {
+    steps.add(isFr
+        ? '🌾 Versez de l\'eau bouillante salée sur le boulgour/couscous, couvrez et laissez gonfler 10 min. Égrainez à la fourchette.'
+        : '🌾 Pour salted boiling water over the bulgur/couscous, cover and let swell for 10 min. Fluff with a fork.');
+  } else if (d.contains('lentilles') || d.contains('pois chiches') || d.contains('pois cassés') ||
+             d.contains('lentil') || d.contains('chickpea') || d.contains('split pea')) {
+    steps.add(isFr
+        ? '🫘 Rincez les légumineuses. Faites-les cuire dans l\'eau bouillante 20–25 min jusqu\'à tendreté. Égouttez.'
+        : '🫘 Rinse the legumes. Cook in boiling water for 20–25 min until tender. Drain.');
   }
 
-  // ── Cuisson principale ─────────────────────────────────────────────
-  if (d.contains('mijoté') || d.contains('curry') || d.contains('dahl') || d.contains('tajine') || d.contains('harira')) {
-    steps.add('🫕 Dans une casserole, faites chauffer un filet d\'huile à feu moyen. Faites revenir les épices et aromates 2 min.');
-    steps.add('🫕 Ajoutez les ingrédients principaux, mélangez bien, couvrez et laissez mijoter 20–25 min à feu doux.');
-  } else if (d.contains('rôti') || d.contains('four')) {
-    steps.add('🔥 Préchauffez le four à 190°C (chaleur tournante).');
-    steps.add('🔥 Disposez les ingrédients sur une plaque huilée. Enfournez 20–25 min jusqu\'à belle coloration.');
-  } else if (d.contains('vapeur')) {
-    steps.add('♨️ Faites cuire les légumes à la vapeur 8–10 min : ils doivent rester légèrement croquants.');
-  } else if (d.contains('sauté') || d.contains('poêle') || d.contains('grillé') || d.contains('mariné')) {
-    steps.add('🍳 Chauffez une poêle (ou grill) à feu vif avec un filet d\'huile d\'olive.');
-    steps.add('🍳 Faites saisir la protéine principale 3–4 min par face jusqu\'à coloration. Baissez à feu moyen et poursuivez 5 min.');
-  } else if (d.contains('vapeur') || d.contains('poché')) {
-    steps.add('♨️ Pochez ou cuisez à la vapeur les ingrédients principaux 8–12 min.');
-  } else if (d.contains('cru') || n.contains('salade') || n.contains('bowl')) {
-    steps.add('🥗 Pas de cuisson nécessaire pour ce plat — veillez simplement à bien rincer et sécher les ingrédients frais.');
+  // ── Main cooking method ────────────────────────────────────────────
+  if (d.contains('mijoté') || d.contains('curry') || d.contains('dahl') || d.contains('dhal') ||
+      d.contains('tajine') || d.contains('harira') || d.contains('simmered') || d.contains('tagine')) {
+    steps.add(isFr
+        ? '🫕 Dans une casserole, faites chauffer un filet d\'huile à feu moyen. Faites revenir les épices et aromates 2 min.'
+        : '🫕 In a saucepan, heat a drizzle of oil over medium heat. Sauté the spices and aromatics for 2 min.');
+    steps.add(isFr
+        ? '🫕 Ajoutez les ingrédients principaux, mélangez bien, couvrez et laissez mijoter 20–25 min à feu doux.'
+        : '🫕 Add the main ingredients, stir well, cover and simmer on low heat for 20–25 min.');
+  } else if (d.contains('rôti') || d.contains('four') || d.contains('roast') || d.contains('baked') || d.contains('oven')) {
+    steps.add(isFr
+        ? '🔥 Préchauffez le four à 190°C (chaleur tournante).'
+        : '🔥 Preheat the oven to 190°C / 375°F (fan).');
+    steps.add(isFr
+        ? '🔥 Disposez les ingrédients sur une plaque huilée. Enfournez 20–25 min jusqu\'à belle coloration.'
+        : '🔥 Arrange the ingredients on a greased tray. Roast for 20–25 min until golden.');
+  } else if (d.contains('vapeur') || d.contains('steamed') || d.contains('steam')) {
+    steps.add(isFr
+        ? '♨️ Faites cuire les légumes à la vapeur 8–10 min : ils doivent rester légèrement croquants.'
+        : '♨️ Steam the vegetables for 8–10 min: they should remain slightly crunchy.');
+  } else if (d.contains('sauté') || d.contains('poêle') || d.contains('grillé') || d.contains('mariné') ||
+             d.contains('stir-fry') || d.contains('grilled') || d.contains('sautéed') || d.contains('pan')) {
+    steps.add(isFr
+        ? '🍳 Chauffez une poêle (ou grill) à feu vif avec un filet d\'huile d\'olive.'
+        : '🍳 Heat a pan (or grill) over high heat with a drizzle of olive oil.');
+    steps.add(isFr
+        ? '🍳 Faites saisir la protéine principale 3–4 min par face jusqu\'à coloration. Baissez à feu moyen et poursuivez 5 min.'
+        : '🍳 Sear the main protein 3–4 min per side until golden. Reduce to medium heat and cook 5 min more.');
+  } else if (d.contains('poché') || d.contains('poached')) {
+    steps.add(isFr
+        ? '♨️ Pochez ou cuisez à la vapeur les ingrédients principaux 8–12 min.'
+        : '♨️ Poach or steam the main ingredients for 8–12 min.');
+  } else if (d.contains('cru') || d.contains('raw') || n.contains('salade') || n.contains('salad') || n.contains('bowl')) {
+    steps.add(isFr
+        ? '🥗 Pas de cuisson nécessaire pour ce plat — veillez simplement à bien rincer et sécher les ingrédients frais.'
+        : '🥗 No cooking required — simply rinse and dry all fresh ingredients well.');
   } else {
-    steps.add('🍳 Faites chauffer une poêle à feu moyen avec un filet d\'huile. Cuisez les ingrédients principaux 8–12 min en remuant régulièrement.');
+    steps.add(isFr
+        ? '🍳 Faites chauffer une poêle à feu moyen avec un filet d\'huile. Cuisez les ingrédients principaux 8–12 min en remuant régulièrement.'
+        : '🍳 Heat a pan over medium heat with a drizzle of oil. Cook the main ingredients for 8–12 min, stirring regularly.');
   }
 
-  // ── Légumes d'accompagnement ───────────────────────────────────────
-  if (d.contains('brocolis') || d.contains('épinards') || d.contains('haricots') || d.contains('courgette')) {
-    steps.add('🥦 Pendant ce temps, faites sauter les légumes d\'accompagnement à la poêle 4–5 min avec sel, poivre et ail. Réservez.');
+  // ── Side vegetables ────────────────────────────────────────────────
+  if (d.contains('brocolis') || d.contains('épinards') || d.contains('haricots') || d.contains('courgette') ||
+      d.contains('broccoli') || d.contains('spinach') || d.contains('green bean') || d.contains('zucchini')) {
+    steps.add(isFr
+        ? '🥦 Pendant ce temps, faites sauter les légumes d\'accompagnement à la poêle 4–5 min avec sel, poivre et ail. Réservez.'
+        : '🥦 Meanwhile, sauté the side vegetables in a pan for 4–5 min with salt, pepper and garlic. Set aside.');
   }
 
-  // ── Sauce / assaisonnement ─────────────────────────────────────────
+  // ── Sauce / seasoning ─────────────────────────────────────────────
   if (d.contains('tahini')) {
-    steps.add('🧄 Préparez la sauce tahini : mélangez le tahini avec le jus de citron, une gousse d\'ail pressée et 2 c. à soupe d\'eau. Ajustez la consistance.');
-  } else if (d.contains('vinaigrette') || d.contains('sauce')) {
-    steps.add('🫙 Préparez la sauce : mélangez les ingrédients liquides avec les épices. Goûtez et ajustez.');
+    steps.add(isFr
+        ? '🧄 Préparez la sauce tahini : mélangez le tahini avec le jus de citron, une gousse d\'ail pressée et 2 c. à soupe d\'eau. Ajustez la consistance.'
+        : '🧄 Make the tahini sauce: mix tahini with lemon juice, 1 crushed garlic clove and 2 tbsp water. Adjust consistency.');
+  } else if (d.contains('vinaigrette') || d.contains('sauce') || d.contains('dressing')) {
+    steps.add(isFr
+        ? '🫙 Préparez la sauce : mélangez les ingrédients liquides avec les épices. Goûtez et ajustez.'
+        : '🫙 Make the sauce/dressing: mix the liquid ingredients with the spices. Taste and adjust.');
   } else {
-    steps.add('🧂 Assaisonnez avec sel, poivre, et les épices de votre choix. Ajoutez un filet de citron si souhaité.');
+    steps.add(isFr
+        ? '🧂 Assaisonnez avec sel, poivre, et les épices de votre choix. Ajoutez un filet de citron si souhaité.'
+        : '🧂 Season with salt, pepper, and your preferred spices. Add a squeeze of lemon if desired.');
   }
 
-  // ── Assemblage / dressage ──────────────────────────────────────────
-  if (n.contains('bowl') || n.contains('salade')) {
-    steps.add('🥣 Disposez harmonieusement les différentes préparations dans un bol : céréales en base, protéine et légumes par-dessus, sauce en filet.');
+  // ── Plating ────────────────────────────────────────────────────────
+  if (n.contains('bowl') || n.contains('salade') || n.contains('salad')) {
+    steps.add(isFr
+        ? '🥣 Disposez harmonieusement les différentes préparations dans un bol : céréales en base, protéine et légumes par-dessus, sauce en filet.'
+        : '🥣 Arrange the components in a bowl: grains as the base, protein and vegetables on top, drizzle the sauce.');
   } else if (dish.type.contains('dinner') || dish.type.contains('dîner')) {
-    steps.add('🍽️ Dressez le plat dans une assiette chaude. Garnissez d\'herbes fraîches (persil, coriandre ou basilic).');
+    steps.add(isFr
+        ? '🍽️ Dressez le plat dans une assiette chaude. Garnissez d\'herbes fraîches (persil, coriandre ou basilic).'
+        : '🍽️ Plate on a warm dish. Garnish with fresh herbs (parsley, coriander or basil).');
   } else {
-    steps.add('🍽️ Dressez dans l\'assiette et servez immédiatement pendant que c\'est chaud.');
+    steps.add(isFr
+        ? '🍽️ Dressez dans l\'assiette et servez immédiatement pendant que c\'est chaud.'
+        : '🍽️ Plate and serve immediately while hot.');
   }
 
-  steps.add('✅ C\'est prêt — bon appétit !');
+  steps.add(isFr ? '✅ C\'est prêt — bon appétit !' : '✅ Ready — enjoy your meal!');
   return steps;
 }
 
 void showPreparationSheet(BuildContext context, {required DishRecommendation dish}) {
   final c       = AppTheme.of(context);
-  final steps   = _generateSteps(dish);
+  final l10n    = AppLocalizations.of(context)!;
+  final locale  = Localizations.localeOf(context).languageCode;
+  final steps   = dish.steps.isNotEmpty ? dish.steps : _generateSteps(dish, locale: locale);
   final minutes = _prepMinutes(dish);
 
   showModalBottomSheet(
@@ -4155,7 +4322,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                                 color: c.accent.withAlpha(20),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: Text('RECETTE',
+                              child: Text(l10n.dishRecipeLabel,
                                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800,
                                       color: c.accent, letterSpacing: 1.4)),
                             ),
@@ -4220,7 +4387,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
                   // Ingrédients (si disponibles)
                   if (dish.ingredients.isNotEmpty) ...[
                     _PrepSectionTitle(icon: Icons.format_list_bulleted_rounded,
-                        label: 'Ingrédients (${dish.ingredients.length})'),
+                        label: l10n.dishIngredientsSection(dish.ingredients.length)),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 8,
@@ -4258,7 +4425,7 @@ void showPreparationSheet(BuildContext context, {required DishRecommendation dis
 
                   // Étapes de préparation
                   _PrepSectionTitle(icon: Icons.menu_book_rounded,
-                      label: 'Étapes de préparation (${steps.length})'),
+                      label: l10n.dishPrepStepsSection(steps.length)),
                   const SizedBox(height: 14),
                   ...steps.asMap().entries.map((e) {
                     final idx   = e.key;
@@ -4438,19 +4605,18 @@ class _SmartSummaryCard extends StatelessWidget {
 
     final pills = <({IconData icon, String value, String sub, Color color})>[
       if (inSurplus)
-        (icon: Icons.warning_amber_rounded, value: '+$surplus kcal', sub: 'de trop', color: surplusColor)
+        (icon: Icons.warning_amber_rounded, value: '+$surplus kcal', sub: l10n.pillSubExcess, color: surplusColor)
       else
-        (icon: Icons.local_fire_department_rounded, value: '$remaining kcal', sub: 'restantes', color: c.accent),
-      (icon: Icons.grass_rounded,                 value: dietLabel,            sub: 'Régime',      color: dietColor),
-      (icon: Icons.restaurant_menu_rounded,       value: '$dishCount plats',   sub: 'à générer',   color: const Color(0xFF4DA1FF)),
+        (icon: Icons.local_fire_department_rounded, value: '$remaining kcal', sub: l10n.pillSubRemaining, color: c.accent),
+      (icon: Icons.grass_rounded,           value: dietLabel,                  sub: l10n.pillSubDiet,                              color: dietColor),
+      (icon: Icons.restaurant_menu_rounded, value: l10n.dishCountPillValue(dishCount), sub: l10n.pillSubToGenerate,               color: const Color(0xFF4DA1FF)),
       if (activeFiltersCount > 0)
-        (icon: Icons.tune_rounded, value: '$activeFiltersCount filtre${activeFiltersCount > 1 ? 's' : ''}', sub: 'actif${activeFiltersCount > 1 ? 's' : ''}', color: const Color(0xFFFFB347)),
+        (icon: Icons.tune_rounded, value: l10n.filterCountPillValue(activeFiltersCount), sub: l10n.pillSubActive(activeFiltersCount), color: const Color(0xFFFFB347)),
     ];
 
     final description = inSurplus
-        ? 'Vous avez dépassé votre objectif de +$surplus kcal. L\'IA vous suggère $dishCount plat${dishCount > 1 ? 's' : ''} léger${dishCount > 1 ? 's' : ''} pour équilibrer votre journée.'
-        : 'L\'IA va vous proposer $dishCount plat${dishCount > 1 ? 's' : ''}'
-          ' $dietLabel adaptés à vos calories restantes et à votre objectif nutritionnel.';
+        ? l10n.smartSummaryDescSurplus(surplus, dishCount)
+        : l10n.smartSummaryDescNormal(dishCount, dietLabel);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -4581,44 +4747,69 @@ class _SmartSummaryCard extends StatelessWidget {
 
 // ── Preview Dish Cards (static, avant génération) ────────────────────────────
 
-List<DishRecommendation> _previewDishesForDiet(String diet) {
+List<DishRecommendation> _previewDishesForDiet(String diet, {String locale = 'fr'}) {
   const _empty = <DishIngredient>[];
+  final isFr = locale == 'fr';
   switch (diet) {
     case 'vegan':
-      return const [
+      return isFr ? const [
         DishRecommendation(name: 'Bowl vegan protéiné',        type: 'lunch',  calories: 520, protein: 28, carbs: 70, fat: 16, description: 'Quinoa, pois chiches rôtis, edamame, patate douce, avocat, tahini.', ingredients: _empty),
-        DishRecommendation(name: 'Curry de lentilles & riz',   type: 'dinner', calories: 580, protein: 26, carbs: 78, fat: 18, description: 'Lentilles corail mijotées au lait de coco, épinards, riz complet, coriandre.', ingredients: _empty),
-        DishRecommendation(name: 'Tofu sauté légumes quinoa',  type: 'lunch',  calories: 490, protein: 30, carbs: 60, fat: 14, description: 'Tofu mariné, brocolis, poivrons, carottes, quinoa, sauce soja.', ingredients: _empty),
+        DishRecommendation(name: 'Curry de lentilles & riz',   type: 'dinner', calories: 580, protein: 26, carbs: 78, fat: 18, description: 'Red lentils simmered in coconut milk, spinach, brown rice, coriander.', ingredients: _empty),
+        DishRecommendation(name: 'Tofu sauté légumes quinoa',  type: 'lunch',  calories: 490, protein: 30, carbs: 60, fat: 14, description: 'Marinated tofu, broccoli, peppers, carrots, quinoa, soy sauce.', ingredients: _empty),
+      ] : const [
+        DishRecommendation(name: 'Protein vegan bowl',         type: 'lunch',  calories: 520, protein: 28, carbs: 70, fat: 16, description: 'Quinoa, roasted chickpeas, edamame, sweet potato, avocado, tahini.', ingredients: _empty),
+        DishRecommendation(name: 'Red lentil curry & rice',    type: 'dinner', calories: 580, protein: 26, carbs: 78, fat: 18, description: 'Red lentils simmered in coconut milk, spinach, brown rice, coriander.', ingredients: _empty),
+        DishRecommendation(name: 'Stir-fried tofu & quinoa',   type: 'lunch',  calories: 490, protein: 30, carbs: 60, fat: 14, description: 'Marinated tofu, broccoli, peppers, carrots, quinoa, soy sauce.', ingredients: _empty),
       ];
     case 'vegetarian':
-      return const [
+      return isFr ? const [
         DishRecommendation(name: 'Omelette aux herbes',        type: 'breakfast', calories: 340, protein: 24, carbs: 12, fat: 22, description: 'Œufs fermiers, fines herbes, épinards, fromage de brebis.', ingredients: _empty),
         DishRecommendation(name: 'Buddha bowl méditerranéen',  type: 'lunch',     calories: 510, protein: 22, carbs: 64, fat: 18, description: 'Pois chiches rôtis, feta, tomates cerises, courgettes grillées, riz.', ingredients: _empty),
         DishRecommendation(name: 'Dahl de pois cassés',        type: 'dinner',    calories: 430, protein: 20, carbs: 58, fat: 12, description: 'Pois cassés mijotés aux épices, riz basmati, yaourt nature.', ingredients: _empty),
+      ] : const [
+        DishRecommendation(name: 'Herb omelette',              type: 'breakfast', calories: 340, protein: 24, carbs: 12, fat: 22, description: 'Farm eggs, fresh herbs, spinach, sheep cheese.', ingredients: _empty),
+        DishRecommendation(name: 'Mediterranean buddha bowl',  type: 'lunch',     calories: 510, protein: 22, carbs: 64, fat: 18, description: 'Roasted chickpeas, feta, cherry tomatoes, grilled courgette, rice.', ingredients: _empty),
+        DishRecommendation(name: 'Split pea dhal',             type: 'dinner',    calories: 430, protein: 20, carbs: 58, fat: 12, description: 'Split peas simmered with spices, basmati rice, plain yogurt.', ingredients: _empty),
       ];
     case 'keto':
-      return const [
+      return isFr ? const [
         DishRecommendation(name: 'Saumon avocat & œufs',       type: 'breakfast', calories: 480, protein: 36, carbs: 4,  fat: 34, description: 'Saumon fumé, œufs pochés, avocat, citron, câpres.', ingredients: _empty),
         DishRecommendation(name: 'Poulet rôti & légumes',       type: 'lunch',     calories: 520, protein: 42, carbs: 8,  fat: 32, description: 'Cuisse de poulet rôtie, brocolis, courgettes à l\'huile d\'olive.', ingredients: _empty),
         DishRecommendation(name: 'Steak & asperges grillées',   type: 'dinner',    calories: 560, protein: 48, carbs: 6,  fat: 36, description: 'Entrecôte, asperges, beurre maître d\'hôtel, herbes fraîches.', ingredients: _empty),
+      ] : const [
+        DishRecommendation(name: 'Salmon avocado & eggs',      type: 'breakfast', calories: 480, protein: 36, carbs: 4,  fat: 34, description: 'Smoked salmon, poached eggs, avocado, lemon, capers.', ingredients: _empty),
+        DishRecommendation(name: 'Roast chicken & vegetables', type: 'lunch',     calories: 520, protein: 42, carbs: 8,  fat: 32, description: 'Roasted chicken thigh, broccoli, courgette with olive oil.', ingredients: _empty),
+        DishRecommendation(name: 'Steak & grilled asparagus',  type: 'dinner',    calories: 560, protein: 48, carbs: 6,  fat: 36, description: 'Ribeye steak, asparagus, herb butter, fresh herbs.', ingredients: _empty),
       ];
     case 'halal':
-      return const [
+      return isFr ? const [
         DishRecommendation(name: 'Poulet mariné & tabboulé',   type: 'lunch',  calories: 490, protein: 38, carbs: 50, fat: 14, description: 'Filet de poulet halal grillé, tabboulé au persil et boulgour.', ingredients: _empty),
         DishRecommendation(name: 'Tajine d\'agneau léger',      type: 'dinner', calories: 560, protein: 36, carbs: 48, fat: 20, description: 'Épaule d\'agneau halal, couscous, légumes fondants, épices douces.', ingredients: _empty),
         DishRecommendation(name: 'Soupe harira & galette',      type: 'lunch',  calories: 380, protein: 22, carbs: 54, fat: 10, description: 'Harira aux pois chiches, lentilles, tomates, galette de pain.', ingredients: _empty),
+      ] : const [
+        DishRecommendation(name: 'Marinated halal chicken & tabbouleh', type: 'lunch',  calories: 490, protein: 38, carbs: 50, fat: 14, description: 'Grilled halal chicken fillet, parsley tabbouleh and bulgur wheat.', ingredients: _empty),
+        DishRecommendation(name: 'Light lamb tagine',           type: 'dinner', calories: 560, protein: 36, carbs: 48, fat: 20, description: 'Halal lamb shoulder, couscous, tender vegetables, mild spices.', ingredients: _empty),
+        DishRecommendation(name: 'Harira soup & flatbread',     type: 'lunch',  calories: 380, protein: 22, carbs: 54, fat: 10, description: 'Chickpea harira, lentils, tomatoes, flatbread.', ingredients: _empty),
       ];
     case 'high-protein':
-      return const [
+      return isFr ? const [
         DishRecommendation(name: 'Blanc de poulet & edamame',  type: 'lunch',  calories: 440, protein: 52, carbs: 28, fat: 12, description: 'Blanc de poulet vapeur, edamame, brocolis, sauce gingembre.', ingredients: _empty),
         DishRecommendation(name: 'Omelette protéinée',         type: 'breakfast', calories: 360, protein: 40, carbs: 8,  fat: 18, description: 'Œufs entiers + blancs, jambon blanc, cottage cheese, épinards.', ingredients: _empty),
         DishRecommendation(name: 'Thon & patate douce',        type: 'dinner', calories: 460, protein: 44, carbs: 42, fat: 10, description: 'Thon en conserve, patate douce rôtie, haricots verts, citron.', ingredients: _empty),
+      ] : const [
+        DishRecommendation(name: 'Steamed chicken & edamame',  type: 'lunch',  calories: 440, protein: 52, carbs: 28, fat: 12, description: 'Steamed chicken breast, edamame, broccoli, ginger sauce.', ingredients: _empty),
+        DishRecommendation(name: 'Protein omelette',           type: 'breakfast', calories: 360, protein: 40, carbs: 8,  fat: 18, description: 'Whole eggs + egg whites, ham, cottage cheese, spinach.', ingredients: _empty),
+        DishRecommendation(name: 'Tuna & sweet potato',        type: 'dinner', calories: 460, protein: 44, carbs: 42, fat: 10, description: 'Canned tuna, roasted sweet potato, green beans, lemon.', ingredients: _empty),
       ];
     default: // omnivore + others
-      return const [
+      return isFr ? const [
         DishRecommendation(name: 'Poulet grillé & quinoa',     type: 'lunch',  calories: 510, protein: 40, carbs: 52, fat: 12, description: 'Blanc de poulet, quinoa aux herbes, haricots verts, vinaigrette légère.', ingredients: _empty),
         DishRecommendation(name: 'Saumon & légumes rôtis',     type: 'dinner', calories: 490, protein: 36, carbs: 30, fat: 22, description: 'Pavé de saumon, patate douce, brocolis, courgettes, huile d\'olive.', ingredients: _empty),
         DishRecommendation(name: 'Salade César au poulet',     type: 'lunch',  calories: 420, protein: 34, carbs: 28, fat: 18, description: 'Poulet rôti, laitue romaine, parmesan, croûtons, sauce légère.', ingredients: _empty),
+      ] : const [
+        DishRecommendation(name: 'Grilled chicken & quinoa',   type: 'lunch',  calories: 510, protein: 40, carbs: 52, fat: 12, description: 'Chicken breast, herb quinoa, green beans, light vinaigrette.', ingredients: _empty),
+        DishRecommendation(name: 'Salmon & roasted vegetables',type: 'dinner', calories: 490, protein: 36, carbs: 30, fat: 22, description: 'Salmon fillet, sweet potato, broccoli, courgette, olive oil.', ingredients: _empty),
+        DishRecommendation(name: 'Caesar salad with chicken',  type: 'lunch',  calories: 420, protein: 34, carbs: 28, fat: 18, description: 'Roast chicken, romaine lettuce, parmesan, croutons, light dressing.', ingredients: _empty),
       ];
   }
 }
@@ -4637,7 +4828,8 @@ class _PreviewDishCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppTheme.of(context);
-    final previews = _previewDishesForDiet(diet);
+    final locale = Localizations.localeOf(context).languageCode;
+    final previews = _previewDishesForDiet(diet, locale: locale);
     return Column(
       children: [
         // Preview badge

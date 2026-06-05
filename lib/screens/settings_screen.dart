@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/payment_service.dart';
@@ -146,10 +146,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
     final localeProvider = context.watch<LocaleProvider>();
     final themeProvider  = context.watch<ThemeProvider>();
-    final c = AppTheme.of(context);
     final currentLang = LocaleProvider.supportedLanguages.firstWhere(
       (l) => l.$1 == localeProvider.locale.languageCode,
       orElse: () => LocaleProvider.supportedLanguages.first,
@@ -315,7 +315,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _loggingOut ? null : _logout,
                       icon: _loggingOut
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 16,
                               height: 16,
                               child: CircularProgressIndicator(
@@ -397,6 +397,7 @@ class _PlanCard extends StatelessWidget {
   // ── Couleur selon le plan ────────────────────────────────────────────────
   Color _color(String p, AppColors c) {
     switch (p) {
+      case 'vip':     return const Color(0xFFFFD700); // or
       case 'premium': return c.accent;
       case 'pro':     return const Color(0xFFAB82FF);
       case 'starter': return c.accent2;
@@ -406,6 +407,7 @@ class _PlanCard extends StatelessWidget {
 
   IconData _icon(String p) {
     switch (p) {
+      case 'vip':     return Icons.diamond_rounded;
       case 'premium': return Icons.star_rounded;
       case 'pro':     return Icons.workspace_premium_rounded;
       case 'starter': return Icons.rocket_launch_rounded;
@@ -415,6 +417,7 @@ class _PlanCard extends StatelessWidget {
 
   String _label(String p, AppLocalizations l10n) {
     switch (p) {
+      case 'vip':     return 'VIP 💎';
       case 'premium': return 'Premium';
       case 'pro':     return 'Pro';
       case 'starter': return 'Starter';

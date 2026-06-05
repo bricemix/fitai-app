@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsService {
   static const _modelKey = 'fitai_model';
-  static const defaultModel = 'google/gemini-2.0-flash-001';
+  static const defaultModel = 'google/gemini-2.5-flash';
 
   static Future<String> getModel() async {
     final prefs = await SharedPreferences.getInstance();

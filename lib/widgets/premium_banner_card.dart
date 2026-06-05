@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../screens/subscription_screen.dart';
@@ -68,8 +68,8 @@ class _PremiumBannerCardState extends State<PremiumBannerCard>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final trialLabel = _trialLabel(l10n);
     final mainTitle  = _mainTitle(l10n, trialLabel);
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/locale_provider.dart';
@@ -7,6 +7,7 @@ import '../services/auth_service.dart';
 import '../services/payment_service.dart';
 import '../services/currency_service.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/error_dialog.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   /// Appelé après confirmation du paiement, avant fermeture de l'écran.
@@ -35,6 +36,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   @override
   void didChangeDependencies() {
+    final c = AppTheme.of(context);
     super.didChangeDependencies();
     final locale = Localizations.localeOf(context).languageCode;
     if (_lastLocale != locale) {
@@ -92,16 +94,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       setState(() => _processingPlanId = null);
       _showCheckoutSheet(plan, result);
     } catch (e) {
-      if (mounted) {
-        setState(() => _processingPlanId = null);
-        _snack(e.toString(), error: true);
-      }
+      if (!mounted) return;
+      setState(() => _processingPlanId = null);
+      // Afficher un dialog adapté au type d'erreur, avec bouton "Réessayer"
+      ErrorDialog.showForException(
+        context,
+        e,
+        onRetry: () => _onSubscribe(plan),
+      );
     }
   }
 
   // Async : attend que CheckoutSheet retourne true (paiement confirmé)
   // puis ferme aussi SubscriptionScreen pour revenir directement à l'écran appelant.
   Future<void> _showCheckoutSheet(Plan plan, SubscribeResult result) async {
+    final c = AppTheme.of(context);
     final paid = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: c.surface,
@@ -124,6 +131,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   void _snack(String msg, {bool error = false}) {
+    final c = AppTheme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
       backgroundColor: error ? Colors.red.shade800 : c.surface,
@@ -132,9 +140,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
-    final c = AppTheme.of(context);
     return Scaffold(
       backgroundColor: c.bg,
       appBar: AppBar(
@@ -183,7 +191,8 @@ class CheckoutSheet extends StatefulWidget {
   State<CheckoutSheet> createState() => _CheckoutSheetState();
 }
 
-class _CheckoutSheetState extends State<CheckoutSheet> {
+class _CheckoutSheetState extends State<CheckoutSheet>
+    with WidgetsBindingObserver {
   bool _opened   = false;
   bool _checking = false;
 
@@ -195,6 +204,32 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
   // Polling webhook
   int  _webhookAttempt = 0;
   static const _webhookMaxAttempts = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Auto-déclenche la confirmation quand l'utilisateur revient dans l'app
+  /// après avoir payé sur Stripe (app passe de background → foreground).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _opened && !_checking) {
+      // Petit délai pour laisser le temps au webhook d'arriver
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted && _opened && !_checking) {
+          _confirmPayment();
+        }
+      });
+    }
+  }
 
   Future<void> _openStripe() async {
     final uri = Uri.parse(widget.checkoutUrl);
@@ -209,9 +244,21 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.cannotOpenBrowser(e.toString()))),
-        );
+        // Si c'est une erreur réseau, afficher un dialog approprié
+        final isNetwork = e.toString().toLowerCase().contains('socket') ||
+            e.toString().toLowerCase().contains('network') ||
+            e.toString().toLowerCase().contains('connection');
+        if (isNetwork) {
+          ErrorDialog.showForException(
+            context,
+            NetworkException(e.toString()),
+            onRetry: _openStripe,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.cannotOpenBrowser(e.toString()))),
+          );
+        }
       }
     }
   }
@@ -290,6 +337,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
   }
 
   void _snack(String msg, {required bool retry}) {
+    final c = AppTheme.of(context);
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -306,6 +354,7 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
   }
 
   void _showSuccessDialog({required bool invoiceSent, required bool emailSent}) {
+    final c = AppTheme.of(context);
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -386,8 +435,8 @@ class _CheckoutSheetState extends State<CheckoutSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
           24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 32),
@@ -680,8 +729,8 @@ class _PlanList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     if (plans.isEmpty) {
       return Center(
           child: Text(l10n.noPlanAvailable, style: TextStyle(color: c.muted)));
@@ -877,8 +926,8 @@ class _PlanGroupCardState extends State<_PlanGroupCard> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final plan = _selectedPlan;
     final isCurrentPlan = widget.currentPlan != null &&
         plan.slug.toLowerCase() == widget.currentPlan!.toLowerCase();
@@ -1339,8 +1388,8 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),

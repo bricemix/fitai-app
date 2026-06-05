@@ -12,6 +12,7 @@ class StorageService {
   static const _planningKey     = 'fitai_planning';
   static const _dishesKey       = 'fitai_dishes';
   static const _firstOpenKey    = 'fitai_first_open_done';
+  static const _missionsKey     = 'fitai_missions_history';
 
   // ── Première ouverture (paywall) ──────────────────────────────────────────
 
@@ -119,6 +120,28 @@ class StorageService {
     } catch (_) {
       return null;
     }
+  }
+
+  // ── Daily missions history ────────────────────────────────────────────────────
+
+  /// Load full missions history {dateISO: {water, walk, nosugar, ...}}
+  static Future<Map<String, dynamic>> loadMissionsHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_missionsKey);
+    if (raw == null) return {};
+    try {
+      return Map<String, dynamic>.from(jsonDecode(raw) as Map);
+    } catch (_) {
+      return {};
+    }
+  }
+
+  /// Save full missions history (merge with existing)
+  static Future<void> saveMissionsHistory(Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    final existing = await loadMissionsHistory();
+    existing.addAll(data);
+    await prefs.setString(_missionsKey, jsonEncode(existing));
   }
 
   // ── Dish recommendations ──────────────────────────────────────────────────────

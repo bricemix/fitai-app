@@ -68,6 +68,7 @@ class DishRecommendation {
   final int fat;
   final String description;
   final List<DishIngredient> ingredients;
+  final List<String> steps;
 
   const DishRecommendation({
     required this.name,
@@ -78,10 +79,12 @@ class DishRecommendation {
     required this.fat,
     required this.description,
     this.ingredients = const [],
+    this.steps = const [],
   });
 
   factory DishRecommendation.fromJson(Map<String, dynamic> j) {
     final rawIngredients = j['ingredients'] as List? ?? [];
+    final rawSteps = j['steps'] as List? ?? [];
     return DishRecommendation(
       name:        j['name'] as String? ?? '',
       type:        j['type'] as String? ?? 'repas',
@@ -93,6 +96,7 @@ class DishRecommendation {
       ingredients: rawIngredients
           .map((e) => DishIngredient.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(),
+      steps: rawSteps.map((e) => e.toString()).toList(),
     );
   }
 
@@ -105,5 +109,6 @@ class DishRecommendation {
         'fat':         fat,
         'description': description,
         'ingredients': ingredients.map((i) => i.toJson()).toList(),
+        'steps':       steps,
       };
 }

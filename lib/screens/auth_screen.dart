@@ -1,4 +1,4 @@
-import 'package:flutter/gestures.dart';
+﻿import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -247,6 +247,7 @@ class _AuthScreenState extends State<AuthScreen>
   }
 
   void _showLanguagePicker(BuildContext context) {
+    final c = AppTheme.of(context);
     final localeProvider = context.read<LocaleProvider>();
     showModalBottomSheet<void>(
       context: context,
@@ -300,8 +301,8 @@ class _AuthScreenState extends State<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
-    final localeProvider = context.watch<LocaleProvider>();
     final c = AppTheme.of(context);
+    final localeProvider = context.watch<LocaleProvider>();
     final currentLang = LocaleProvider.supportedLanguages.firstWhere(
       (l) => l.$1 == localeProvider.locale.languageCode,
       orElse: () => LocaleProvider.supportedLanguages.first,
@@ -421,7 +422,7 @@ class _DietVisionLogo extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         RichText(
-          text: const TextSpan(
+          text: TextSpan(
             children: [
               TextSpan(
                 text: 'Diet',
@@ -498,8 +499,8 @@ class _LoginFormState extends State<_LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Form(
       key: _formKey,
       child: Column(
@@ -626,6 +627,7 @@ class _RegisterFormState extends State<_RegisterForm> {
 
   @override
   void dispose() {
+    final c = AppTheme.of(context);
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
@@ -645,20 +647,23 @@ class _RegisterFormState extends State<_RegisterForm> {
       locale: Localizations.localeOf(context),
       initialEntryMode: DatePickerEntryMode.calendarOnly,
       helpText: '',
-      builder: (ctx, child) => Theme(
-        data: Theme.of(ctx).copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: c.accent,
-            onPrimary: Colors.black,
-            surface: Color(0xFF1C1C1E),
-            onSurface: Colors.white,
+      builder: (ctx, child) {
+        final c = AppTheme.of(ctx);
+        return Theme(
+          data: Theme.of(ctx).copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: c.accent,
+              onPrimary: Colors.black,
+              surface: const Color(0xFF1C1C1E),
+              onSurface: Colors.white,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: c.accent),
+            ),
           ),
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(foregroundColor: c.accent),
-          ),
-        ),
-        child: child!,
-      ),
+          child: child!,
+        );
+      },
     );
     if (picked == null || !mounted) return;
 
@@ -678,6 +683,7 @@ class _RegisterFormState extends State<_RegisterForm> {
 
   void _showUnderageDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -728,6 +734,7 @@ class _RegisterFormState extends State<_RegisterForm> {
   }
 
   void _openCountryPicker() {
+    final c = AppTheme.of(context);
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -750,6 +757,7 @@ class _RegisterFormState extends State<_RegisterForm> {
   }
 
   void _openCurrencyPicker() {
+    final c = AppTheme.of(context);
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -759,9 +767,9 @@ class _RegisterFormState extends State<_RegisterForm> {
       ),
       builder: (ctx) => _CurrencyPickerSheet(
         selected: _currency,
-        onSelect: (c) async {
-          setState(() => _currency = c);
-          await CurrencyService.save(c); // persisté dès le choix
+        onSelect: (cur) async {
+          setState(() => _currency = cur);
+          await CurrencyService.save(cur); // persisté dès le choix
           if (ctx.mounted) Navigator.pop(ctx);
         },
       ),
@@ -811,8 +819,8 @@ class _RegisterFormState extends State<_RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Form(
       key: _formKey,
       child: Column(
@@ -1124,8 +1132,8 @@ class _PasswordStrengthHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final hasLength  = password.length >= 8;
     final hasUpper   = password.contains(RegExp(r'[A-Z]'));
     final hasNumSym  = password.contains(RegExp(r'[\d!@#$%^&*()\-_=+\[\]{};:,.<>/?\\|~]'));
@@ -1232,8 +1240,8 @@ class _SocialButtonsState extends State<_SocialButtons> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     // Sur Android, Apple n'est pas disponible → on masque toute la section
     if (!SocialAuthService.isAppleAvailable) return const SizedBox.shrink();
 
@@ -1281,7 +1289,10 @@ class _SocialButtonsState extends State<_SocialButtons> {
 
   Widget _facebookIcon() => const Icon(Icons.facebook, color: Color(0xFF1877F2), size: 22);
 
-  Widget _appleIcon() => Icon(Icons.apple, color: c.text, size: 22);
+  Widget _appleIcon() {
+    final c = AppTheme.of(context);
+    return Icon(Icons.apple, color: c.text, size: 22);
+  }
 }
 
 class _SocialIconButton extends StatelessWidget {
@@ -1385,6 +1396,7 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
 
   @override
   void dispose() {
+    _searchCtrl.removeListener(_onSearch);
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -1559,6 +1571,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
 
   @override
   void dispose() {
+    _searchCtrl.removeListener(_onSearch);
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -1640,10 +1653,10 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 itemCount: _filtered.length,
                 itemBuilder: (ctx, i) {
-                  final c = _filtered[i];
-                  final isSelected = c.code == widget.selected.code;
+                  final cur = _filtered[i];
+                  final isSelected = cur.code == widget.selected.code;
                   return InkWell(
-                    onTap: () => widget.onSelect(c),
+                    onTap: () => widget.onSelect(cur),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       decoration: BoxDecoration(
@@ -1651,19 +1664,19 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                       ),
                       child: Row(
                         children: [
-                          Text(c.flag, style: TextStyle(fontSize: 20)),
+                          Text(cur.flag, style: TextStyle(fontSize: 20)),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(c.name,
+                                Text(cur.name,
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                       color: isSelected ? c.accent : c.text,
                                     )),
-                                Text(c.code,
+                                Text(cur.code,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: isSelected ? c.accent.withAlpha(180) : c.muted,
@@ -1672,7 +1685,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                             ),
                           ),
                           Text(
-                            CurrencyService.format(499, c),
+                            CurrencyService.format(499, cur),
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,

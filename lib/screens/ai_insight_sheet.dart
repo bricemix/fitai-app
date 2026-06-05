@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../l10n/app_localizations.dart';
 
@@ -65,8 +65,8 @@ class _AiInsightSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     final IconData headerIcon;
     final Color headerColor;

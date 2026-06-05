@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -183,9 +183,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
-    final c = AppTheme.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -455,7 +455,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                             border: Border.all(color: c.border),
                           ),
                           child: _sending
-                              ? const Center(
+                              ? Center(
                                   child: SizedBox(
                                     width: 18,
                                     height: 18,

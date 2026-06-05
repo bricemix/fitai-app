@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthResult {
   final bool success;
@@ -16,6 +17,10 @@ class AuthService {
   static const String baseUrl = 'https://api.diet-vision.com/api/v1';
   static const _tokenKey = 'dv_jwt_token';
   static const _userKey  = 'dv_user';
+
+  static const _secure = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
 
   // ── Session unique : notifier global ─────────────────────────────────────
   // Lorsque le serveur répond SESSION_INVALIDATED (autre appareil connecté),
@@ -41,16 +46,13 @@ class AuthService {
   }
 
   // ── Token ──────────────────────────────────────────────────────────────────
-  // TODO(SEC-1): migrer vers flutter_secure_storage quand le SSL Gradle est résolu
 
   static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
+    return _secure.read(key: _tokenKey);
   }
 
   static Future<void> saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
+    await _secure.write(key: _tokenKey, value: token);
   }
 
   static Future<bool> isLoggedIn() async {
@@ -61,8 +63,7 @@ class AuthService {
   // ── User cache ─────────────────────────────────────────────────────────────
 
   static Future<Map<String, dynamic>?> getCachedUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_userKey);
+    final raw = await _secure.read(key: _userKey);
     if (raw == null) return null;
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
@@ -72,8 +73,7 @@ class AuthService {
   }
 
   static Future<void> _saveUser(Map<String, dynamic> user) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode(user));
+    await _secure.write(key: _userKey, value: jsonEncode(user));
   }
 
   /// Met à jour le cache utilisateur (appelé après refresh depuis le serveur).
@@ -82,10 +82,9 @@ class AuthService {
   // ── Session ────────────────────────────────────────────────────────────────
 
   static Future<void> clearSession() async {
-    // Supprimer toutes les données utilisateur de SharedPreferences
+    await _secure.delete(key: _tokenKey);
+    await _secure.delete(key: _userKey);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_userKey);
     await prefs.remove('fitai_profile');
     await prefs.remove('fitai_meals');
     await prefs.remove('fitai_body_entries');

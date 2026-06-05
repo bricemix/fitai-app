@@ -2,7 +2,7 @@ name: smartfit
 description: "DietVision - Coach nutrition & fitness alimenté par l'IA"
 publish_to: 'none'
 
-version: 1.0.0+22
+version: 1.0.0+29
 
 environment:
   sdk: ^3.11.5
@@ -15,6 +15,7 @@ dependencies:
   intl: ^0.20.2
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.3.2
+  flutter_secure_storage: ^9.2.2
   provider: ^6.1.2
   http: ^1.2.2
   image_picker: ^1.1.2

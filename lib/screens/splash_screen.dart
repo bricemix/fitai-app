@@ -269,8 +269,8 @@ class _SplashScreenState extends State<SplashScreen>
                           position: _titleSlide,
                           child: RichText(
                             textAlign: TextAlign.center,
-                            text: const TextSpan(
-                              style: TextStyle(
+                            text: TextSpan(
+                              style: const TextStyle(
                                 fontFamily: 'Syne',
                                 fontSize: 38,
                                 fontWeight: FontWeight.w900,

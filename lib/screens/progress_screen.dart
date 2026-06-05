@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' show min, max;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/profile.dart';
@@ -29,6 +30,8 @@ class ProgressScreen extends StatefulWidget {
 }
 
 class _ProgressScreenState extends State<ProgressScreen> with SingleTickerProviderStateMixin {
+  AppColors get c => AppTheme.of(context);
+
   late TabController _tabs;
   List<BodyEntry> _entries = [];
   String? _toast;
@@ -175,7 +178,7 @@ class _ProgressScreenState extends State<ProgressScreen> with SingleTickerProvid
               child: TabBarView(
                 controller: _tabs,
                 children: [
-                  _HistoryTab(meals: widget.meals),
+                  _HistoryTab(meals: widget.meals, profile: widget.profile),
                   _BodyTab(entries: _entries, profile: widget.profile, onAddEntry: _openEntrySheet),
                 ],
               ),
@@ -369,6 +372,7 @@ class _BodyTab extends StatelessWidget {
           if (entries.any((e) => e.weight != null))
             _TrendChart(
               title: l10n.weight,
+              unit: 'kg',
               icon: Icons.monitor_weight_rounded,
               entries: recent,
               getValue: (e) => e.weight,
@@ -381,6 +385,7 @@ class _BodyTab extends StatelessWidget {
             const SizedBox(height: 14),
             _TrendChart(
               title: l10n.waist,
+              unit: 'cm',
               icon: Icons.straighten_rounded,
               entries: recent,
               getValue: (e) => e.waist,
@@ -394,6 +399,7 @@ class _BodyTab extends StatelessWidget {
             const SizedBox(height: 14),
             _TrendChart(
               title: l10n.biceps,
+              unit: 'cm',
               icon: Icons.fitness_center_rounded,
               entries: recent,
               getValue: (e) => e.biceps,
@@ -407,6 +413,7 @@ class _BodyTab extends StatelessWidget {
             const SizedBox(height: 14),
             _TrendChart(
               title: l10n.chest,
+              unit: 'cm',
               icon: Icons.accessibility_new_rounded,
               entries: recent,
               getValue: (e) => e.chest,
@@ -537,80 +544,285 @@ class _MetricChip extends StatelessWidget {
   }
 }
 
-// ── Trend Chart ───────────────────────────────────────────────────────────────
+// ── Trend Chart (line chart) ──────────────────────────────────────────────────
 class _TrendChart extends StatelessWidget {
   final String title;
+  final String unit;
   final IconData icon;
   final List<BodyEntry> entries;
   final double? Function(BodyEntry) getValue;
   final Color color;
   final bool lowerIsBetter;
-  const _TrendChart({required this.title, required this.icon, required this.entries, required this.getValue, required this.color, this.lowerIsBetter = false});
+  const _TrendChart({
+    required this.title, required this.icon,
+    required this.entries, required this.getValue,
+    required this.color, this.lowerIsBetter = false,
+    this.unit = '',
+  });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
-    final points = entries.map((e) => (date: e.date, val: getValue(e))).where((p) => p.val != null).toList();
+    final points = entries
+        .map((e) => (date: e.date, val: getValue(e)))
+        .where((p) => p.val != null)
+        .toList();
     if (points.isEmpty) return const SizedBox();
 
     final vals = points.map((p) => p.val!).toList();
-    final minV = vals.reduce((a, b) => a < b ? a : b) - 0.5;
-    final maxV = vals.reduce((a, b) => a > b ? a : b) + 0.5;
-    final range = (maxV - minV).clamp(0.1, double.infinity);
+    final current = vals.last;
+    final previous = vals.length >= 2 ? vals[vals.length - 2] : null;
+    final prevDate = points.length >= 2 ? DateTime.parse(points[points.length - 2].date) : null;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: c.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: c.border)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Icon(icon, size: 16, color: color),
-            const SizedBox(width: 6),
-            Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-            const Spacer(),
-            if (vals.length >= 2)
-              _DeltaBadge(first: vals.first, last: vals.last, lowerIsBetter: lowerIsBetter),
-          ]),
-          const SizedBox(height: 14),
-          SizedBox(
-            height: 80,
-            child: Row(
+    final diff = previous != null ? current - previous : null;
+    final isRising = diff != null && diff > 0.05;
+    final isFalling = diff != null && diff < -0.05;
+    final good = lowerIsBetter ? isFalling : isRising;
+    final trendColor = (isRising || isFalling)
+        ? (good ? c.accent : c.accent3)
+        : c.muted;
+    final trendLabel = isRising ? l10n.trendRising
+        : isFalling ? l10n.trendFalling
+        : l10n.stable;
+
+    final dateLabels = points
+        .map((p) { final d = DateTime.parse(p.date); return '${d.day}/${d.month}'; })
+        .toList();
+
+    return GestureDetector(
+      onTap: () => _showDetailSheet(context, title: title, unit: unit, color: color,
+          points: points, lowerIsBetter: lowerIsBetter),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: c.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: c.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Header ──────────────────────────────────────────────
+            Row(children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 6),
+              Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+              const Spacer(),
+              Icon(Icons.chevron_right_rounded, size: 16, color: c.muted),
+            ]),
+            const SizedBox(height: 14),
+            // ── Chart + value side by side ───────────────────────────
+            Row(
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: points.asMap().entries.map((e) {
-                final h = ((e.value.val! - minV) / range * 65 + 8).clamp(8.0, 73.0);
-                final d = DateTime.parse(e.value.date);
-                final isLast = e.key == points.length - 1;
-                return Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (isLast)
-                        Text(e.value.val!.toStringAsFixed(1), style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.w700))
-                      else
-                        const SizedBox(height: 12),
-                      const SizedBox(height: 2),
-                      AnimatedContainer(
-                        duration: Duration(milliseconds: 300 + e.key * 50),
-                        height: h,
-                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                        decoration: BoxDecoration(
-                          color: isLast ? color : color.withAlpha(64),
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                        ),
+              children: [
+                // Chart
+                Expanded(
+                  flex: 3,
+                  child: SizedBox(
+                    height: 90,
+                    child: CustomPaint(
+                      painter: _LineChartPainter(
+                        values: vals,
+                        color: color,
+                        labels: dateLabels,
+                        mutedColor: c.muted,
                       ),
-                      const SizedBox(height: 4),
-                      Text('${d.day}/${d.month}', style: TextStyle(fontSize: 8, color: c.muted)),
-                    ],
+                    ),
                   ),
-                );
-              }).toList(),
+                ),
+                const SizedBox(width: 16),
+                // Value + trend
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    RichText(text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: current.toStringAsFixed(1),
+                          style: TextStyle(fontFamily: 'Syne', fontSize: 26,
+                              fontWeight: FontWeight.w900, color: color),
+                        ),
+                        TextSpan(
+                          text: ' $unit',
+                          style: TextStyle(fontSize: 12, color: c.muted),
+                        ),
+                      ],
+                    )),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: trendColor.withAlpha(24),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Text(trendLabel,
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: trendColor)),
+                    ),
+                    if (diff != null && diff.abs() > 0.05 && prevDate != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        '${diff > 0 ? '+' : ''}${diff.toStringAsFixed(1)} $unit',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: trendColor),
+                      ),
+                      Text(
+                        'vs ${prevDate.day}/${prevDate.month}',
+                        style: TextStyle(fontSize: 10, color: c.muted),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  void _showDetailSheet(BuildContext ctx, {
+    required String title, required String unit, required Color color,
+    required List<({String date, double? val})> points, required bool lowerIsBetter,
+  }) {
+    final c = AppTheme.of(ctx);
+    final vals = points.map((p) => p.val!).toList();
+    final labels = points.map((p) { final d = DateTime.parse(p.date); return '${d.day}/${d.month}'; }).toList();
+    showModalBottomSheet(
+      context: ctx, isScrollControlled: true, backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        height: 340,
+        decoration: BoxDecoration(
+          color: c.surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(children: [
+          Center(child: Container(width: 40, height: 4,
+              decoration: BoxDecoration(color: c.border, borderRadius: BorderRadius.circular(2)))),
+          const SizedBox(height: 16),
+          Row(children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 8),
+            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+          ]),
+          const SizedBox(height: 20),
+          Expanded(child: CustomPaint(
+            painter: _LineChartPainter(values: vals, color: color, labels: labels,
+                mutedColor: c.muted, showYAxis: true),
+          )),
+        ]),
+      ),
+    );
+  }
+}
+
+// ── Line Chart CustomPainter ──────────────────────────────────────────────────
+class _LineChartPainter extends CustomPainter {
+  final List<double> values;
+  final Color color;
+  final List<String> labels;
+  final Color mutedColor;
+  final bool showYAxis;
+
+  const _LineChartPainter({
+    required this.values, required this.color,
+    this.labels = const [], required this.mutedColor,
+    this.showYAxis = false,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (values.length < 2) {
+      // Single point — draw a dot
+      final paint = Paint()..color = color..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(size.width / 2, size.height / 2 - 10), 5, paint);
+      return;
+    }
+
+    final labelH = labels.isNotEmpty ? 18.0 : 0.0;
+    final chartH = size.height - labelH;
+    final w = size.width;
+
+    final minV = values.reduce(min);
+    final maxV = values.reduce(max);
+    final range = (maxV - minV).clamp(1.0, double.infinity);
+    final pad = range * 0.15;
+
+    double toY(double v) =>
+        chartH - ((v - (minV - pad)) / (range + pad * 2) * chartH * 0.90 + chartH * 0.05);
+    double toX(int i) => i / (values.length - 1) * w;
+
+    final pts = List.generate(values.length, (i) => Offset(toX(i), toY(values[i])));
+
+    // ── Gradient fill ──────────────────────────────────────────────
+    final fillPath = Path()
+      ..moveTo(pts.first.dx, chartH)
+      ..lineTo(pts.first.dx, pts.first.dy);
+    for (int i = 0; i < pts.length - 1; i++) {
+      final cp1 = Offset((pts[i].dx + pts[i + 1].dx) / 2, pts[i].dy);
+      final cp2 = Offset((pts[i].dx + pts[i + 1].dx) / 2, pts[i + 1].dy);
+      fillPath.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, pts[i + 1].dx, pts[i + 1].dy);
+    }
+    fillPath
+      ..lineTo(pts.last.dx, chartH)
+      ..close();
+
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [color.withAlpha(70), color.withAlpha(0)],
+      ).createShader(Rect.fromLTWH(0, 0, w, chartH))
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(fillPath, fillPaint);
+
+    // ── Curve ──────────────────────────────────────────────────────
+    final linePath = Path()..moveTo(pts.first.dx, pts.first.dy);
+    for (int i = 0; i < pts.length - 1; i++) {
+      final cp1 = Offset((pts[i].dx + pts[i + 1].dx) / 2, pts[i].dy);
+      final cp2 = Offset((pts[i].dx + pts[i + 1].dx) / 2, pts[i + 1].dy);
+      linePath.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, pts[i + 1].dx, pts[i + 1].dy);
+    }
+    canvas.drawPath(linePath, Paint()
+      ..color = color
+      ..strokeWidth = 2.2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round);
+
+    // ── Dots ───────────────────────────────────────────────────────
+    for (int i = 0; i < pts.length; i++) {
+      final isLast = i == pts.length - 1;
+      if (isLast) {
+        canvas.drawCircle(pts[i], 6, Paint()..color = color.withAlpha(30));
+        canvas.drawCircle(pts[i], 4, Paint()..color = color);
+        canvas.drawCircle(pts[i], 2.5, Paint()..color = Colors.white.withAlpha(200));
+      } else {
+        canvas.drawCircle(pts[i], 3, Paint()..color = color.withAlpha(150));
+      }
+    }
+
+    // ── X date labels ──────────────────────────────────────────────
+    if (labels.isNotEmpty) {
+      final textStyle = TextStyle(
+        fontSize: 8, color: mutedColor, fontWeight: FontWeight.w500,
+      );
+      for (int i = 0; i < labels.length; i++) {
+        // Show first, last, and evenly spaced
+        if (labels.length > 5 && i != 0 && i != labels.length - 1 && i % 2 != 0) continue;
+        final tp = TextPainter(
+          text: TextSpan(text: labels[i], style: textStyle),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        final x = (toX(i) - tp.width / 2).clamp(0.0, w - tp.width);
+        tp.paint(canvas, Offset(x, chartH + 3));
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_LineChartPainter old) =>
+      old.values != values || old.color != color;
 }
 
 class _DeltaBadge extends StatelessWidget {
@@ -738,9 +950,22 @@ class _Projection {
     final currentWeight = withWeight.last.weight!;
     final startWeight   = double.tryParse(profile.weight) ?? currentWeight;
     final height        = double.tryParse(profile.height) ?? 170.0;
-    final isLoss        = profile.goal.toLowerCase().contains('perdre');
-    final isGain        = profile.goal.toLowerCase().contains('masse');
-    if (!isLoss && !isGain) return null; // Maintenir → pas de projection
+    // Use goalKgPerWeek (locale-independent) to detect goal type
+    final isLoss = profile.goalKgPerWeek < -0.05 ||
+        (profile.goalKgPerWeek == 0 &&
+          (profile.goal.toLowerCase().contains('perd') ||
+           profile.goal.toLowerCase().contains('loss') ||
+           profile.goal.toLowerCase().contains('perd') ||
+           profile.goal.toLowerCase().contains('abnehm') ||
+           profile.goal.toLowerCase().contains('bajar')));
+    final isGain = profile.goalKgPerWeek > 0.05 ||
+        (profile.goalKgPerWeek == 0 &&
+          (profile.goal.toLowerCase().contains('masse') ||
+           profile.goal.toLowerCase().contains('gain') ||
+           profile.goal.toLowerCase().contains('muscle') ||
+           profile.goal.toLowerCase().contains('zunehm') ||
+           profile.goal.toLowerCase().contains('ganar')));
+    if (!isLoss && !isGain) return null; // Maintain → no projection
 
     // ── Poids cible ─────────────────────────────────────────────────────
     double targetWeight;
@@ -1018,7 +1243,8 @@ class _ProjStat extends StatelessWidget {
 // ── History Tab (repas) ───────────────────────────────────────────────────────
 class _HistoryTab extends StatelessWidget {
   final List<Meal> meals;
-  const _HistoryTab({required this.meals});
+  final UserProfile profile;
+  const _HistoryTab({required this.meals, required this.profile});
 
   Map<String, List<Meal>> _groupByDate(AppLocalizations l10n) {
     final map = <String, List<Meal>>{};
@@ -1060,10 +1286,13 @@ class _HistoryTab extends StatelessWidget {
     final grouped = _groupByDate(l10n);
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      itemCount: grouped.length,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      itemCount: grouped.length + 1,
       itemBuilder: (_, i) {
-        final label = grouped.keys.elementAt(i);
+        // ── Summary card (item 0) ──────────────────────────────────────
+        if (i == 0) return _MealSummaryCard(meals: meals, profile: profile);
+
+        final label = grouped.keys.elementAt(i - 1);
         final dayMeals = grouped[label]!;
         final dayKcal = dayMeals.fold(0, (s, m) => s + m.result.calories);
 
@@ -1073,6 +1302,8 @@ class _HistoryTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 10, top: 4),
               child: Row(children: [
+                Icon(Icons.calendar_month_rounded, size: 14, color: c.accent),
+                const SizedBox(width: 6),
                 Text(label, style: TextStyle(fontFamily: 'Syne', fontSize: 15, fontWeight: FontWeight.w700)),
                 const Spacer(),
                 Container(
@@ -1098,6 +1329,170 @@ class _HistoryTab extends StatelessWidget {
   }
 }
 
+// ── Meal Summary Card ─────────────────────────────────────────────────────────
+class _MealSummaryCard extends StatelessWidget {
+  final List<Meal> meals;
+  final UserProfile profile;
+  const _MealSummaryCard({required this.meals, required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final c = AppTheme.of(context);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final todayMeals = meals.where((m) {
+      final d = DateTime.parse(m.date);
+      return DateTime(d.year, d.month, d.day) == today;
+    }).toList();
+
+    final todayKcal = todayMeals.fold(0, (s, m) => s + m.result.calories);
+    final target = profile.tdee.round();
+    final progress = (todayKcal / target.clamp(1, 99999)).clamp(0.0, 1.0);
+
+    final avgScore = meals.isEmpty
+        ? 0.0
+        : meals.fold(0.0, (s, m) => s + m.result.healthScore) / meals.length;
+
+    String qualityLabel(double sc) {
+      if (sc >= 7) return l10n.veryGood;
+      if (sc >= 4) return l10n.goodLabel;
+      return l10n.fairLabel;
+    }
+
+    Color qualityColor(double sc) {
+      if (sc >= 7) return c.accent;
+      if (sc >= 4) return const Color(0xFFffcc00);
+      return c.accent3;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: c.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: c.border),
+        ),
+        child: Column(
+          children: [
+            // ── Stat row ────────────────────────────────────────────
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  // Kcal today
+                  Expanded(child: _SummaryStatCell(
+                    icon: Icons.local_fire_department_rounded,
+                    iconColor: c.accent,
+                    label: l10n.totalTodayLabel,
+                    value: '$todayKcal kcal',
+                    subtitle: l10n.kcalTargetValue(target),
+                    border: false,
+                  )),
+                  VerticalDivider(width: 1, color: c.border),
+                  // Meals today / total
+                  Expanded(child: _SummaryStatCell(
+                    icon: Icons.restaurant_rounded,
+                    iconColor: const Color(0xFF4DA1FF),
+                    label: l10n.mealsLoggedLabel,
+                    value: '${todayMeals.length} / ${meals.length}',
+                    subtitle: l10n.todayLabel,
+                    border: false,
+                  )),
+                  VerticalDivider(width: 1, color: c.border),
+                  // Avg health score
+                  Expanded(child: _SummaryStatCell(
+                    icon: Icons.star_rounded,
+                    iconColor: qualityColor(avgScore),
+                    label: l10n.avgHealthScoreLabel,
+                    value: '${avgScore.toStringAsFixed(1)} / 10',
+                    subtitle: qualityLabel(avgScore),
+                    subtitleColor: qualityColor(avgScore),
+                    border: false,
+                  )),
+                ],
+              ),
+            ),
+            // ── Calorie progress bar ─────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              child: Column(
+                children: [
+                  Divider(color: c.border, height: 1),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('$todayKcal kcal',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: c.accent)),
+                      Text('$target kcal',
+                          style: TextStyle(fontSize: 11, color: c.muted)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: c.border,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        progress >= 1.0 ? c.accent3 : c.accent,
+                      ),
+                      minHeight: 6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryStatCell extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label, value, subtitle;
+  final Color? subtitleColor;
+  final bool border;
+  const _SummaryStatCell({
+    required this.icon, required this.iconColor,
+    required this.label, required this.value, required this.subtitle,
+    this.subtitleColor, this.border = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(icon, size: 14, color: iconColor),
+            const SizedBox(width: 5),
+            Expanded(child: Text(label,
+                maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 10, color: c.muted))),
+          ]),
+          const SizedBox(height: 6),
+          Text(value, style: TextStyle(
+              fontFamily: 'Syne', fontSize: 15, fontWeight: FontWeight.w800,
+              color: iconColor)),
+          const SizedBox(height: 2),
+          Text(subtitle, style: TextStyle(
+              fontSize: 10, color: subtitleColor ?? c.muted,
+              fontWeight: subtitleColor != null ? FontWeight.w600 : FontWeight.normal)),
+        ],
+      ),
+    );
+  }
+}
+
 /// Affiche la miniature d'un repas — fichier local OU base64 synchronisé (nouveau téléphone).
 Widget _buildProgressMealThumb(Meal meal) {
   // 1. Fichier local présent sur cet appareil
@@ -1105,6 +1500,7 @@ Widget _buildProgressMealThumb(Meal meal) {
     final file = File(meal.imagePath!);
     if (file.existsSync()) {
       return Image.file(file, fit: BoxFit.cover,
+          cacheWidth: 120, cacheHeight: 120,
           errorBuilder: (_, __, ___) => _progressMealIcon());
     }
   }
@@ -1120,19 +1516,18 @@ Widget _buildProgressMealThumb(Meal meal) {
   return _progressMealIcon();
 }
 
-Widget _progressMealIcon() =>
-    Center(child: Icon(Icons.restaurant_rounded, size: 22, color: c.muted));
+Widget _progressMealIcon({Color? color}) =>
+    Center(child: Icon(Icons.restaurant_rounded, size: 22, color: color ?? AppTheme.muted));
 
 class _MealTile extends StatelessWidget {
   final Meal meal;
   final bool isLast;
   const _MealTile({required this.meal, required this.isLast});
 
-  Color _scoreColor(int s) => s >= 7 ? c.accent : s >= 4 ? Color(0xFFffcc00) : c.accent3;
-
   @override
   Widget build(BuildContext context) {
     final c = AppTheme.of(context);
+    Color scoreColor(int s) => s >= 7 ? c.accent : s >= 4 ? const Color(0xFFffcc00) : c.accent3;
     final d = DateTime.parse(meal.date);
     final time = '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 
@@ -1167,7 +1562,7 @@ class _MealTile extends StatelessWidget {
             Text('${meal.result.calories}', style: TextStyle(fontFamily: 'Syne', fontSize: 16, fontWeight: FontWeight.w700, color: c.accent)),
             Text('kcal', style: TextStyle(fontSize: 10, color: c.muted)),
             const SizedBox(height: 2),
-            Text('${meal.result.healthScore}/10', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _scoreColor(meal.result.healthScore))),
+            Text('${meal.result.healthScore}/10', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: scoreColor(meal.result.healthScore))),
           ]),
         ],
       ),

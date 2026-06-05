@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../models/profile.dart';
@@ -75,9 +75,9 @@ class _ProgressForecastSheetState extends State<_ProgressForecastSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
-    final c = AppTheme.of(context);
     final currentWeight = double.tryParse(widget.profile.weight) ?? 70.0;
     final goalKg = widget.profile.goalKgPerWeek;
 

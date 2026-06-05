@@ -18,6 +18,8 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  AppColors get c => AppTheme.of(context);
+
   int _step = 0; // 0=welcome, 1=identité, 2=objectif, 3=activité
 
   // Step 1 — identité
@@ -230,7 +232,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          const Text(
+          Text(
             'DietVision',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -352,11 +354,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.muted)),
         const SizedBox(height: 20),
 
-        _inputField(l10n.yourFirstName, hint: l10n.firstNameEx, onChanged: (v) => _name = v),
+        _inputField(l10n.yourFirstName, hint: l10n.firstNameEx, onChanged: (v) => setState(() => _name = v)),
         const SizedBox(height: 12),
 
         Row(children: [
-          Expanded(child: _inputField(l10n.age, hint: '25', numeric: true, onChanged: (v) => _age = v)),
+          Expanded(child: _inputField(l10n.age, hint: '25', numeric: true, onChanged: (v) => setState(() => _age = v))),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -375,20 +377,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         const SizedBox(height: 12),
 
         Row(children: [
-          Expanded(child: _inputField(l10n.weight, hint: '70', numeric: true, onChanged: (v) => _weight = v)),
+          Expanded(child: _inputField(l10n.weight, hint: '70', numeric: true, onChanged: (v) => setState(() => _weight = v))),
           const SizedBox(width: 12),
-          Expanded(child: _inputField(l10n.height, hint: '175', numeric: true, onChanged: (v) => _height = v)),
+          Expanded(child: _inputField(l10n.height, hint: '175', numeric: true, onChanged: (v) => setState(() => _height = v))),
         ]),
         const SizedBox(height: 16),
 
         _label(l10n.bodyMeasurementsLabel),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: _inputField(l10n.waist, hint: 'cm', numeric: true, onChanged: (v) => _waistCm = v)),
+          Expanded(child: _inputField(l10n.waist, hint: 'cm', numeric: true, onChanged: (v) => setState(() => _waistCm = v))),
           const SizedBox(width: 12),
-          Expanded(child: _inputField(l10n.biceps, hint: 'cm', numeric: true, onChanged: (v) => _bicepsCm = v)),
+          Expanded(child: _inputField(l10n.biceps, hint: 'cm', numeric: true, onChanged: (v) => setState(() => _bicepsCm = v))),
           const SizedBox(width: 12),
-          Expanded(child: _inputField(l10n.belly, hint: 'cm', numeric: true, onChanged: (v) => _bellyCm = v)),
+          Expanded(child: _inputField(l10n.belly, hint: 'cm', numeric: true, onChanged: (v) => setState(() => _bellyCm = v))),
         ]),
         const SizedBox(height: 20),
       ],
@@ -452,7 +454,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             fontWeight: FontWeight.w600,
                             color: _goalKgPerWeek == opt.$1 ? c.accent : c.text,
                           )),
-                          Text('${opt.$1.abs().toStringAsFixed(2)} kg/semaine',
+                          Text('${opt.$1.abs().toStringAsFixed(2)} ${l10n.kgPerWeek}',
                               style: TextStyle(fontSize: 12, color: c.muted)),
                         ],
                       ),
@@ -595,6 +597,7 @@ class _OnboardingLangButton extends StatelessWidget {
   const _OnboardingLangButton();
 
   void _showPicker(BuildContext context) {
+    final c = AppTheme.of(context);
     final localeProvider = context.read<LocaleProvider>();
     showModalBottomSheet<void>(
       context: context,

@@ -38,6 +38,12 @@ class SyncService {
     });
   }
 
+  /// Upload the daily missions history to the server.
+  /// [missions] is a map of {dateISO: {water, walk, nosugar, ...}}
+  static Future<void> uploadMissions(Map<String, dynamic> missions) async {
+    await _put('/user/missions', {'missions': missions});
+  }
+
   // ── Download (au login) ───────────────────────────────────────────────────
 
   /// Récupère toutes les données utilisateur depuis le serveur et les stocke

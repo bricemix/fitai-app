@@ -167,6 +167,20 @@ abstract class AppLocalizations {
   String get fibers;
   String get entirePlate;
   String get halfPortion;
+  // Scan — text tab
+  String get scanTabPhoto;
+  String get scanTabText;
+  String get scanTextSubtitle;
+  String get describeMeal;
+  String get describeMealHint;
+  String get mealNameLabel;
+  String get mealNamePlaceholder;
+  String get portionQtyLabel;
+  String get portionQtyPlaceholder;
+  String get mealTypeLabel;
+  String get precisionTip;
+  String get switchToPhoto;
+  String get forgotPhotoTip;
 
   // ── Coach ───────────────────────────────────────────────────────────────────
   String get coachTitle;
@@ -570,6 +584,17 @@ abstract class AppLocalizations {
   String promptDinnerSurplus(int surplus, int tdee, String diet);
   String promptDinnerNormal(int remaining, String diet);
 
+  // ── Dashboard — Today Score & Quick Actions ──────────────────────────────────
+  String get todayScore;
+  String get ofDailyGoal;
+  String get scoreScanFirstMeal;
+  String get addFoodLabel;
+  String get askCoachLabel;
+  String get dailyNutrition;
+  String get consumed;
+  String get nextMilestone;
+  String get completedFraction;
+
   // ── Dashboard — Today Mission & AI Reco ──────────────────────────────────────
   String get readyToCrush;
   String get notifications;
@@ -627,6 +652,20 @@ abstract class AppLocalizations {
   String get scanUpsellBody;
   String get upgradeNow;
   String get notNow;
+  String get limitReachedTitle;
+  String limitReachedBody(String type, int limit);
+  String get proScanFeature;
+  String get proChatFeature;
+  String get premiumScanFeature;
+  String get premiumChatFeature;
+  String limitUsedPill(int used, int total, String type);
+  String get withProLabel;
+  String get continueWithPro;
+  String get comeBackTomorrow;
+  String get limitProFeature1;
+  String get limitProFeature2;
+  String get limitProFeature3;
+  String get limitProFeature4;
   String annualSavingsBanner(String amt);
   String get trialNotifJ7;
   String get trialNotifJ7Body;
@@ -745,6 +784,20 @@ abstract class AppLocalizations {
   String get filterSnack;
   String get dishSelectedMsg;
   String get preparationBtn;
+  String get dishRecipeLabel;
+  String dishIngredientsSection(int n);
+  String dishPrepStepsSection(int n);
+
+  // ── Progress screen — new labels ────────────────────────────────────────────
+  String get trendRising;
+  String get trendFalling;
+  String get totalTodayLabel;
+  String get mealsLoggedLabel;
+  String get avgHealthScoreLabel;
+  String get veryGood;
+  String get goodLabel;
+  String get fairLabel;
+  String kcalTargetValue(int n);
 
   // ── Chat tab — smart context ──────────────────────────────────────────────────
   String get contextDayTitle;
@@ -779,6 +832,36 @@ abstract class AppLocalizations {
   String get cancelAnytime;
   String get freeTrialDays;
 
+  // ── Gestion abonnement ──────────────────────────────────────────────────────
+  String get manageSubscription;
+  String get manageSubscriptionDesc;
+  String get openingPortal;
+  String get portalError;
+
+  // ── Dashboard i18n (tâches planning, milestone, compteurs) ──────────────────
+  String get todoLabel;
+  String get doneLabel;
+  String get milestoneLabel;
+  String inDaysLabel(int n);
+  String completedFractionLabel(int done, int total);
+  String kcalConsumedLabel(int kcal, int protein);
+  String get averageLabel;
+  String get priorityLabel;
+  String get aiRecPriorityProtein;
+
+  // ── Coach screen i18n ────────────────────────────────────────────────────────
+  String get planningNutritional;
+  String get macroCalories;
+  String get macroProtein;
+  String get macroCarbs;
+  String get macroFat;
+  String get percentReached;
+  String get exceeded;
+  String get remaining;
+
+  // ── Onboarding i18n ─────────────────────────────────────────────────────────
+  String get kgPerWeek;
+
   // ── Gate PREMIUM (Planning) ───────────────────────────────────────────────────
   String get premiumGateBannerTitle;
   String get premiumGateBannerSub;
@@ -795,10 +878,32 @@ abstract class AppLocalizations {
   String get dayMeals;
   String get previewHint;
   String stepLabel(int n);
+  // SmartSummaryCard — pills & descriptions
+  String get pillSubExcess;
+  String get pillSubRemaining;
+  String get pillSubDiet;
+  String dishCountPillValue(int count);
+  String get pillSubToGenerate;
+  String filterCountPillValue(int count);
+  String pillSubActive(int count);
+  String smartSummaryDescSurplus(int surplus, int count);
+  String smartSummaryDescNormal(int count, String diet);
 
   // ── Social auth ───────────────────────────────────────────────────────────────
   String get orContinueWith;
   String get socialAuthError;
+
+  // ── Network / Error dialogs ───────────────────────────────────────────────────
+  String get noConnectionTitle;
+  String get noConnectionBody;
+  String get serverErrorTitle;
+  String get serverErrorBody;
+  String get timeoutErrorTitle;
+  String get timeoutErrorBody;
+  String get checkoutUnavailableTitle;
+  String get checkoutUnavailableBody;
+  String get sessionExpiredDialogTitle;
+  String get sessionExpiredDialogBody;
 }
 
 class _AppLocalizationsDelegate

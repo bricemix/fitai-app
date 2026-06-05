@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -57,6 +57,7 @@ class FitAIApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     final localeProvider = context.watch<LocaleProvider>();
     final themeProvider  = context.watch<ThemeProvider>();
     // Adapter la barre de statut selon le thème
@@ -135,6 +136,7 @@ class _AppLoaderState extends State<_AppLoader> {
   }
 
   void _onSessionInvalidated() {
+    final c = AppTheme.of(context);
     final msg = AuthService.sessionInvalidated.value;
     if (msg == null || !mounted) return;
     // Réinitialiser le notifier AVANT le setState pour éviter une boucle
@@ -148,6 +150,7 @@ class _AppLoaderState extends State<_AppLoader> {
         barrierDismissible: false,
         builder: (ctx) {
           final l10n = AppLocalizations.of(ctx);
+          final c = AppTheme.of(ctx);
           return AlertDialog(
             backgroundColor: const Color(0xFF1E293B),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -156,7 +159,7 @@ class _AppLoaderState extends State<_AppLoader> {
                 const Icon(Icons.devices_other_rounded, color: Colors.orangeAccent, size: 22),
                 const SizedBox(width: 10),
                 Text(l10n.sessionExpired,
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
               ],
             ),
             content: Text(
@@ -405,7 +408,7 @@ class _AppLoaderState extends State<_AppLoader> {
 
     // ── 3. Chargement des données ──────────────────────────────────────────
     if (_loading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: c.bg,
         body: Center(child: CircularProgressIndicator(color: c.accent)),
       );
@@ -572,8 +575,8 @@ class _SubscriptionGateState extends State<_SubscriptionGate> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final daysLeft = widget.subscriptionStatus.trialDaysRemaining;
     final (countH, countM) = _countdown();
     final offerActive = countH > 0 || countM > 0;
@@ -817,8 +820,10 @@ class _HomeShellState extends State<HomeShell> {
   DateTime? _trialEndsAt;
 
   // Triggers for deep navigation from Dashboard
-  final _bodyEntryTrigger   = ValueNotifier<int>(0);
+  final _bodyEntryTrigger     = ValueNotifier<int>(0);
   final _coachPlanningTrigger = ValueNotifier<int>(0);
+  // Trigger to reload mission state when returning to home tab
+  final _missionReloadTrigger = ValueNotifier<int>(0);
 
   @override
   void initState() {
@@ -884,9 +889,9 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     // Watch locale so HomeShell rebuilds when language changes
     context.watch<LocaleProvider>();
-    final c = AppTheme.of(context);
     // IndexedStack préserve l'état de chaque onglet sans recréer les widgets
     return Scaffold(
       body: SafeArea(
@@ -901,8 +906,10 @@ class _HomeShellState extends State<HomeShell> {
               onLogBody: _goToBodyLog,
               onGoToScan:  () => setState(() => _tab = 1),
               onGoToCoach: _goToCoachPlanning,
+              onGoToChat:  () => setState(() => _tab = 2),
               userPlan: _userPlan,
               trialEndsAt: _trialEndsAt,
+              missionReloadTrigger: _missionReloadTrigger,
             ),
             ScanScreen(onMealAdded: _addMeal),
             CoachScreen(
@@ -933,7 +940,11 @@ class _HomeShellState extends State<HomeShell> {
       ),
       bottomNavigationBar: _BottomNav(
         current: _tab,
-        onTap: (i) => setState(() => _tab = i),
+        onTap: (i) {
+          setState(() => _tab = i);
+          // Reload home missions when switching back to tab 0
+          if (i == 0) _missionReloadTrigger.value++;
+        },
       ),
     );
   }
@@ -957,8 +968,8 @@ class _BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
     final labels = [
       l10n.navHome,
       l10n.navScan,
@@ -973,33 +984,45 @@ class _BottomNav extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          children: List.generate(_icons.length, (i) {
-            final active = i == current;
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => onTap(i),
-                behavior: HitTestBehavior.opaque,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: active ? c.accent.withAlpha(24) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(_icons[i], size: 22, color: active ? c.accent : c.muted),
-                      const SizedBox(height: 4),
-                      Text(labels[i], style: TextStyle(fontSize: 10, color: active ? c.accent : c.muted)),
-                    ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          child: Row(
+            children: List.generate(_icons.length, (i) {
+              final active = i == current;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onTap(i),
+                  behavior: HitTestBehavior.opaque,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: EdgeInsets.symmetric(
+                      vertical: active ? 10 : 10,
+                      horizontal: active ? 0 : 0,
+                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      color: active ? c.accent : Colors.transparent,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(_icons[i], size: 20,
+                            color: active ? c.bg : c.muted),
+                        const SizedBox(height: 3),
+                        Text(labels[i],
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: active ? FontWeight.w700 : FontWeight.normal,
+                              color: active ? c.bg : c.muted,
+                            )),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
       ),
     );

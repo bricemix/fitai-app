@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/meal.dart';
 import '../models/planning.dart';
 import '../models/profile.dart';
@@ -80,8 +80,8 @@ class _WeeklyDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n  = AppLocalizations.of(context);
     final c = AppTheme.of(context);
+    final l10n  = AppLocalizations.of(context);
     final today = DayPlan.todayKey();
     final now   = DateTime.now();
 
@@ -191,7 +191,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                   final fatUsed     = dayMeals.fold(0.0, (s, m) => s + m.result.fat);
                   final checkCount  = _checklistCount(plan, dayMeals);
 
-                  final statusColor = _statusColor(status);
+                  final statusColor = _statusColor(status, c);
                   final statusLabel = _statusLabel(status, l10n);
 
                   return Container(
@@ -290,16 +290,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
                               ),
                             ),
                           ],
-                          // Action buttons
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 8, runSpacing: 8,
-                            children: [
-                              _ActionChip(label: l10n.editThisDay,  icon: Icons.edit_rounded,   onTap: () {}),
-                              _ActionChip(label: l10n.replaceMeals, icon: Icons.swap_horiz_rounded, onTap: () {}),
-                              _ActionChip(label: l10n.copyThisDay,  icon: Icons.copy_rounded,   onTap: () {}),
-                            ],
-                          ),
+                          // Action buttons — hidden until feature is implemented
                         ],
                       ),
                     ),
@@ -344,7 +335,7 @@ class _WeeklyDetailsSheet extends StatelessWidget {
     return count;
   }
 
-  Color _statusColor(_DayStatus s) {
+  Color _statusColor(_DayStatus s, AppColors c) {
     switch (s) {
       case _DayStatus.onTrack:    return const Color(0xFF6BCB77);
       case _DayStatus.attention:  return const Color(0xFFFFB347);
@@ -379,10 +370,13 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.title);
 
   @override
-  Widget build(BuildContext context) => Text(
-        title,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.accent, letterSpacing: 1.2),
-      );
+  Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
+    return Text(
+      title,
+      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.accent, letterSpacing: 1.2),
+    );
+  }
 }
 
 class _SummaryRow extends StatelessWidget {
@@ -393,19 +387,22 @@ class _SummaryRow extends StatelessWidget {
   const _SummaryRow({required this.label, required this.value, this.accent = false, this.color});
 
   @override
-  Widget build(BuildContext context) => Row(
-        children: [
-          Expanded(child: Text(label, style: TextStyle(fontSize: 13, color: c.muted))),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: color ?? (accent ? c.accent : c.text),
-            ),
+  Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
+    return Row(
+      children: [
+        Expanded(child: Text(label, style: TextStyle(fontSize: 13, color: c.muted))),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: color ?? (accent ? c.accent : c.text),
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 }
 
 class _MacroChip extends StatelessWidget {
@@ -415,18 +412,21 @@ class _MacroChip extends StatelessWidget {
   const _MacroChip({required this.label, required this.value, required this.color});
 
   @override
-  Widget build(BuildContext context) => Expanded(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          decoration: BoxDecoration(color: color.withAlpha(18), borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            children: [
-              Text('$label: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
-              Expanded(child: Text(value, style: TextStyle(fontSize: 11, color: c.muted), overflow: TextOverflow.ellipsis)),
-            ],
-          ),
+  Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        decoration: BoxDecoration(color: color.withAlpha(18), borderRadius: BorderRadius.circular(8)),
+        child: Row(
+          children: [
+            Text('$label: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+            Expanded(child: Text(value, style: TextStyle(fontSize: 11, color: c.muted), overflow: TextOverflow.ellipsis)),
+          ],
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _ActionChip extends StatelessWidget {
@@ -436,23 +436,26 @@ class _ActionChip extends StatelessWidget {
   const _ActionChip({required this.label, required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          decoration: BoxDecoration(
-            color: c.surface2,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: c.border),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 13, color: c.muted),
-              const SizedBox(width: 5),
-              Text(label, style: TextStyle(fontSize: 12, color: c.muted, fontWeight: FontWeight.w600)),
-            ],
-          ),
+  Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: c.surface2,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: c.border),
         ),
-      );
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: c.muted),
+            const SizedBox(width: 5),
+            Text(label, style: TextStyle(fontSize: 12, color: c.muted, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
 }

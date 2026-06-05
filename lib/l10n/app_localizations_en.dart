@@ -251,7 +251,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override String get halfPortion => 'Half portion';
 
-
+  // Scan — text tab
+  @override String get scanTabPhoto        => 'Photo';
+  @override String get scanTabText         => 'Text';
+  @override String get scanTextSubtitle    => 'Add a photo or describe your meal to get its nutritional analysis';
+  @override String get describeMeal        => 'Describe a meal';
+  @override String get describeMealHint    => 'Forgot the photo? Describe your meal and provide an approximate portion.';
+  @override String get mealNameLabel       => 'Meal name';
+  @override String get mealNamePlaceholder => 'E.g. Rice, chicken, vegetables, sauce';
+  @override String get portionQtyLabel     => 'Portion / quantity';
+  @override String get portionQtyPlaceholder => 'E.g. 1 plate, 250 g, 2 pieces';
+  @override String get mealTypeLabel       => 'Meal type';
+  @override String get precisionTip        => 'Tip: the more precise your description, the better the estimate.';
+  @override String get switchToPhoto       => 'Take a photo instead';
+  @override String get forgotPhotoTip      => 'Forgot the photo? Use the Text tab to add the meal later.';
 
   // ── Coach ───────────────────────────────────────────────────────────────────
 
@@ -985,9 +998,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override String get scanUpsellBody => 'Upgrade to Pro for unlimited scans and personalized AI recommendations.';
 
-  @override String get upgradeNow => 'See plans';
+  @override String get upgradeNow => 'Unlock more';
 
-  @override String get notNow => 'Not now';
+  @override String get notNow => 'Tomorrow works';
+
+  @override String get limitReachedTitle => 'Great progress today!';
+  @override String limitReachedBody(String type, int limit) => type == 'chat'
+      ? "You've used your $limit free daily messages today. Come back tomorrow to continue for free, or go Pro to keep going now."
+      : "You've used your $limit free daily scans today. Come back tomorrow to continue for free, or go Pro to keep going now.";
+  @override String limitUsedPill(int used, int total, String type) => type == 'chat'
+      ? '$used / $total messages used'
+      : '$used / $total scans used';
+  @override String get proScanFeature     => '50 AI photo scans / day';
+  @override String get proChatFeature     => '100 AI coach chats / day';
+  @override String get premiumScanFeature => '150 AI photo scans / day';
+  @override String get premiumChatFeature => '200 AI coach chats / day';
+  @override String get withProLabel      => 'With Pro';
+  @override String get continueWithPro   => 'Continue with Pro';
+  @override String get comeBackTomorrow  => 'Come back tomorrow';
+  @override String get limitProFeature1  => 'More AI analyses';
+  @override String get limitProFeature2  => 'Personalised AI dishes';
+  @override String get limitProFeature3  => 'Advanced nutrition advice';
+  @override String get limitProFeature4  => 'More complete tracking';
 
   @override String annualSavingsBanner(String amt) => 'Save $amt with annual';
 
@@ -1145,6 +1177,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get filterSnack         => 'Snack';
   @override String get dishSelectedMsg     => 'Dish selected!';
   @override String get preparationBtn        => 'Preparation';
+  @override String get dishRecipeLabel       => 'RECIPE';
+  @override String dishIngredientsSection(int n) => 'Ingredients ($n)';
+  @override String dishPrepStepsSection(int n)   => 'Preparation steps ($n)';
+  @override String get trendRising           => '↑ Rising';
+  @override String get trendFalling          => '↓ Falling';
+  @override String get totalTodayLabel       => "Today's total";
+  @override String get mealsLoggedLabel      => 'Meals logged';
+  @override String get avgHealthScoreLabel   => 'Avg. health score';
+  @override String get veryGood             => 'Very good';
+  @override String get goodLabel            => 'Good';
+  @override String get fairLabel            => 'Fair';
+  @override String kcalTargetValue(int n)   => 'Target $n kcal';
   @override String get contextDayTitle       => "Today's context";
   @override String get smartActionsTitle     => 'Smart actions';
   @override String get viewAll               => 'View all';
@@ -1167,6 +1211,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get resetPassword => 'Reset password';
   @override String get passwordResetSuccess => 'Password reset!';
   @override String get passwordResetSuccessDesc => 'Your password has been changed successfully. You can now log in.';
+
+  // ── Dashboard — Today Score & Quick Actions ──────────────────────────────────
+  @override String get todayScore => 'Today Score';
+  @override String get ofDailyGoal => 'of daily goal';
+  @override String get scoreScanFirstMeal => 'Start strong — scan your first meal to unlock your daily insights.';
+  @override String get addFoodLabel => 'Add food';
+  @override String get askCoachLabel => 'Ask coach';
+  @override String get dailyNutrition => 'Daily Nutrition';
+  @override String get consumed => 'Consumed';
+  @override String get nextMilestone => 'Next milestone';
+  @override String get completedFraction => 'done';
 
   // ── Dashboard — Today Mission & AI Reco ──────────────────────────────────────
   @override String get readyToCrush => 'Ready to crush your goals?';
@@ -1201,6 +1256,35 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get cancelAnytime       => 'Cancel anytime';
   @override String get freeTrialDays       => '7-day free trial';
 
+  @override String get manageSubscription     => 'Manage my subscription';
+  @override String get manageSubscriptionDesc => 'Cancel, update payment method, or view invoices via the Stripe portal.';
+  @override String get openingPortal          => 'Opening portal…';
+  @override String get portalError            => 'Unable to open the portal. Please try again.';
+
+  // ── Dashboard i18n ──────────────────────────────────────────────────────────
+  @override String get todoLabel => 'TO DO';
+  @override String get doneLabel => '✓ DONE';
+  @override String get milestoneLabel => 'MILESTONE';
+  @override String inDaysLabel(int n) => 'in $n days';
+  @override String completedFractionLabel(int done, int total) => '$done / $total completed';
+  @override String kcalConsumedLabel(int kcal, int protein) => '$kcal kcal consumed · ${protein}g protein';
+  @override String get averageLabel => 'Average';
+  @override String get priorityLabel => 'Priority: ';
+  @override String get aiRecPriorityProtein => 'add a protein-rich meal at the next scan.';
+
+  // ── Coach screen i18n ────────────────────────────────────────────────────────
+  @override String get planningNutritional => 'Nutritional planning';
+  @override String get macroCalories => 'Calories';
+  @override String get macroProtein => 'Protein';
+  @override String get macroCarbs => 'Carbs';
+  @override String get macroFat => 'Fat';
+  @override String get percentReached => '% reached';
+  @override String get exceeded => 'exceeded';
+  @override String get remaining => 'remaining';
+
+  // ── Onboarding i18n ─────────────────────────────────────────────────────────
+  @override String get kgPerWeek => 'kg/week';
+
   // ── Gate PREMIUM ──────────────────────────────────────────────────────────────
   @override String get premiumGateBannerTitle  => 'Premium Plan required';
   @override String get premiumGateBannerSub    => 'Unlock your personalised nutrition plan';
@@ -1217,8 +1301,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get dayMeals     => 'Today\'s meals';
   @override String get previewHint  => 'Preview — Generate to see your personalised dishes';
   @override String stepLabel(int n) => 'Step $n';
+  @override String get pillSubExcess => 'excess';
+  @override String get pillSubRemaining => 'remaining';
+  @override String get pillSubDiet => 'Diet';
+  @override String dishCountPillValue(int count) => '$count dish${count > 1 ? 'es' : ''}';
+  @override String get pillSubToGenerate => 'to generate';
+  @override String filterCountPillValue(int count) => '$count filter${count > 1 ? 's' : ''}';
+  @override String pillSubActive(int count) => 'active';
+  @override String smartSummaryDescSurplus(int surplus, int count) =>
+      'You\'ve exceeded your goal by +$surplus kcal. AI suggests $count lighter dish${count > 1 ? 'es' : ''} to balance your day.';
+  @override String smartSummaryDescNormal(int count, String diet) =>
+      'AI will suggest $count $diet dish${count > 1 ? 'es' : ''} adapted to your remaining calories and nutritional goal.';
   @override String get orContinueWith => 'Or continue with';
   @override String get socialAuthError => 'Social authentication error';
+
+  // ── Network / Error dialogs ──────────────────────────────────────────────────
+  @override String get noConnectionTitle        => 'No connection';
+  @override String get noConnectionBody         => 'Check your Internet connection and try again.';
+  @override String get serverErrorTitle         => 'Server error';
+  @override String get serverErrorBody          => 'Something went wrong on our end. Please try again in a moment.';
+  @override String get timeoutErrorTitle        => 'Connection too slow';
+  @override String get timeoutErrorBody         => 'The request timed out. Check your network and try again.';
+  @override String get checkoutUnavailableTitle => 'Payment unavailable';
+  @override String get checkoutUnavailableBody  => 'Unable to start payment. Check your connection and try again.';
+  @override String get sessionExpiredDialogTitle => 'Session expired';
+  @override String get sessionExpiredDialogBody  => 'Your session has expired. Please sign in again to continue.';
 
   // ── Onboarding welcome step ───────────────────────────────────────────────
   @override String get welcomeTo => 'Welcome to';

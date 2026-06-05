@@ -11,7 +11,7 @@ import 'settings_service.dart';
 /// Priorité : préférence sauvegardée → 'fr' par défaut.
 Future<String> _appLocale() async {
   final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('locale') ?? 'fr';
+  return prefs.getString('locale') ?? 'en';
 }
 
 /// Nom complet de la langue pour les instructions à l'IA.
@@ -24,7 +24,7 @@ String _languageName(String code) {
     'pt': 'Portuguese',
     'zh': 'Chinese',
   };
-  return names[code] ?? 'French';
+  return names[code] ?? 'English';
 }
 
 class AiService {
@@ -62,7 +62,67 @@ class AiService {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       return FoodResult.fromJson(data);
     } else if (response.statusCode == 429) {
-      throw AiException('AI quota reached. Come back tomorrow or upgrade to Premium.');
+      Map<String, dynamic>? data;
+      try { data = jsonDecode(response.body) as Map<String, dynamic>; } catch (_) {}
+      throw AiLimitException(
+        plan:  data?['plan']       as String? ?? 'free',
+        limit: (data?['limit'] as num?)?.toInt() ?? 3,
+        used:  (data?['used']  as num?)?.toInt() ?? 0,
+        type:  data?['limit_type'] as String? ?? 'scan',
+      );
+    } else if (response.statusCode == 401) {
+      final invalidated = await AuthService.handleUnauthorized(response);
+      if (invalidated) throw AiException('SESSION_INVALIDATED');
+      throw AiException('Session expirée — veuillez vous reconnecter.');
+    } else {
+      String message = 'Analyse échouée (code ${response.statusCode})';
+      try {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        if (data['error'] != null) message = data['error'].toString();
+      } catch (_) {}
+      throw AiException(message);
+    }
+  }
+
+  // ── Text-only food analysis (no image) ────────────────────────────────────
+  static Future<FoodResult> analyzeText(
+    String description, {
+    String? mealType,
+  }) async {
+    final headers = await AuthService.authHeaders();
+    final locale  = await _appLocale();
+    final model   = await SettingsService.getModel();
+    final body = <String, dynamic>{
+      'description': description.trim(),
+      'locale': locale,
+      'model': model,
+      'text_only': true,
+    };
+    if (mealType != null && mealType.isNotEmpty) body['meal_type'] = mealType;
+    final http.Response response;
+    try {
+      response = await http
+          .post(
+            Uri.parse('$_baseUrl/ai/analyze'),
+            headers: headers,
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 90));
+    } on Exception catch (e) {
+      throw AiException('Connection error: ${e.runtimeType}');
+    }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return FoodResult.fromJson(data);
+    } else if (response.statusCode == 429) {
+      Map<String, dynamic>? data;
+      try { data = jsonDecode(response.body) as Map<String, dynamic>; } catch (_) {}
+      throw AiLimitException(
+        plan:  data?['plan']       as String? ?? 'free',
+        limit: (data?['limit'] as num?)?.toInt() ?? 3,
+        used:  (data?['used']  as num?)?.toInt() ?? 0,
+        type:  data?['limit_type'] as String? ?? 'scan',
+      );
     } else if (response.statusCode == 401) {
       final invalidated = await AuthService.handleUnauthorized(response);
       if (invalidated) throw AiException('SESSION_INVALIDATED');
@@ -137,13 +197,26 @@ class AiService {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         return data['reply'] as String? ?? 'Sorry, I could not respond.';
       } else if (response.statusCode == 401) {
-        return 'Session expired — please log in again.';
+        final invalidated = await AuthService.handleUnauthorized(response);
+        if (invalidated) throw AiException('SESSION_INVALIDATED');
+        throw AiException('Session expirée — veuillez vous reconnecter.');
       } else if (response.statusCode == 429) {
-        return 'Monthly AI quota reached. Come back next month or upgrade to Premium.';
+        Map<String, dynamic>? data;
+        try { data = jsonDecode(response.body) as Map<String, dynamic>; } catch (_) {}
+        throw AiLimitException(
+          plan:  data?['plan']       as String? ?? 'free',
+          limit: (data?['limit'] as num?)?.toInt() ?? 3,
+          used:  (data?['used']  as num?)?.toInt() ?? 0,
+          type:  data?['limit_type'] as String? ?? 'chat',
+        );
       }
-      return 'Connection error (code ${response.statusCode}).';
+      throw AiException('Connection error (code ${response.statusCode}).');
+    } on AiLimitException {
+      rethrow;
+    } on AiException {
+      rethrow;
     } catch (_) {
-      return 'Unable to reach the server.';
+      throw AiException('Unable to reach the server.');
     }
   }
 
@@ -191,10 +264,11 @@ $surplusInstruction
 SELECTED DIET: $dietType
 $dietInstructions
 
-For each dish, list EXACT ingredients with their weight in grams.
+For each dish, list EXACT ingredients with their weight in grams AND 4-5 preparation steps in $lang.
 Return ONLY this JSON (no markdown, no explanation).
 The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always in English, never translated).
-{"dishes":[{"name":"...","type":"breakfast|lunch|dinner|snack","calories":int,"protein":int,"carbs":int,"fat":int,"description":"short description in $lang","ingredients":[{"name":"Chicken","weight_g":150},{"name":"Basmati rice","weight_g":80}]}]}
+Steps must be concise (1-2 sentences each), start with an emoji, and be written in $lang.
+{"dishes":[{"name":"...","type":"breakfast|lunch|dinner|snack","calories":int,"protein":int,"carbs":int,"fat":int,"description":"short description in $lang","ingredients":[{"name":"Chicken","weight_g":150},{"name":"Basmati rice","weight_g":80}],"steps":["🧾 Gather all ingredients...","🍳 Heat a pan...","🧂 Season with...","🍽️ Serve immediately."]}]}
 ''';
 
     final headers = await AuthService.authHeaders();
@@ -206,7 +280,7 @@ The "type" field must be EXACTLY one of: breakfast, lunch, dinner, snack (always
             'messages': [{'role': 'user', 'content': prompt}],
             'profile': profile.toJson(),
             'locale': locale,
-            'max_tokens': 1200, // 3 dishes with ingredients require ~700-1000 tokens
+            'max_tokens': 1800, // 3 dishes with ingredients + steps require ~1200-1600 tokens
           }),
         )
         .timeout(const Duration(seconds: 45));
@@ -364,4 +438,19 @@ class AiException implements Exception {
   const AiException(this.message);
   @override
   String toString() => message;
+}
+
+class AiLimitException implements Exception {
+  final String plan;
+  final int limit;
+  final int used;
+  final String type; // 'scan' | 'chat'
+  const AiLimitException({
+    required this.plan,
+    required this.limit,
+    required this.used,
+    this.type = 'scan',
+  });
+  @override
+  String toString() => 'AiLimitException($type: $used/$limit)';
 }

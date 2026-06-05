@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -171,9 +171,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // ── Build ──────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    final c = AppTheme.of(context);
     context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context);
-    final c = AppTheme.of(context);
     return Scaffold(
       backgroundColor: c.bg,
       appBar: AppBar(
@@ -204,6 +204,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   // ── Step 1 UI ──────────────────────────────────────────────────────────────
   Widget _buildStep1(AppLocalizations l10n) {
+    final c = AppTheme.of(context);
     return Form(
       key: _emailFormKey,
       child: Column(
@@ -289,6 +290,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   // ── Step 2 UI ──────────────────────────────────────────────────────────────
   Widget _buildStep2(AppLocalizations l10n) {
+    final c = AppTheme.of(context);
     return Form(
       key: _resetFormKey,
       child: Column(
@@ -500,6 +502,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   // ── Step 3 : succès ────────────────────────────────────────────────────────
   Widget _buildSuccess(AppLocalizations l10n) {
+    final c = AppTheme.of(context);
     return Column(
       children: [
         const SizedBox(height: 40),
@@ -565,14 +568,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return null;
   }
 
-  Widget _label(String text) => Text(
-        text,
-        style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: c.muted,
-            letterSpacing: 0.8),
-      );
+  Widget _label(String text) {
+    final c = AppTheme.of(context);
+    return Text(
+      text,
+      style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: c.muted,
+          letterSpacing: 0.8),
+    );
+  }
 
   Widget _errorBanner(String msg) => Container(
         width: double.infinity,
@@ -659,16 +665,17 @@ class _PasswordStrengthHint extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _row(hasMinLength, l10n.passwordMin8),
+        _row(hasMinLength, l10n.passwordMin8, context),
         const SizedBox(height: 4),
-        _row(hasUppercase, l10n.passwordNeedsUppercase),
+        _row(hasUppercase, l10n.passwordNeedsUppercase, context),
         const SizedBox(height: 4),
-        _row(hasNumberOrSymbol, l10n.passwordNeedsNumberOrSymbol),
+        _row(hasNumberOrSymbol, l10n.passwordNeedsNumberOrSymbol, context),
       ],
     );
   }
 
-  Widget _row(bool ok, String label) {
+  Widget _row(bool ok, String label, BuildContext context) {
+    final c = AppTheme.of(context);
     return Row(
       children: [
         Icon(
