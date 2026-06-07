@@ -5,7 +5,6 @@ import '../models/meal.dart';
 import '../models/profile.dart';
 import '../models/planning.dart';
 import 'auth_service.dart';
-import 'settings_service.dart';
 
 /// Retourne le code langue sélectionné par l'utilisateur dans l'app.
 /// Priorité : préférence sauvegardée → 'fr' par défaut.
@@ -36,12 +35,10 @@ class AiService {
   static Future<FoodResult> analyzeFood(String base64Image, {String? description}) async {
     final headers = await AuthService.authHeaders();
     final locale = await _appLocale();
-    final model  = await SettingsService.getModel();
     final http.Response response;
     final body = <String, dynamic>{
       'image': base64Image,
       'locale': locale,
-      'model': model,
     };
     if (description != null && description.trim().isNotEmpty) {
       body['description'] = description.trim();
@@ -91,11 +88,9 @@ class AiService {
   }) async {
     final headers = await AuthService.authHeaders();
     final locale  = await _appLocale();
-    final model   = await SettingsService.getModel();
     final body = <String, dynamic>{
       'description': description.trim(),
       'locale': locale,
-      'model': model,
       'text_only': true,
     };
     if (mealType != null && mealType.isNotEmpty) body['meal_type'] = mealType;
@@ -147,7 +142,6 @@ class AiService {
     try {
       final headers = await AuthService.authHeaders();
       final locale  = await _appLocale();
-      final model   = await SettingsService.getModel();
 
       // Calcule le contexte nutritionnel du jour
       final kcalConsumed  = todayMeals?.fold(0, (s, m) => s + m.result.calories) ?? 0;
@@ -186,7 +180,6 @@ class AiService {
               'messages':      messages,
               'profile':       profile.toJson(),
               'locale':        locale,
-              'model':         model,
               'today_context': todayContext,
               'max_tokens':    1500,
             }),
@@ -294,7 +287,6 @@ Steps must be concise (1-2 sentences each), start with an emoji, and be written 
       }).toList(),
     };
 
-    final model = await SettingsService.getModel();
     final headers = await AuthService.authHeaders();
     final response = await http
         .post(
@@ -304,7 +296,6 @@ Steps must be concise (1-2 sentences each), start with an emoji, and be written 
             'messages': [{'role': 'user', 'content': prompt}],
             'profile': profile.toJson(),
             'locale': locale,
-            'model': model,
             'today_context': todayContext,
             'max_tokens': 1800, // 3 dishes with ingredients + steps require ~1200-1600 tokens
           }),
