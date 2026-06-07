@@ -1908,6 +1908,12 @@ class _DishesTabState extends State<_DishesTab> {
           await StorageService.saveDishes(result.map((d) => d.toJson()).toList());
         }
       }
+    } on AiLimitException catch (e) {
+      // Même pop-up premium que le chat/scan quand le quota est épuisé
+      if (mounted) {
+        setState(() { _loading = false; _loaded = true; });
+        showLimitDialog(context, e);
+      }
     } catch (e) {
       if (mounted) {
         final msg = e.toString();

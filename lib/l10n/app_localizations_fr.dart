@@ -993,9 +993,13 @@ class AppLocalizationsFr extends AppLocalizations {
   @override String get limitReachedTitle => 'Belle progression aujourd\'hui !';
   @override String limitReachedBody(String type, int limit) => type == 'chat'
       ? 'Vous avez utilisé vos $limit messages gratuits aujourd\'hui. Revenez demain pour continuer gratuitement, ou passez en Pro pour continuer maintenant.'
+      : type == 'dishes'
+      ? 'Vous avez utilisé vos $limit générations de plats gratuites aujourd\'hui. Revenez demain pour continuer gratuitement, ou passez en Pro pour continuer maintenant.'
       : 'Vous avez utilisé vos $limit analyses gratuites aujourd\'hui. Revenez demain pour continuer gratuitement, ou passez en Pro pour continuer maintenant.';
   @override String limitUsedPill(int used, int total, String type) => type == 'chat'
       ? '$used / $total messages utilisés'
+      : type == 'dishes'
+      ? '$used / $total plats utilisés'
       : '$used / $total analyses utilisées';
   @override String get proScanFeature     => '50 scans photo IA / jour';
   @override String get proChatFeature     => '100 échanges coach IA / jour';

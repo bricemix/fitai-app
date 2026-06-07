@@ -1005,9 +1005,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override String get limitReachedTitle => 'Great progress today!';
   @override String limitReachedBody(String type, int limit) => type == 'chat'
       ? "You've used your $limit free daily messages today. Come back tomorrow to continue for free, or go Pro to keep going now."
+      : type == 'dishes'
+      ? "You've used your $limit free daily dish generations today. Come back tomorrow to continue for free, or go Pro to keep going now."
       : "You've used your $limit free daily scans today. Come back tomorrow to continue for free, or go Pro to keep going now.";
   @override String limitUsedPill(int used, int total, String type) => type == 'chat'
       ? '$used / $total messages used'
+      : type == 'dishes'
+      ? '$used / $total dishes used'
       : '$used / $total scans used';
   @override String get proScanFeature     => '50 AI photo scans / day';
   @override String get proChatFeature     => '100 AI coach chats / day';

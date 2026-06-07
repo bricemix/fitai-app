@@ -317,7 +317,16 @@ Steps must be concise (1-2 sentences each), start with an emoji, and be written 
       throw AiException('Session expirée — veuillez vous reconnecter.');
     }
     if (response.statusCode == 403) throw AiException('DISHES_PLAN_REQUIRED');
-    if (response.statusCode == 429) throw AiException('DISHES_LIMIT_REACHED');
+    if (response.statusCode == 429) {
+      Map<String, dynamic>? data;
+      try { data = jsonDecode(response.body) as Map<String, dynamic>; } catch (_) {}
+      throw AiLimitException(
+        plan:  data?['plan']       as String? ?? 'free',
+        limit: (data?['limit'] as num?)?.toInt() ?? 3,
+        used:  (data?['used']  as num?)?.toInt() ?? 0,
+        type:  data?['limit_type'] as String? ?? 'dishes',
+      );
+    }
     if (response.statusCode != 200) {
       // Remonte le détail de validation FastAPI (422) pour faciliter le diagnostic
       String detail = '';
