@@ -271,6 +271,30 @@ Steps must be concise (1-2 sentences each), start with an emoji, and be written 
 {"dishes":[{"name":"...","type":"breakfast|lunch|dinner|snack","calories":int,"protein":int,"carbs":int,"fat":int,"description":"short description in $lang","ingredients":[{"name":"Chicken","weight_g":150},{"name":"Basmati rice","weight_g":80}],"steps":["🧾 Gather all ingredients...","🍳 Heat a pan...","🧂 Season with...","🍽️ Serve immediately."]}]}
 ''';
 
+    // Contexte nutritionnel du jour (mêmes champs que /ai/coach pour passer la validation backend)
+    final proteinToday = todayMeals.fold(0.0, (s, m) => s + m.result.protein);
+    final carbsToday   = todayMeals.fold(0.0, (s, m) => s + m.result.carbs);
+    final fatToday     = todayMeals.fold(0.0, (s, m) => s + m.result.fat);
+    final todayContext = {
+      'date': DateTime.now().toIso8601String().substring(0, 10),
+      'kcal_consumed':    todayKcal,
+      'kcal_target':      profile.tdee.round(),
+      'kcal_remaining':   remaining,
+      'protein_g':        proteinToday.round(),
+      'carbs_g':          carbsToday.round(),
+      'carbs_target_g':   profile.targetCarbs,
+      'fat_g':            fatToday.round(),
+      'fat_target_g':     profile.targetFat,
+      'meals': todayMeals.map((m) => {
+        'name':     m.result.name,
+        'calories': m.result.calories,
+        'protein':  m.result.protein.round(),
+        'carbs':    m.result.carbs.round(),
+        'fat':      m.result.fat.round(),
+      }).toList(),
+    };
+
+    final model = await SettingsService.getModel();
     final headers = await AuthService.authHeaders();
     final response = await http
         .post(
@@ -280,6 +304,8 @@ Steps must be concise (1-2 sentences each), start with an emoji, and be written 
             'messages': [{'role': 'user', 'content': prompt}],
             'profile': profile.toJson(),
             'locale': locale,
+            'model': model,
+            'today_context': todayContext,
             'max_tokens': 1800, // 3 dishes with ingredients + steps require ~1200-1600 tokens
           }),
         )
@@ -292,7 +318,15 @@ Steps must be concise (1-2 sentences each), start with an emoji, and be written 
     }
     if (response.statusCode == 403) throw AiException('DISHES_PLAN_REQUIRED');
     if (response.statusCode == 429) throw AiException('DISHES_LIMIT_REACHED');
-    if (response.statusCode != 200) throw AiException('Server error (${response.statusCode})');
+    if (response.statusCode != 200) {
+      // Remonte le détail de validation FastAPI (422) pour faciliter le diagnostic
+      String detail = '';
+      try {
+        final err = jsonDecode(response.body);
+        if (err is Map && err['detail'] != null) detail = ' — ${err['detail']}';
+      } catch (_) {}
+      throw AiException('Server error (${response.statusCode})$detail');
+    }
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final text = data['reply'] as String? ?? '';
