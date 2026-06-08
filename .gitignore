@@ -59,5 +59,8 @@ ssh_check.py
 key.properties
 android/key.properties
 **/*.keystore
+# Firebase / FCM — clé de compte de service (envoi push backend) : JAMAIS commitée
+fcm-service-account.json
+*-service-account*.json
 **/*.jks
 googleplay/release/*.aab

@@ -12,6 +12,7 @@ import 'services/storage_service.dart';
 import 'services/auth_service.dart';
 import 'services/consent_service.dart';
 import 'services/notification_service.dart';
+import 'services/fcm_service.dart';
 import 'services/sync_service.dart';
 import 'services/payment_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,6 +42,12 @@ void main() async {
   ));
   // Init notifications (does not request permission yet)
   await NotificationService.init();
+  // Init Firebase + push (n'demande pas la permission ici)
+  try {
+    await FcmService.initApp();
+  } catch (_) {
+    // Ne pas bloquer le démarrage si Firebase échoue
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -224,6 +231,8 @@ class _AppLoaderState extends State<_AppLoader> {
           // Ne pas bloquer le démarrage si les notifications échouent
         }
       }
+      // Enregistre l'appareil pour les notifications push (token FCM → backend)
+      FcmService.registerDevice();
       // Vérifier si l'email est validé — si non, bloquer avant l'onboarding
       final cachedUser = await AuthService.getCachedUser();
       final emailVerified = cachedUser?['email_verified'] as bool? ?? true;
@@ -280,6 +289,8 @@ class _AppLoaderState extends State<_AppLoader> {
         // Ne pas bloquer la connexion si les notifications échouent
       }
     }
+    // Enregistre l'appareil pour les notifications push (token FCM → backend)
+    FcmService.registerDevice();
 
     if (isNewAccount) {
       // Nouveau compte : vérifier si l'email est validé avant d'aller à l'onboarding

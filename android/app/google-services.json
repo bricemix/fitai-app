@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "578208096118",
+    "project_id": "dietvision-5e511",
+    "storage_bucket": "dietvision-5e511.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:578208096118:android:77868a4a5beeefc7cc6457",
+        "android_client_info": {
+          "package_name": "com.novalabstudios.dietvision"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDla59AqeEDk6A8EIgKmY5A94-p5nZn6Bo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
