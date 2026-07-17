@@ -1318,6 +1318,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'AI will suggest $count $diet dish${count > 1 ? 'es' : ''} adapted to your remaining calories and nutritional goal.';
   @override String get orContinueWith => 'Or continue with';
   @override String get socialAuthError => 'Social authentication error';
+  @override String get invalidCredentials => 'Email or password incorrect';
+  @override String get serverUnreachable => 'Unable to reach the server. Please try again.';
 
   // ── Network / Error dialogs ──────────────────────────────────────────────────
   @override String get noConnectionTitle        => 'No connection';

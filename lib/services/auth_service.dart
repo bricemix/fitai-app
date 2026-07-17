@@ -116,12 +116,11 @@ class AuthService {
         await _saveUser(user);
         return AuthResult(success: true, token: token, user: user);
       } else {
-        final error = data['error'] ?? data['message'] ?? 'Invalid credentials';
-        return AuthResult(success: false, error: error.toString());
+        // Code stable → l'UI affiche un message localisé (langue de l'app)
+        return const AuthResult(success: false, error: 'INVALID_CREDENTIALS');
       }
     } catch (_) {
-      return const AuthResult(
-          success: false, error: 'Unable to reach the server');
+      return const AuthResult(success: false, error: 'SERVER_UNREACHABLE');
     }
   }
 
@@ -163,7 +162,7 @@ class AuthService {
       }
     } catch (_) {
       return const AuthResult(
-          success: false, error: 'Unable to reach the server');
+          success: false, error: 'SERVER_UNREACHABLE');
     }
   }
 
@@ -188,7 +187,7 @@ class AuthService {
         return AuthResult(success: false, error: data['error'] ?? 'Error sending code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Unable to reach the server');
+      return const AuthResult(success: false, error: 'SERVER_UNREACHABLE');
     }
   }
 
@@ -212,7 +211,7 @@ class AuthService {
         return AuthResult(success: false, error: data['error'] ?? 'Invalid code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Unable to reach the server');
+      return const AuthResult(success: false, error: 'SERVER_UNREACHABLE');
     }
   }
 
@@ -237,7 +236,7 @@ class AuthService {
         return AuthResult(success: false, error: data['error'] ?? 'Error sending code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Unable to reach the server');
+      return const AuthResult(success: false, error: 'SERVER_UNREACHABLE');
     }
   }
 
@@ -262,7 +261,7 @@ class AuthService {
         return AuthResult(success: false, error: data['error'] ?? 'Invalid or expired code');
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Unable to reach the server');
+      return const AuthResult(success: false, error: 'SERVER_UNREACHABLE');
     }
   }
 
@@ -297,7 +296,7 @@ class AuthService {
         return AuthResult(success: false, error: error.toString());
       }
     } catch (_) {
-      return const AuthResult(success: false, error: 'Unable to reach the server');
+      return const AuthResult(success: false, error: 'SERVER_UNREACHABLE');
     }
   }
 

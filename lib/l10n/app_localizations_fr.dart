@@ -1322,6 +1322,8 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'IA va vous proposer $count plat${count > 1 ? 's' : ''} $diet adaptés à vos calories restantes et à votre objectif nutritionnel.';
   @override String get orContinueWith => 'Ou continuer avec';
   @override String get socialAuthError => 'Erreur d\'authentification sociale';
+  @override String get invalidCredentials => 'Email ou mot de passe incorrect';
+  @override String get serverUnreachable => 'Impossible de joindre le serveur. Réessayez.';
 
   // ── Network / Error dialogs ──────────────────────────────────────────────────
   @override String get noConnectionTitle        => 'Pas de connexion';

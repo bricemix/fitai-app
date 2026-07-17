@@ -1312,6 +1312,8 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die KI schlägt $count $diet-Gericht${count > 1 ? 'e' : ''} vor, die an Ihre verbleibenden Kalorien und Ihr Ernährungsziel angepasst sind.';
   @override String get orContinueWith => 'Oder fortfahren mit';
   @override String get socialAuthError => 'Fehler bei der sozialen Authentifizierung';
+  @override String get invalidCredentials => 'E-Mail oder Passwort falsch';
+  @override String get serverUnreachable => 'Server nicht erreichbar. Bitte erneut versuchen.';
 
   // ── Network / Error dialogs ──────────────────────────────────────────────────
   @override String get noConnectionTitle        => 'Keine Verbindung';

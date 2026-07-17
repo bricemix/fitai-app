@@ -218,6 +218,18 @@ const _kAllCountries = [
   ('VU', '🇻🇺', 'Vanuatu'),
 ];
 
+/// Traduit les codes d'erreur d'authentification dans la langue de l'app.
+/// Un message inconnu est affiché tel quel (fallback).
+String _localizedAuthError(BuildContext context, String? code) {
+  final l = AppLocalizations.of(context);
+  switch (code) {
+    case 'INVALID_CREDENTIALS': return l.invalidCredentials;
+    case 'SERVER_UNREACHABLE':  return l.serverUnreachable;
+    case 'SESSION_INVALIDATED': return l.sessionExpired;
+    default: return code ?? l.invalidCredentials;
+  }
+}
+
 class AuthScreen extends StatefulWidget {
   /// Called after a successful login or registration.
   /// [isNewAccount] is true when the user just registered (needs onboarding).
@@ -493,7 +505,7 @@ class _LoginFormState extends State<_LoginForm> {
     if (result.success) {
       widget.onSuccess();
     } else {
-      setState(() => _error = result.error);
+      setState(() => _error = _localizedAuthError(context, result.error));
     }
   }
 
@@ -813,7 +825,7 @@ class _RegisterFormState extends State<_RegisterForm> {
       // Laisser main.dart gérer la gate de vérification e-mail
       widget.onSuccess();
     } else {
-      setState(() => _error = result.error);
+      setState(() => _error = _localizedAuthError(context, result.error));
     }
   }
 
@@ -1205,7 +1217,9 @@ class _SocialButtonsState extends State<_SocialButtons> {
 
       if (!socialResult.success) {
         if (socialResult.error != 'cancelled') {
-          _showError(socialResult.error ?? AppLocalizations.of(context).socialAuthError);
+          _showError(socialResult.error == 'SERVER_UNREACHABLE'
+              ? AppLocalizations.of(context).serverUnreachable
+              : AppLocalizations.of(context).socialAuthError);
         }
         return;
       }
@@ -1221,7 +1235,9 @@ class _SocialButtonsState extends State<_SocialButtons> {
       if (authResult.success) {
         widget.onSuccess();
       } else {
-        _showError(authResult.error ?? AppLocalizations.of(context).socialAuthError);
+        _showError(authResult.error == 'SERVER_UNREACHABLE'
+            ? AppLocalizations.of(context).serverUnreachable
+            : AppLocalizations.of(context).socialAuthError);
       }
     } finally {
       if (mounted) setState(() => _loading = false);

@@ -892,6 +892,8 @@ abstract class AppLocalizations {
   // ── Social auth ───────────────────────────────────────────────────────────────
   String get orContinueWith;
   String get socialAuthError;
+  String get invalidCredentials;
+  String get serverUnreachable;
 
   // ── Network / Error dialogs ───────────────────────────────────────────────────
   String get noConnectionTitle;
